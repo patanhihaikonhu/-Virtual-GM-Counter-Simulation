@@ -193,8 +193,12 @@
                     </button>
                 </div>
 
-                <!-- Digital Displays -->
-                <div class="flex space-x-4 mb-6">
+                <!-- Digital Displays (Now with Synced Decay Clock) -->
+                <div class="flex space-x-2 mb-6">
+                    <div id="decay-display-container" class="flex-1 bg-black/80 p-4 border border-rose-900/50 text-center relative shadow-[inset_0_0_20px_rgba(0,0,0,1)] hidden">
+                        <div class="text-[10px] text-rose-600 uppercase font-bold tracking-widest mb-1 absolute top-1 left-2">DECAY(s)</div>
+                        <div id="global-time-val" class="digital-font text-4xl text-rose-900 mt-2 transition-colors">000</div>
+                    </div>
                     <div class="flex-1 bg-black/80 p-4 border border-cyan-900/50 text-center relative shadow-[inset_0_0_20px_rgba(0,0,0,1)]">
                         <div class="text-[10px] text-cyan-600 uppercase font-bold tracking-widest mb-1 absolute top-1 left-2">T(s)</div>
                         <div id="time-display" class="digital-font text-4xl text-cyan-900 mt-2 transition-colors">00.0</div>
@@ -206,10 +210,16 @@
                 </div>
 
                 <!-- Playback -->
-                <div class="flex space-x-2 mb-6">
+                <div class="flex space-x-2 mb-3">
                     <button id="start-btn" onclick="startCount()" disabled class="flex-1 hud-btn disabled:opacity-30 disabled:pointer-events-none py-2 font-bold text-sm" onmouseenter="playHover()">▶ INIT</button>
                     <button id="stop-btn" onclick="stopCount()" disabled class="flex-1 hud-btn disabled:opacity-30 disabled:pointer-events-none py-2 font-bold text-sm" onmouseenter="playHover()">■ HALT</button>
                     <button id="reset-btn" onclick="resetCount()" disabled class="flex-1 hud-btn disabled:opacity-30 disabled:pointer-events-none py-2 font-bold text-sm" onmouseenter="playHover()">↻ CLR</button>
+                </div>
+
+                <!-- Primary Actions -->
+                <div class="flex flex-col space-y-2 mb-6 min-h-[40px]">
+                    <button id="elute-btn" onclick="eluteSource()" class="hidden w-full border border-rose-500 text-rose-400 hover:bg-rose-900/50 py-2 text-xs font-bold transition-colors uppercase tracking-widest shadow-[0_0_10px_rgba(244,63,94,0.2)]" onmouseenter="playHover()">↻ Elute Isotope & Sync Clocks</button>
+                    <button id="record-btn" onclick="recordData()" class="hidden w-full hud-btn hud-btn-green py-2 font-bold tracking-widest" onmouseenter="playHover()">[ LOG TELEMETRY ]</button>
                 </div>
 
                 <!-- Settings -->
@@ -245,16 +255,17 @@
                         </div>
                         <select id="thickness" class="w-full p-1.5 text-sm" onchange="updateParams(); playClick()"></select>
                     </div>
+
+                    <div class="mt-4 pt-4 border-t border-cyan-900/50">
+                        <label class="block text-[10px] text-cyan-500 mb-1 font-bold tracking-widest uppercase">Target Isotope</label>
+                        <select id="source-select" class="w-full p-2 text-sm" onchange="updateParams(); playClick()"></select>
+                    </div>
                 </div>
             </div>
 
             <!-- Virtual Lab Bench -->
             <div class="hud-panel p-6 relative min-h-[250px] flex flex-col justify-between">
-                <div id="halflife-clock" class="hidden absolute top-4 right-4 bg-rose-900/30 border border-rose-500/50 p-2 text-center flex-col items-center z-30">
-                    <div class="text-[9px] text-rose-400 uppercase tracking-widest mb-1">Decay Clock</div>
-                    <div id="global-time-val" class="digital-font text-rose-300 font-bold text-lg glow-text">0 s</div>
-                </div>
-
+                
                 <div class="flex flex-col items-center py-4 relative flex-1 justify-center">
                     <!-- GM TUBE -->
                     <div id="gm-tube" class="w-16 h-20 bg-gradient-to-b from-slate-700 to-slate-900 border-x-2 border-t-2 border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] z-20 flex flex-col items-center justify-end pb-1 relative transition-all">
@@ -277,15 +288,6 @@
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-cyan-900/50">
-                    <label class="block text-[10px] text-cyan-500 mb-1 font-bold tracking-widest uppercase">Target Isotope</label>
-                    <select id="source-select" class="w-full p-2 text-sm" onchange="updateParams(); playClick()"></select>
-                    <button id="elute-btn" onclick="eluteSource()" class="hidden mt-2 w-full border border-rose-500 text-rose-400 hover:bg-rose-900/50 py-1.5 text-xs font-bold transition-colors uppercase tracking-widest" onmouseenter="playHover()">↻ Elute Isotope</button>
-                </div>
-
-                <button id="record-btn" onclick="recordData()" class="hidden w-full mt-4 hud-btn hud-btn-green py-3 font-bold tracking-widest" onmouseenter="playHover()">
-                    [ LOG TELEMETRY ]
-                </button>
             </div>
         </div>
 
@@ -456,7 +458,6 @@
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
             setTimeout(() => { intro.style.visibility = 'hidden'; }, 1500);
-            // Must init audio on user interaction
             if(state.soundEnabled) initAudio();
             playSuccess();
         }
@@ -468,7 +469,7 @@
             None: { name: 'None (Background)', type: 'bg', rate: 0, range: 0, halfLifeThick: 1, halfLifeSec: Infinity },
             Tl204: { name: 'Thallium-204 (Beta)', type: 'beta', rate: 120, range: 0.307, halfLifeThick: 0.124, halfLifeSec: Infinity },
             Sr90: { name: 'Strontium-90 (Beta)', type: 'beta', rate: 180, range: 0.966, halfLifeThick: 0.390, halfLifeSec: Infinity },
-            Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 5000, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity }, // Highly increased rate to overcome ISL noise at 50cm
+            Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 5000, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity }, 
             Ba137m: { name: 'Barium-137m (Gamma)', type: 'gamma', rate: 400, range: Infinity, halfLifeThick: 4.5, halfLifeSec: 153 }
         };
 
@@ -504,10 +505,10 @@
                 title: "Radioactive Half-Life Determination", 
                 aim: "To determine the half-life of a short-lived radioactive isotope (Ba-137m).",
                 apparatus: "GM Counter, Isotope Generator (Cs-137/Ba-137m), Timer.",
-                theory: "Radioactive decay is a random, exponential process. The rate of decay is proportional to the number of unstable atoms remaining. The 'Half-life' (T½) is the time required for half of the radioactive atoms in a sample to decay.", 
-                procedure: ["Select Half-Life experiment.", "Click 'Elute Fresh Ba-137m' to prepare the sample and start the clock.", "Set preset time to 10 seconds.", "Take an immediate reading (t=0).", "Wait 20 seconds, take another reading.", "Repeat over 5 minutes to capture the decay curve."], 
+                theory: "Radioactive decay is a random, exponential process. The rate of decay is proportional to the number of unstable atoms remaining. The 'Half-life' (T½) is the time required for half of the radioactive atoms in a sample to decay. The system automatically syncs the elapsed decay time to the midpoint of your counting interval for perfect physics calculations.", 
+                procedure: ["Select Half-Life experiment.", "Click '↻ Elute Isotope' to prepare the sample and start the Decay Clock.", "Set preset time to 10 seconds.", "Click '▶ INIT' to take a reading.", "Wait a few seconds, then click '▶ INIT' again to take the next reading.", "Repeat over 3-5 minutes. The system tracks the exact physics decay time automatically."], 
                 formula: "N(t) = N₀ * e^(-λt)  where  λ = ln(2) / T½",
-                precautions: ["Perform readings quickly due to the short half-life.", "Subtract background counts accurately."]
+                precautions: ["Take readings sequentially as the decay clock runs.", "Subtract background counts accurately."]
             }
         };
 
@@ -596,7 +597,12 @@
                 btn.onmouseenter = playHover;
             });
             changeMode('plateau');
-            timers.global = setInterval(() => { state.globalTime += 0.1; if (state.mode === 'halflife') document.getElementById('global-time-val').textContent = Math.floor(state.globalTime) + ' s'; }, 100);
+            timers.global = setInterval(() => { 
+                state.globalTime += 0.1; 
+                if (state.mode === 'halflife') {
+                    document.getElementById('global-time-val').textContent = Math.floor(state.globalTime); 
+                }
+            }, 100);
             if('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = () => {};
         };
 
@@ -688,7 +694,14 @@
             const cps = (state.currentCount / state.presetTime).toFixed(2);
             if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) state.bgCountRate = parseFloat(cps);
             const net = Math.max(0, (cps - (state.bgCountRate || 0))).toFixed(2);
-            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: state.globalTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net });
+            
+            let recordTime = state.globalTime;
+            // Physics Correction: The representative time for a count interval is the MIDPOINT of that interval
+            if (state.mode === 'halflife') {
+                recordTime = Math.max(0, state.globalTime - (state.presetTime / 2));
+            }
+
+            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: recordTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net });
             updateTableAndGraph();
         }
         function clearData() { playClick(); state.records[state.mode] = []; updateTableAndGraph(); }
@@ -736,13 +749,16 @@
         function updateUI() {
             const pBtn = document.getElementById('power-btn'); const pTxt = document.getElementById('power-text');
             const tDisp = document.getElementById('time-display'); const cDisp = document.getElementById('count-display');
+            const gtDisp = document.getElementById('global-time-val');
             if (state.isPowered) {
                 pBtn.className = "bg-cyan-900 border border-cyan-400 text-cyan-200 px-4 py-1 rounded transition-all flex items-center shadow-[0_0_10px_rgba(6,182,212,0.5)] cursor-pointer";
                 pTxt.textContent = "SYS.ON"; tDisp.className = "digital-font text-4xl text-cyan-300 mt-2 glow-text"; cDisp.className = "digital-font text-4xl text-emerald-400 mt-2 glow-text";
+                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-400 mt-2 glow-text";
                 tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0');
             } else {
                 pBtn.className = "bg-black border border-cyan-700 text-cyan-700 px-4 py-1 rounded transition-all flex items-center hover:border-cyan-400 hover:text-cyan-400 cursor-pointer";
                 pTxt.textContent = "SYS.OFF"; tDisp.className = "digital-font text-4xl text-cyan-900 mt-2"; cDisp.className = "digital-font text-4xl text-cyan-900 mt-2";
+                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-900 mt-2";
                 tDisp.textContent = "00.0"; cDisp.textContent = "00000";
             }
             document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting'; document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
@@ -752,7 +768,8 @@
             document.getElementById('ctrl-distance').style.display = 'block'; document.getElementById('distance').disabled = state.status === 'counting';
             document.getElementById('ctrl-thickness').style.display = 'block'; document.getElementById('thickness').disabled = state.status === 'counting';
             
-            document.getElementById('halflife-clock').style.display = cm === 'halflife' ? 'flex' : 'none'; document.getElementById('elute-btn').style.display = cm === 'halflife' ? 'block' : 'none'; document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
+            document.getElementById('decay-display-container').style.display = cm === 'halflife' ? 'block' : 'none';
+            document.getElementById('elute-btn').style.display = cm === 'halflife' ? 'block' : 'none'; document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
             document.getElementById('preset-time-val').textContent = state.presetTime + ' s'; document.getElementById('voltage-val').textContent = state.voltage + ' V'; document.getElementById('distance-val').textContent = state.distance + ' cm'; document.getElementById('thickness-val').textContent = state.thicknessCm.toFixed(2) + ' cm';
             
             const maxVisDist = cm === 'inversesquare' ? 50 : 20; const pixelHeight = Math.max(16, (state.distance / maxVisDist) * 150);
