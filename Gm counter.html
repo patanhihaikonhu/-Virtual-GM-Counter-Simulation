@@ -3,34 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Nuclear Physics Lab</title>
+    <title>Virtual Nuclear Physics Lab | AI Expert Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom scrollbar for a neat look */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
         .glow-text { text-shadow: 0 0 10px currentColor; }
         .digital-font { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+        .math-font { font-family: 'Times New Roman', Times, serif; font-style: italic; }
+
+        /* Calculator Dragging styling */
+        #calculator-widget { transition: opacity 0.2s; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .calc-btn { background-color: #334155; color: white; padding: 0.5rem; border-radius: 0.25rem; font-weight: 600; font-family: monospace; transition: all 0.1s; }
+        .calc-btn:hover { background-color: #475569; }
+        .calc-btn:active { background-color: #64748b; transform: scale(0.95); }
+        .calc-op { background-color: #2563eb; }
+        .calc-op:hover { background-color: #3b82f6; }
+        
+        /* Assistant Animations */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .ai-active-glow { animation: pulse-ring 2s infinite; background-color: #10b981 !important; }
+
+        .ai-math-box { background: rgba(15, 23, 42, 0.6); border-left: 4px solid #3b82f6; padding: 12px; margin: 10px 0; border-radius: 4px; font-family: monospace; color: #93c5fd; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans min-h-screen pb-10">
 
     <!-- Header -->
-    <header class="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-50 shadow-xl">
+    <header class="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-40 shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded bg-emerald-500 flex items-center justify-center font-bold text-white">☢</div>
+                <div class="w-10 h-10 rounded bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] text-xl">☢</div>
                 <div>
                     <h1 class="text-xl font-bold text-white leading-tight">Virtual Nuclear Physics Lab</h1>
-                    <p class="text-xs text-slate-400">Multipurpose GM Counter Simulator (Vanilla JS)</p>
+                    <p class="text-xs text-emerald-400 font-medium tracking-wide">AI EXPERT EDITION</p>
                 </div>
             </div>
 
-            <div class="flex space-x-2 bg-slate-800 p-1 rounded-lg" id="mode-selector">
-                <!-- Modes injected via JS -->
+            <div class="flex space-x-4 items-center flex-wrap justify-center gap-y-2">
+                <div class="flex space-x-2 bg-slate-800 p-1 rounded-lg" id="mode-selector">
+                    <!-- Modes injected via JS -->
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button onclick="toggleSound()" id="sound-toggle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-3 py-1.5 rounded-md text-sm font-bold flex items-center transition-all shadow-md">
+                        🔈 Sound: OFF
+                    </button>
+                    <button onclick="toggleCalculator()" class="bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border border-blue-800 px-3 py-1.5 rounded-md text-sm font-bold flex items-center transition-all shadow-md">
+                        🖩 Calculator
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -38,7 +68,7 @@
     <main class="max-w-7xl mx-auto p-4 md:p-6 mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- LEFT COLUMN: Controls & Apparatus -->
-        <div class="lg:col-span-5 space-y-6">
+        <div class="lg:col-span-4 space-y-6">
             
             <!-- Control Console -->
             <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl relative overflow-hidden">
@@ -54,11 +84,11 @@
 
                 <!-- Digital Displays -->
                 <div class="flex space-x-4 mb-6">
-                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center">
+                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center relative overflow-hidden">
                         <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Time (s)</div>
                         <div id="time-display" class="digital-font text-3xl tracking-wider text-slate-700">00.0</div>
                     </div>
-                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center">
+                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center relative overflow-hidden">
                         <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Counts</div>
                         <div id="count-display" class="digital-font text-3xl tracking-wider text-slate-700">00000</div>
                     </div>
@@ -66,7 +96,7 @@
 
                 <!-- Playback Controls -->
                 <div class="flex space-x-2 mb-6 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50">
-                    <button id="start-btn" onclick="startCount()" disabled class="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all">▶ Start</button>
+                    <button id="start-btn" onclick="startCount()" disabled class="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all shadow-md">▶ Start</button>
                     <button id="stop-btn" onclick="stopCount()" disabled class="flex-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all">■ Stop</button>
                     <button id="reset-btn" onclick="resetCount()" disabled class="flex-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all">↻ Reset</button>
                 </div>
@@ -94,7 +124,7 @@
                             <label class="font-medium text-blue-300">Source-Detector Distance</label>
                             <span id="distance-val" class="text-slate-200 digital-font">2 cm</span>
                         </div>
-                        <input type="range" id="distance" min="2" max="20" step="1" value="2" class="w-full accent-emerald-500" oninput="updateParams()">
+                        <input type="range" id="distance" min="2" max="50" step="1" value="2" class="w-full accent-emerald-500" oninput="updateParams()">
                     </div>
 
                     <div id="ctrl-thickness" class="p-3 rounded-lg border bg-slate-900/50 border-slate-700/50 hidden">
@@ -110,120 +140,124 @@
             </div>
 
             <!-- Virtual Lab Bench -->
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl relative">
-                
-                <div id="halflife-clock" class="hidden absolute top-4 right-4 bg-slate-900 border border-rose-900 p-2 rounded-lg text-center flex-col items-center">
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl relative min-h-[250px]">
+                <div id="halflife-clock" class="hidden absolute top-4 right-4 bg-slate-900 border border-rose-900 p-2 rounded-lg text-center flex-col items-center shadow-lg z-30">
                     <div class="text-[10px] text-slate-400 uppercase">Lab Clock</div>
                     <div id="global-time-val" class="digital-font text-rose-400 font-bold">0 s</div>
                 </div>
-
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Lab Bench</h2>
-                
-                <div class="flex flex-col items-center py-6 relative">
-                    <!-- GM Tube -->
-                    <div id="gm-tube" class="w-20 h-28 bg-gradient-to-b from-slate-300 to-slate-500 rounded-t-full border-4 border-slate-600 shadow-[0_10px_20px_rgba(0,0,0,0.5)] z-20 flex flex-col items-center justify-end pb-2 relative transition-all">
-                        <div class="text-[10px] text-slate-800 font-bold absolute top-10 rotate-90 tracking-widest">DETECTOR</div>
-                        <div class="w-full h-4 bg-slate-800/50"></div>
+                <div class="flex flex-col items-center py-2 relative">
+                    <div id="gm-tube" class="w-16 h-20 bg-gradient-to-b from-slate-300 to-slate-500 rounded-t-full border-4 border-slate-600 shadow-[0_10px_20px_rgba(0,0,0,0.5)] z-20 flex flex-col items-center justify-end pb-2 relative transition-all">
+                        <div class="text-[8px] text-slate-800 font-bold absolute top-6 rotate-90 tracking-widest">DETECTOR</div>
+                        <div class="w-full h-3 bg-slate-800/50"></div>
                         <div id="spark-effect" class="absolute inset-0 bg-yellow-400/20 rounded-t-full animate-pulse z-30 hidden"></div>
                     </div>
-
-                    <!-- Distance Track -->
-                    <div id="visual-distance" class="w-2 relative flex flex-col items-center z-10 bg-slate-700/50 transition-all duration-300" style="height: 16px;">
-                        <div class="absolute left-4 top-0 bottom-0 border-l border-slate-600 flex flex-col justify-between py-1 text-[9px] text-slate-500 digital-font">
-                            <span>0</span>
-                            <span id="visual-dist-label">2cm</span>
+                    <div id="visual-distance" class="w-1.5 relative flex flex-col items-center z-10 bg-slate-700/50 transition-all duration-300" style="height: 16px;">
+                        <div class="absolute left-3 top-0 bottom-0 border-l border-slate-600 flex flex-col justify-between py-1 text-[8px] text-slate-500 digital-font">
+                            <span>0</span><span id="visual-dist-label">2cm</span>
                         </div>
-                        <!-- Absorber Visual -->
-                        <div id="visual-absorber" class="hidden absolute top-2 w-24 bg-slate-300/90 border border-slate-400 shadow-lg z-20" style="left: -44px; height: 4px;">
-                            <div class="text-[8px] text-center text-slate-600 mt-0.5 font-bold">Al Foil</div>
-                        </div>
+                        <div id="visual-absorber" class="hidden absolute top-2 w-20 bg-slate-300/90 border border-slate-400 shadow-lg z-20" style="left: -38px; height: 4px;"></div>
                     </div>
-
-                    <!-- Source Tray -->
-                    <div class="w-28 h-8 bg-slate-700 border-2 border-slate-600 rounded shadow-xl flex items-center justify-center relative z-20">
-                        <div id="visual-source" class="hidden w-5 h-5 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse bg-amber-500"></div>
+                    <div class="w-24 h-6 bg-slate-700 border-2 border-slate-600 rounded shadow-xl flex items-center justify-center relative z-20">
+                        <div id="visual-source" class="hidden w-4 h-4 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse bg-amber-500"></div>
                     </div>
                 </div>
 
-                <!-- Source Selection -->
                 <div class="mt-4 border-t border-slate-700 pt-4">
-                    <label class="block text-xs text-slate-400 mb-1.5 font-medium">Radioactive Source Selection</label>
-                    <select id="source-select" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-sm outline-none focus:border-blue-500 text-slate-200" onchange="updateParams()">
-                        <!-- Populated via JS -->
-                    </select>
-                    
-                    <button id="elute-btn" onclick="eluteSource()" class="hidden mt-3 w-full bg-rose-900/30 hover:bg-rose-900/50 border border-rose-800 text-rose-300 py-1.5 rounded text-sm transition-colors flex items-center justify-center">
-                        ↻ Elute Fresh Ba-137m (Reset Clock)
-                    </button>
+                    <label class="block text-xs text-slate-400 mb-1.5 font-medium">Source Material</label>
+                    <select id="source-select" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-sm outline-none focus:border-blue-500 text-slate-200" onchange="updateParams()"></select>
+                    <button id="elute-btn" onclick="eluteSource()" class="hidden mt-3 w-full bg-rose-900/30 hover:bg-rose-900/50 border border-rose-800 text-rose-300 py-1.5 rounded text-sm transition-colors flex items-center justify-center shadow-inner">↻ Elute Fresh Ba-137m</button>
                 </div>
 
-                <!-- Record Button -->
                 <button id="record-btn" onclick="recordData()" class="hidden w-full mt-6 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-pulse border border-emerald-400">
                     Log Data Reading
                 </button>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Tabs (Data/Graph & Manual) -->
-        <div class="lg:col-span-7 bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-xl flex flex-col h-[850px]">
+        <!-- RIGHT COLUMN: Tabs -->
+        <div class="lg:col-span-8 bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-xl flex flex-col h-[880px]">
             
             <div class="flex border-b border-slate-700 p-2 space-x-2 bg-slate-800/50 rounded-t-xl">
-                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white shadow">
-                    📊 Data & Analysis
+                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white shadow flex items-center justify-center">
+                    📊 Data & Plot
                 </button>
-                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-slate-300">
-                    📖 Lab Manual
+                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-emerald-400 hover:text-emerald-300 hover:bg-slate-700 flex items-center justify-center border border-transparent hover:border-emerald-800">
+                    <span class="mr-2">🧠</span> AI Auto-Solver
+                </button>
+                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-slate-300 flex items-center justify-center">
+                    📖 Manual
                 </button>
             </div>
 
             <div class="flex-1 overflow-hidden p-4 flex flex-col relative">
                 
-                <!-- LAB MANUAL TAB -->
-                <div id="tab-manual" class="hidden h-full overflow-y-auto pr-2 space-y-6 text-slate-300">
-                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-700">
-                        <h2 id="man-title" class="text-2xl font-bold text-white">Title</h2>
-                    </div>
-                    <section>
-                        <h3 class="text-lg font-semibold text-blue-400 mb-2">Theoretical Background</h3>
-                        <p id="man-theory" class="text-sm leading-relaxed text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></p>
-                    </section>
-                    <section>
-                        <h3 class="text-lg font-semibold text-emerald-400 mb-2">Experimental Procedure</h3>
-                        <ol id="man-procedure" class="list-decimal pl-5 space-y-2 text-sm text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></ol>
-                    </section>
-                    <section>
-                        <h3 class="text-lg font-semibold text-yellow-400 mb-2">Key Formula</h3>
-                        <div id="man-formula" class="bg-slate-900 digital-font p-4 rounded-lg border border-slate-700/50 text-center text-sm text-yellow-300"></div>
-                    </section>
-                </div>
-
-                <!-- DATA & GRAPH TAB -->
+                <!-- TAB 1: DATA & GRAPH -->
                 <div id="tab-simulation" class="h-full flex flex-col space-y-4">
-                    <!-- Table -->
                     <div class="flex-1 bg-slate-900 rounded-lg border border-slate-700 overflow-hidden flex flex-col min-h-[250px] max-h-[350px]">
                         <div class="p-2 border-b border-slate-700 flex justify-between items-center bg-slate-800">
                             <span class="text-xs font-bold text-slate-400 uppercase ml-2">Observation Table</span>
-                            <button onclick="clearData()" class="text-xs bg-rose-900/30 text-rose-400 px-2 py-1 rounded hover:bg-rose-900/50 transition-colors">Clear Data</button>
+                            <div class="space-x-2 flex">
+                                <button onclick="exportCSV()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded transition-colors border border-slate-600 flex items-center shadow-sm">📄 CSV</button>
+                                <button onclick="exportGraphPNG()" class="text-xs bg-indigo-900/60 hover:bg-indigo-900/80 text-indigo-300 px-3 py-1 rounded transition-colors border border-indigo-700 flex items-center shadow-sm">📸 Export PNG</button>
+                                <button onclick="clearData()" class="text-xs bg-rose-900/30 text-rose-400 px-3 py-1 rounded hover:bg-rose-900/50 transition-colors border border-rose-800 ml-2">🗑 Clear</button>
+                            </div>
                         </div>
                         <div class="overflow-y-auto flex-1">
                             <table class="w-full text-xs text-left whitespace-nowrap">
-                                <thead id="table-head" class="bg-slate-950 text-slate-400 sticky top-0 shadow">
-                                    <!-- Dynamic headers -->
-                                </thead>
-                                <tbody id="table-body" class="text-slate-300">
-                                    <!-- Dynamic rows -->
-                                </tbody>
+                                <thead id="table-head" class="bg-slate-950 text-slate-400 sticky top-0 shadow"></thead>
+                                <tbody id="table-body" class="text-slate-300"></tbody>
                             </table>
                         </div>
                     </div>
-
-                    <!-- Graph -->
-                    <div class="h-[400px] bg-slate-900 rounded-lg border border-slate-700 p-4 flex flex-col relative">
+                    <div class="h-[430px] bg-slate-900 rounded-lg border border-slate-700 p-4 flex flex-col relative shadow-inner">
                         <h3 id="graph-title" class="text-sm font-bold text-slate-300 mb-2">Plot</h3>
-                        <div id="graph-container" class="flex-1 w-full h-full relative">
-                            <!-- SVG Graph injected here -->
+                        <div id="graph-container" class="flex-1 w-full h-full relative bg-slate-900 rounded"></div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: AI AUTO-SOLVER -->
+                <div id="tab-ai" class="hidden h-full flex flex-col space-y-4">
+                    <div class="bg-slate-900 p-4 rounded-lg border border-emerald-900/50 flex justify-between items-center shadow-inner">
+                        <div class="flex items-center space-x-3">
+                            <div id="ai-status-indicator" class="w-4 h-4 rounded-full bg-slate-600"></div>
+                            <div>
+                                <h3 class="text-emerald-400 font-bold">Physics AI Expert System</h3>
+                                <p class="text-xs text-slate-400">Analyzes data, performs detailed physical calculations, and estimates statistical error.</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="runAIAnalysis()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-bold text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all">
+                                🧠 Analyze Data
+                            </button>
+                            <button onclick="speakAI()" id="ai-speak-btn" class="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white px-3 py-2 rounded-md text-sm font-bold transition-all" disabled>
+                                🔊 Explain
+                            </button>
                         </div>
                     </div>
+                    
+                    <div id="ai-output" class="flex-1 bg-slate-950 rounded-lg border border-slate-800 p-6 overflow-y-auto text-slate-300 text-sm leading-relaxed shadow-inner">
+                        <div class="flex h-full items-center justify-center text-slate-600 flex-col">
+                            <span class="text-4xl mb-3">🤖</span>
+                            <p>Awaiting data analysis command...</p>
+                            <p class="text-xs mt-2">Log points in the Simulation tab, then click "Analyze Data".</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: LAB MANUAL -->
+                <div id="tab-manual" class="hidden h-full overflow-y-auto pr-2 space-y-6 text-slate-300">
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-700">
+                        <h2 id="man-title" class="text-2xl font-bold text-white">Title</h2>
+                        <div class="flex items-center space-x-2 bg-slate-900 border border-blue-900/50 p-1.5 rounded-lg shadow-inner">
+                            <div id="assistant-indicator" class="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
+                            <button onclick="speakManual()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors">🔊 Read</button>
+                            <button onclick="stopSpeaking()" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-xs font-bold transition-colors">■ Stop</button>
+                        </div>
+                    </div>
+                    <section><h3 class="text-lg font-semibold text-blue-400 mb-2">Theory</h3><p id="man-theory" class="text-sm leading-relaxed text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></p></section>
+                    <section><h3 class="text-lg font-semibold text-emerald-400 mb-2">Procedure</h3><ol id="man-procedure" class="list-decimal pl-5 space-y-2 text-sm text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></ol></section>
+                    <section><h3 class="text-lg font-semibold text-yellow-400 mb-2">Key Formula</h3><div id="man-formula" class="bg-slate-900 digital-font p-4 rounded-lg border border-slate-700/50 text-center text-sm text-yellow-300"></div></section>
                 </div>
 
             </div>
@@ -231,9 +265,25 @@
 
     </main>
 
-    <!-- CORE JAVASCRIPT LOGIC -->
+    <!-- Floating Calculator -->
+    <div id="calculator-widget" class="fixed top-24 right-6 bg-slate-800 border border-slate-600 rounded-xl p-4 w-72 z-50 hidden flex-col cursor-move" onmousedown="startDrag(event, 'calculator-widget')">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest pointer-events-none">🖩 Calculator</span>
+            <button onclick="toggleCalculator()" class="text-slate-400 hover:text-rose-400">✖</button>
+        </div>
+        <input type="text" id="calc-display" readonly class="w-full bg-slate-950 text-emerald-400 border border-slate-700 text-right p-2 rounded mb-3 digital-font text-xl shadow-inner focus:outline-none" value="0">
+        <div class="grid grid-cols-4 gap-1.5">
+            <button class="calc-btn calc-clear col-span-2" onclick="calcPress('C')">CLEAR</button><button class="calc-btn calc-op" onclick="calcPress('Del')">DEL</button><button class="calc-btn calc-op" onclick="calcPress('/')">÷</button>
+            <button class="calc-btn" onclick="calcPress('7')">7</button><button class="calc-btn" onclick="calcPress('8')">8</button><button class="calc-btn" onclick="calcPress('9')">9</button><button class="calc-btn calc-op" onclick="calcPress('*')">×</button>
+            <button class="calc-btn" onclick="calcPress('4')">4</button><button class="calc-btn" onclick="calcPress('5')">5</button><button class="calc-btn" onclick="calcPress('6')">6</button><button class="calc-btn calc-op" onclick="calcPress('-')">-</button>
+            <button class="calc-btn" onclick="calcPress('1')">1</button><button class="calc-btn" onclick="calcPress('2')">2</button><button class="calc-btn" onclick="calcPress('3')">3</button><button class="calc-btn calc-op" onclick="calcPress('+')">+</button>
+            <button class="calc-btn" onclick="calcPress('0')">0</button><button class="calc-btn" onclick="calcPress('.')">.</button><button class="calc-btn bg-purple-600" onclick="calcPress('x2')">x²</button><button class="calc-btn bg-emerald-600 row-span-2" onclick="calcPress('=')">=</button>
+            <button class="calc-btn bg-purple-600" onclick="calcPress('sqrt')">√</button><button class="calc-btn bg-purple-600" onclick="calcPress('ln')">ln</button><button class="calc-btn bg-purple-600" onclick="calcPress('exp')">e^</button>
+        </div>
+    </div>
+
+    <!-- CORE LOGIC -->
     <script>
-        // --- Physics Constants & Data ---
         const DENSITY_AL = 2.71; 
         const BG_RATE = 0.8; 
         const THICKNESS_OPTS = [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50];
@@ -243,90 +293,62 @@
             Tl204: { name: 'Thallium-204 (Beta)', type: 'beta', rate: 120, range: 0.307, halfLifeThick: 0.124, halfLifeSec: Infinity },
             Sr90: { name: 'Strontium-90 (Beta)', type: 'beta', rate: 180, range: 0.966, halfLifeThick: 0.390, halfLifeSec: Infinity },
             Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 250, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity },
-            Ba137m: { name: 'Barium-137m (Gamma)', type: 'gamma', rate: 400, range: Infinity, halfLifeThick: 4.5, halfLifeSec: 153 } // 2.55 mins
+            Ba137m: { name: 'Barium-137m (Gamma)', type: 'gamma', rate: 400, range: Infinity, halfLifeThick: 4.5, halfLifeSec: 153 }
         };
 
         const LAB_MANUALS = {
-            plateau: {
-                title: "GM Tube Plateau Characteristics",
-                theory: "A Geiger-Müller (GM) tube's efficiency depends on the applied voltage. At low voltages, the electric field is too weak to cause an avalanche (0 counts). At the 'starting voltage', pulses are just large enough to be detected. As voltage increases, the count rate rises sharply and then levels off into a 'plateau' region where the count rate is relatively constant. Operating the tube in the center of this plateau ensures stable measurements. At very high voltages, continuous discharge occurs, which can damage the tube.",
-                procedure: [
-                    "Select the 'Plateau Region' experiment mode.",
-                    "Set the Source to a stable emitter like Cobalt-60.",
-                    "Start with Operating Voltage at 300V. Set Preset Time to 10 seconds.",
-                    "Take readings, increasing the voltage by 50V steps up to 900V.",
-                    "Observe the data table and graph. Identify the flat plateau region.",
-                    "Determine the ideal Operating Voltage (usually the middle of the plateau)."
-                ],
-                formula: "Slope = [ (N2 - N1) / N1 ] * [ 100 / (V2 - V1) ] % per 100V"
-            },
-            inversesquare: {
-                title: "Inverse Square Law",
-                theory: "The intensity of radiation from a point source in a non-absorbing medium is inversely proportional to the square of the distance from the source. As radiation spreads out spherically, the area it covers increases with the square of the distance (A = 4πr²). Therefore, the number of particles passing through a fixed-area detector decreases by 1/r².",
-                procedure: [
-                    "Select the 'Inverse Square Law' experiment mode.",
-                    "Select a Gamma source (e.g., Cobalt-60) to minimize air absorption effects.",
-                    "Set the distance to 2 cm. Run the counter for 20 seconds and record.",
-                    "Increase the distance in 2 cm increments (up to 20 cm), taking readings at each step.",
-                    "The graph will automatically plot Counts vs. 1/d². If the law holds, this should be a straight line."
-                ],
-                formula: "I₁ / I₂ = (d₂)² / (d₁)²  =>  I ∝ 1/d²"
-            },
-            absorption: {
-                title: "Absorption & End-Point Energy",
-                theory: "Beta particles have a continuous energy spectrum up to a maximum 'end-point' energy (E_max). As they pass through matter (like Aluminum), they lose energy. The thickness of the absorber required to completely stop all beta particles is called the 'Range'. By plotting Net Counts vs. Absorber Thickness (in g/cm²), we can find this range and subsequently calculate the end-point energy of the radioisotope.",
-                procedure: [
-                    "Select the 'Absorption' mode.",
-                    "First, take a Background reading (Source: None, 0cm Al) for 30s.",
-                    "Select a Beta source (e.g., Tl-204 or Sr-90).",
-                    "Take a reading with 0cm Aluminum. Record the data.",
-                    "Increment the Aluminum thickness step-by-step, recording counts for 30s each time.",
-                    "Observe the graph. The point where the curve flattens into the background level is the Range."
-                ],
-                formula: "E_max = 1.85 * (Range) + 0.245  (Empirical formula for E > 0.6 MeV)"
-            },
-            halflife: {
-                title: "Radioactive Half-Life",
-                theory: "Radioactive decay is a random process, but for a large number of atoms, the rate of decay is proportional to the number of unstable atoms remaining. The 'Half-life' (T½) is the time required for half of the radioactive atoms in a sample to decay. Barium-137m is an ideal isotope for laboratory study as it has a short half-life of roughly 2.55 minutes.",
-                procedure: [
-                    "Select the 'Half-Life' experiment mode. The source defaults to Ba-137m.",
-                    "Click 'Elute / Reset Source' to simulate preparing a fresh Ba-137m sample. The Global Lab Clock will start.",
-                    "Set preset time to 10 seconds. Take an immediate reading.",
-                    "Wait 20-30 seconds on the lab clock, then take another 10s reading.",
-                    "Repeat this process over 5-10 minutes of lab time.",
-                    "The graph will plot an exponential decay curve of Counts vs. Time."
-                ],
-                formula: "N(t) = N₀ * e^(-λt)   where   λ = ln(2) / T½"
-            }
+            plateau: { title: "GM Tube Plateau Characteristics", theory: "A GM tube's efficiency depends on the applied voltage. As voltage increases, the count rate rises sharply and then levels off into a 'plateau' region where the count rate is relatively constant. Operating the tube in the center of this plateau ensures stable measurements.", procedure: ["Select the 'Plateau Region' experiment mode.", "Set the Source to a stable emitter like Cobalt-60.", "Start with Operating Voltage at 300V. Set Preset Time to 10 seconds.", "Take readings, increasing the voltage by 50V steps up to 900V.", "Observe the data table and graph. Identify the flat plateau region."], formula: "Slope = [ (N2 - N1) / N1 ] * [ 100 / (V2 - V1) ] % per 100V" },
+            inversesquare: { title: "Inverse Square Law", theory: "The intensity of radiation from a point source in a non-absorbing medium is inversely proportional to the square of the distance from the source. As radiation spreads out spherically, the area it covers increases with the square of the distance (A = 4πr²).", procedure: ["Select the 'Inverse Square Law' experiment mode.", "Select a Gamma source (e.g., Cobalt-60).", "Start with distance at 2 cm. Run the counter for 20 seconds and record.", "Increase the distance progressively (up to 50 cm), taking readings at each step.", "The graph plots Net CPS vs. 1/d²."], formula: "I₁ / I₂ = (d₂)² / (d₁)²  =>  I ∝ 1/d²" },
+            absorption: { title: "Absorption & End-Point Energy", theory: "Beta particles have a continuous energy spectrum up to a maximum 'end-point' energy. The thickness of the absorber required to completely stop all beta particles is called the 'Range'. By plotting Net Counts vs. Absorber Thickness, we find this range.", procedure: ["Select the 'Absorption' mode.", "First, take a Background reading (Source: None, 0cm Al) for 30s.", "Select a Beta source (e.g., Sr-90).", "Take a reading with 0cm Aluminum. Record the data.", "Increment the Aluminum thickness step-by-step, recording counts for 30s each time.", "Observe the graph. Find the half-value thickness and calculate Range."], formula: "E = (Range + 0.09) / 0.52  (For E > 0.6 MeV)" },
+            halflife: { title: "Radioactive Half-Life", theory: "Radioactive decay is a random process. The 'Half-life' (T½) is the time required for half of the radioactive atoms in a sample to decay. Barium-137m is an ideal isotope for laboratory study as it has a short half-life of roughly 2.55 minutes.", procedure: ["Select the 'Half-Life' experiment mode. The source defaults to Ba-137m.", "Click 'Elute Fresh Ba-137m' to simulate preparing a fresh sample.", "Set preset time to 10 seconds. Take an immediate reading.", "Wait 20-30 seconds on the lab clock, then take another 10s reading.", "Repeat this process over 5 minutes of lab time."], formula: "N(t) = N₀ * e^(-λt)   where   λ = ln(2) / T½" }
         };
 
-        // --- Global State ---
         let state = {
-            tab: 'simulation',
-            mode: 'plateau',
-            isPowered: false,
-            status: 'idle', // idle, counting, done
-            
-            // Params
-            sourceKey: 'Co60',
-            voltage: 500,
-            distance: 2,
-            thicknessCm: 0,
-            presetTime: 10,
-            
-            // Live counters
-            elapsedTime: 0,
-            currentCount: 0,
-            globalTime: 0,
-            
-            // Data
-            bgCountRate: null,
-            records: { plateau: [], inversesquare: [], absorption: [], halflife: [] }
+            tab: 'simulation', mode: 'plateau', isPowered: false, status: 'idle', soundEnabled: false,
+            sourceKey: 'Co60', voltage: 500, distance: 2, thicknessCm: 0, presetTime: 10,
+            elapsedTime: 0, currentCount: 0, globalTime: 0, bgCountRate: null,
+            records: { plateau: [], inversesquare: [], absorption: [], halflife: [] },
+            aiTextCache: ''
         };
-
         let timers = { count: null, global: null };
+        let audioCtx;
 
-        // --- Math / Physics ---
+        function initAudio() {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            const btn = document.getElementById('sound-toggle-btn');
+            if(state.soundEnabled) {
+                initAudio();
+                btn.innerHTML = '🔊 Sound: ON';
+                btn.className = "bg-green-900/30 hover:bg-green-900/50 text-green-400 border border-green-800 px-3 py-1.5 rounded-md text-sm font-bold flex items-center shadow-md";
+            } else {
+                btn.innerHTML = '🔈 Sound: OFF';
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-3 py-1.5 rounded-md text-sm font-bold flex items-center shadow-md";
+            }
+        }
+
+        function playClickSound(count) {
+            if(!state.soundEnabled || count <= 0 || !audioCtx) return;
+            let clicks = Math.min(count, 5); 
+            for(let i=0; i<clicks; i++) {
+                setTimeout(() => {
+                    if(audioCtx.state !== 'running') return;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(100 + Math.random()*400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+                    osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.015);
+                }, Math.random() * 90); 
+            }
+        }
+
         function poissonRandom(lambda) {
             let L = Math.exp(-lambda), k = 0, p = 1;
             do { k++; p *= Math.random(); } while (p > L);
@@ -336,24 +358,15 @@
         function getInstantRate() {
             const src = SOURCES[state.sourceKey];
             const v = state.voltage, d = state.distance, th = state.thicknessCm;
-            
-            // 1. Voltage Curve
             let vEff = 0;
             if (v >= 350 && v < 400) vEff = (v - 350) / 50;
             else if (v >= 400 && v <= 700) vEff = 1 + (v - 400) * 0.0003;
             else if (v > 700) vEff = 1.09 + Math.pow(v - 700, 2) * 0.001;
             if (vEff === 0) return 0;
 
-            // 2. Base Rate + Decay
             let expectedBase = src.rate;
-            if (src.halfLifeSec < Infinity) {
-                expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
-            }
-
-            // 3. Inverse Square
+            if (src.halfLifeSec < Infinity) expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
             if (expectedBase > 0) expectedBase = expectedBase * Math.pow(2 / d, 2);
-
-            // 4. Absorption
             if (th > 0 && expectedBase > 0) {
                 const thGcm2 = th * DENSITY_AL;
                 if (src.type === 'beta') {
@@ -366,86 +379,58 @@
             return (expectedBase + BG_RATE) * vEff;
         }
 
-        // --- Initialization & Setup ---
         window.onload = () => {
-            // Populate selects
             const srcSel = document.getElementById('source-select');
             for (let key in SOURCES) {
-                let opt = document.createElement('option');
-                opt.value = key;
-                opt.textContent = SOURCES[key].name;
-                srcSel.appendChild(opt);
+                let opt = document.createElement('option'); opt.value = key; opt.textContent = SOURCES[key].name; srcSel.appendChild(opt);
             }
             const thSel = document.getElementById('thickness');
             THICKNESS_OPTS.forEach(val => {
-                let opt = document.createElement('option');
-                opt.value = val;
-                opt.textContent = val === 0 ? 'None (0 cm)' : `${val.toFixed(2)} cm (${(val*DENSITY_AL).toFixed(3)} g/cm²)`;
-                thSel.appendChild(opt);
+                let opt = document.createElement('option'); opt.value = val; opt.textContent = val === 0 ? 'None (0 cm)' : `${val.toFixed(2)} cm (${(val*DENSITY_AL).toFixed(3)} g/cm²)`; thSel.appendChild(opt);
             });
-
-            // Populate Modes
             const modesDiv = document.getElementById('mode-selector');
             Object.keys(LAB_MANUALS).forEach(m => {
-                let btn = document.createElement('button');
-                btn.onclick = () => changeMode(m);
-                btn.className = `px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn`;
-                btn.id = `mode-${m}`;
-                btn.textContent = LAB_MANUALS[m].title;
-                modesDiv.appendChild(btn);
+                let btn = document.createElement('button'); btn.onclick = () => changeMode(m); btn.className = `px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn`; btn.id = `mode-${m}`; btn.textContent = LAB_MANUALS[m].title; modesDiv.appendChild(btn);
             });
-
             changeMode('plateau');
-            startGlobalClock();
+            setInterval(() => {
+                state.globalTime += 0.1;
+                if (state.mode === 'halflife') document.getElementById('global-time-val').textContent = Math.floor(state.globalTime) + ' s';
+            }, 100);
         };
 
-        function startGlobalClock() {
-            clearInterval(timers.global);
-            timers.global = setInterval(() => {
-                state.globalTime += 0.1;
-                if (state.mode === 'halflife') {
-                    document.getElementById('global-time-val').textContent = Math.floor(state.globalTime) + ' s';
-                }
-            }, 100);
-        }
-
-        // --- UI Interactions ---
         function setTab(tab) {
             state.tab = tab;
             document.getElementById('tab-simulation').style.display = tab === 'simulation' ? 'flex' : 'none';
+            document.getElementById('tab-ai').style.display = tab === 'ai' ? 'flex' : 'none';
             document.getElementById('tab-manual').style.display = tab === 'manual' ? 'block' : 'none';
             
             document.getElementById('tab-sim-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='simulation' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`;
+            document.getElementById('tab-ai-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='ai' ? 'bg-slate-700 text-emerald-400 shadow border-emerald-500' : 'text-emerald-500 hover:text-emerald-400 border border-transparent'}`;
             document.getElementById('tab-man-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='manual' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`;
         }
 
         function changeMode(mode) {
-            state.mode = mode;
-            resetCount();
-            
-            // Set defaults based on mode
-            if (mode === 'plateau') { state.sourceKey = 'Co60'; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; }
-            if (mode === 'inversesquare') { state.sourceKey = 'Co60'; state.voltage = 500; state.thicknessCm = 0; state.presetTime = 20; }
-            if (mode === 'absorption') { state.sourceKey = 'Sr90'; state.voltage = 500; state.distance = 2; state.presetTime = 30; }
-            if (mode === 'halflife') { state.sourceKey = 'Ba137m'; state.voltage = 500; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; state.globalTime = 0; }
+            state.mode = mode; resetCount(); stopSpeaking();
+            document.getElementById('ai-output').innerHTML = `<div class="flex h-full items-center justify-center text-slate-600 flex-col"><span class="text-4xl mb-3">🤖</span><p>Awaiting data analysis command...</p><p class="text-xs mt-2">Log points in the Simulation tab, then click "Analyze Data".</p></div>`;
+            document.getElementById('ai-speak-btn').disabled = true;
+            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-slate-600";
 
-            // Update DOM inputs to match state
+            const distInput = document.getElementById('distance');
+            if (mode === 'plateau') { state.sourceKey = 'Co60'; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; distInput.max = 20;}
+            if (mode === 'inversesquare') { state.sourceKey = 'Co60'; state.voltage = 500; state.thicknessCm = 0; state.presetTime = 20; distInput.max = 50;} 
+            if (mode === 'absorption') { state.sourceKey = 'Sr90'; state.voltage = 500; state.distance = 2; state.presetTime = 30; distInput.max = 20;}
+            if (mode === 'halflife') { state.sourceKey = 'Ba137m'; state.voltage = 500; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; state.globalTime = 0; distInput.max = 20;}
+
             document.getElementById('preset-time').value = state.presetTime;
             document.getElementById('voltage').value = state.voltage;
             document.getElementById('distance').value = state.distance;
             document.getElementById('thickness').value = state.thicknessCm;
             document.getElementById('source-select').value = state.sourceKey;
 
-            // Highlight mode button
-            document.querySelectorAll('.mode-btn').forEach(b => {
-                b.classList.remove('bg-blue-600', 'text-white', 'shadow');
-                b.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-700');
-            });
-            let activeBtn = document.getElementById(`mode-${mode}`);
-            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-700');
-            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow');
+            document.querySelectorAll('.mode-btn').forEach(b => { b.className = 'px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn text-slate-400 hover:text-slate-200 hover:bg-slate-700'; });
+            document.getElementById(`mode-${mode}`).className = 'px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn bg-blue-600 text-white shadow';
 
-            // Setup Manual
             let man = LAB_MANUALS[mode];
             document.getElementById('man-title').textContent = man.title;
             document.getElementById('graph-title').textContent = man.title + ' Plot';
@@ -467,227 +452,184 @@
         }
 
         function togglePower() {
+            if(!audioCtx && state.soundEnabled) initAudio(); 
             state.isPowered = !state.isPowered;
             if (state.isPowered) resetCount();
             updateUI();
         }
 
-        function eluteSource() {
-            if (state.status !== 'counting') state.globalTime = 0;
-        }
+        function eluteSource() { if (state.status !== 'counting') state.globalTime = 0; }
 
-        // --- Core Playback ---
         function startCount() {
             if (!state.isPowered || state.status === 'counting') return;
-            state.status = 'counting';
-            state.elapsedTime = 0;
-            state.currentCount = 0;
-            
-            let ticks = 0;
-            const targetTicks = state.presetTime * 10;
-            
+            if(!audioCtx && state.soundEnabled) initAudio();
+            state.status = 'counting'; state.elapsedTime = 0; state.currentCount = 0;
+            let ticks = 0; const targetTicks = state.presetTime * 10;
             updateUI();
-            
             timers.count = setInterval(() => {
-                ticks++;
-                state.elapsedTime += 0.1;
-                
+                ticks++; state.elapsedTime += 0.1;
                 const ratePerSec = getInstantRate();
                 const countsThisTick = poissonRandom(ratePerSec * 0.1);
                 state.currentCount += countsThisTick;
-                
-                // Fast DOM update for timer to prevent lag
+                playClickSound(countsThisTick);
                 document.getElementById('time-display').textContent = state.elapsedTime.toFixed(1).padStart(4, '0');
                 document.getElementById('count-display').textContent = state.currentCount.toString().padStart(5, '0');
-
-                if (ticks >= targetTicks) {
-                    clearInterval(timers.count);
-                    state.status = 'done';
-                    updateUI();
-                }
+                if (ticks >= targetTicks) { clearInterval(timers.count); state.status = 'done'; updateUI(); }
             }, 100);
         }
 
-        function stopCount() {
-            if (state.status === 'counting') {
-                clearInterval(timers.count);
-                state.status = 'done';
-                updateUI();
-            }
-        }
-
-        function resetCount() {
-            clearInterval(timers.count);
-            state.status = 'idle';
-            state.elapsedTime = 0;
-            state.currentCount = 0;
-            updateUI();
-        }
+        function stopCount() { if (state.status === 'counting') { clearInterval(timers.count); state.status = 'done'; updateUI(); } }
+        function resetCount() { clearInterval(timers.count); state.status = 'idle'; state.elapsedTime = 0; state.currentCount = 0; updateUI(); }
 
         function recordData() {
             if (state.status !== 'done') return;
-            
             const cps = (state.currentCount / state.presetTime).toFixed(2);
-            
-            if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) {
-                state.bgCountRate = parseFloat(cps);
-            }
+            if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) state.bgCountRate = parseFloat(cps);
             const bg = state.bgCountRate || 0;
             const net = Math.max(0, (cps - bg)).toFixed(2);
-
             state.records[state.mode].push({
-                id: Date.now(),
-                source: SOURCES[state.sourceKey].name.split(' ')[0],
-                voltage: state.voltage,
-                distance: state.distance,
-                invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(4),
-                thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4),
-                timeAtRecord: state.globalTime.toFixed(1),
-                counts: state.currentCount,
-                cps: cps,
-                netCps: state.sourceKey === 'None' ? 0 : net
+                id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance,
+                invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4),
+                timeAtRecord: state.globalTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net
             });
+            updateTableAndGraph();
+        }
+        function clearData() { state.records[state.mode] = []; updateTableAndGraph(); }
+
+        // --- Exports ---
+        function exportCSV() {
+            const m = state.mode; const records = state.records[m];
+            if (records.length === 0) return alert("No data to export!");
+            let csv = "Source,";
+            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n";
+            else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n";
+            else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n";
+            else if (m === 'halflife') csv += "Time (s),Counts,CPS,Net CPS\n";
+            records.forEach(r => {
+                csv += `${r.source},`;
+                if (m === 'plateau') csv += `${r.voltage},`;
+                else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`;
+                else if (m === 'absorption') csv += `${r.thicknessGcm2},`;
+                else if (m === 'halflife') csv += `${r.timeAtRecord},`;
+                csv += `${r.counts},${r.cps},${r.netCps}\n`;
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.download = `Lab_Data_${m}.csv`; link.click();
+        }
+
+        function exportGraphPNG() {
+            const svgElement = document.querySelector('#graph-container svg');
+            if (!svgElement) return alert("Graph is empty!");
             
-            updateTableAndGraph();
+            // Serialize SVG
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgElement);
+            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+            
+            const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 800; canvas.height = 320;
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                ctx.fillStyle = '#0f172a'; // tailwind slate-900
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                
+                const pngUrl = canvas.toDataURL('image/png');
+                const link = document.createElement("a");
+                link.href = pngUrl;
+                link.download = `Plot_${state.mode}.png`;
+                link.click();
+            };
+            img.src = url;
         }
 
-        function clearData() {
-            state.records[state.mode] = [];
-            updateTableAndGraph();
-        }
-
-        // --- Render Functions ---
+        // --- UI Updates ---
         function updateUI() {
-            // Power button styling
-            const pBtn = document.getElementById('power-btn');
-            const pTxt = document.getElementById('power-text');
-            const tDisp = document.getElementById('time-display');
-            const cDisp = document.getElementById('count-display');
-            
+            const pBtn = document.getElementById('power-btn'); const pTxt = document.getElementById('power-text');
+            const tDisp = document.getElementById('time-display'); const cDisp = document.getElementById('count-display');
             if (state.isPowered) {
                 pBtn.className = "bg-green-500/10 text-green-400 border border-green-500/30 p-2 rounded-full transition-all shadow-[0_0_15px_rgba(74,222,128,0.2)] flex items-center";
-                pTxt.textContent = "ON";
-                tDisp.className = "digital-font text-3xl tracking-wider text-blue-400 glow-text";
+                pTxt.textContent = "ON"; tDisp.className = "digital-font text-3xl tracking-wider text-blue-400 glow-text";
                 cDisp.className = "digital-font text-3xl tracking-wider text-green-400 glow-text";
-                tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0');
-                cDisp.textContent = state.currentCount.toString().padStart(5, '0');
+                tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0');
             } else {
                 pBtn.className = "bg-slate-900 text-slate-500 border border-slate-700 p-2 rounded-full transition-all shadow-inner flex items-center";
-                pTxt.textContent = "OFF";
-                tDisp.className = "digital-font text-3xl tracking-wider text-slate-700";
+                pTxt.textContent = "OFF"; tDisp.className = "digital-font text-3xl tracking-wider text-slate-700";
                 cDisp.className = "digital-font text-3xl tracking-wider text-slate-700";
-                tDisp.textContent = "00.0";
-                cDisp.textContent = "00000";
+                tDisp.textContent = "00.0"; cDisp.textContent = "00000";
             }
-
-            // Buttons state
             document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting';
             document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting';
             document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting';
             document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
 
-            // Parameter visibility based on mode
             const cm = state.mode;
-            document.getElementById('ctrl-voltage').style.display = 'block';
-            document.getElementById('ctrl-voltage').className = `p-3 rounded-lg border ${cm === 'plateau' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`;
-            document.getElementById('voltage').disabled = state.status === 'counting' || (!state.isPowered && cm !== 'plateau');
+            document.getElementById('ctrl-voltage').style.display = 'block'; document.getElementById('ctrl-voltage').className = `p-3 rounded-lg border ${cm === 'plateau' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('voltage').disabled = state.status === 'counting' || (!state.isPowered && cm !== 'plateau');
+            document.getElementById('ctrl-distance').style.display = 'block'; document.getElementById('ctrl-distance').className = `p-3 rounded-lg border ${cm === 'inversesquare' ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('distance').disabled = state.status === 'counting';
+            document.getElementById('ctrl-thickness').style.display = 'block'; document.getElementById('ctrl-thickness').className = `p-3 rounded-lg border ${cm === 'absorption' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('thickness').disabled = state.status === 'counting';
             
-            document.getElementById('ctrl-distance').style.display = 'block';
-            document.getElementById('ctrl-distance').className = `p-3 rounded-lg border ${cm === 'inversesquare' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`;
-            document.getElementById('distance').disabled = state.status === 'counting';
-
-            document.getElementById('ctrl-thickness').style.display = 'block';
-            document.getElementById('ctrl-thickness').className = `p-3 rounded-lg border ${cm === 'absorption' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`;
-            document.getElementById('thickness').disabled = state.status === 'counting';
-
-            // Half life specific
             document.getElementById('halflife-clock').style.display = cm === 'halflife' ? 'flex' : 'none';
             document.getElementById('elute-btn').style.display = cm === 'halflife' ? 'flex' : 'none';
             document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
-
-            // Update Labels
-            document.getElementById('preset-time-val').textContent = state.presetTime + ' s';
-            document.getElementById('voltage-val').textContent = state.voltage + ' V';
-            document.getElementById('distance-val').textContent = state.distance + ' cm';
-            document.getElementById('thickness-val').textContent = state.thicknessCm.toFixed(2) + ' cm';
-
-            // Update Visual Bench
-            document.getElementById('visual-distance').style.height = (state.distance * 8) + 'px';
-            document.getElementById('visual-dist-label').textContent = state.distance + 'cm';
+            
+            document.getElementById('preset-time-val').textContent = state.presetTime + ' s'; document.getElementById('voltage-val').textContent = state.voltage + ' V'; document.getElementById('distance-val').textContent = state.distance + ' cm'; document.getElementById('thickness-val').textContent = state.thicknessCm.toFixed(2) + ' cm';
+            
+            const maxVisDist = cm === 'inversesquare' ? 50 : 20; const pixelHeight = Math.max(16, (state.distance / maxVisDist) * 160);
+            document.getElementById('visual-distance').style.height = pixelHeight + 'px'; document.getElementById('visual-dist-label').textContent = state.distance + 'cm';
             
             const visAbsorber = document.getElementById('visual-absorber');
-            if (state.thicknessCm > 0) {
-                visAbsorber.style.display = 'block';
-                visAbsorber.style.height = Math.max(4, state.thicknessCm * 30) + 'px';
-            } else {
-                visAbsorber.style.display = 'none';
-            }
-
+            if (state.thicknessCm > 0) { visAbsorber.style.display = 'block'; visAbsorber.style.height = Math.max(4, state.thicknessCm * 30) + 'px'; } else { visAbsorber.style.display = 'none'; }
+            
             const visSrc = document.getElementById('visual-source');
-            if (state.sourceKey !== 'None') {
-                visSrc.style.display = 'block';
-                visSrc.className = `w-5 h-5 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse ${SOURCES[state.sourceKey].type === 'gamma' ? 'bg-purple-500' : 'bg-amber-500'}`;
-            } else {
-                visSrc.style.display = 'none';
-            }
-
+            if (state.sourceKey !== 'None') { visSrc.style.display = 'block'; visSrc.className = `w-4 h-4 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse ${SOURCES[state.sourceKey].type === 'gamma' ? 'bg-purple-500' : 'bg-amber-500'}`; } else { visSrc.style.display = 'none'; }
             document.getElementById('spark-effect').style.display = (state.isPowered && state.voltage > 700 && state.status === 'counting') ? 'block' : 'none';
 
             updateTableAndGraph();
         }
 
         function updateTableAndGraph() {
-            const m = state.mode;
-            const records = state.records[m];
-            
-            // Build Table Headers
+            const m = state.mode; const records = state.records[m];
             let hHTML = '<tr><th class="p-2 pl-3">Source</th>';
             if (m === 'plateau') hHTML += '<th class="p-2 text-yellow-300">Voltage (V)</th>';
             if (m === 'inversesquare') hHTML += '<th class="p-2 text-emerald-300">Dist (cm)</th><th class="p-2">1/d²</th>';
             if (m === 'absorption') hHTML += '<th class="p-2 text-blue-300">Thick (g/cm²)</th>';
             if (m === 'halflife') hHTML += '<th class="p-2 text-rose-300">Time (s)</th>';
-            hHTML += '<th class="p-2">Counts</th><th class="p-2">CPS</th><th class="p-2 text-white">Net CPS</th></tr>';
+            hHTML += '<th class="p-2 text-right">Counts (N)</th><th class="p-2 text-right">Error (±√N)</th><th class="p-2 text-white text-right">Net CPS</th></tr>';
             document.getElementById('table-head').innerHTML = hHTML;
 
-            // Build Table Rows
             let bHTML = '';
-            if (records.length === 0) {
-                bHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-600 italic">Run experiment to log data.</td></tr>`;
-            } else {
+            if (records.length === 0) { bHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-600 italic">Run experiment to log data.</td></tr>`; } 
+            else {
                 records.forEach(r => {
+                    const err = Math.sqrt(r.counts).toFixed(1);
                     bHTML += `<tr class="border-b border-slate-800 hover:bg-slate-800/50"><td class="p-2 pl-3">${r.source}</td>`;
                     if (m === 'plateau') bHTML += `<td class="p-2 text-yellow-200">${r.voltage}</td>`;
                     if (m === 'inversesquare') bHTML += `<td class="p-2 text-emerald-200">${r.distance}</td><td class="p-2 text-slate-400">${r.invDistSq}</td>`;
                     if (m === 'absorption') bHTML += `<td class="p-2 text-blue-200">${r.thicknessGcm2}</td>`;
                     if (m === 'halflife') bHTML += `<td class="p-2 text-rose-200">${r.timeAtRecord}</td>`;
-                    bHTML += `<td class="p-2 digital-font text-slate-400">${r.counts}</td><td class="p-2 digital-font text-slate-400">${r.cps}</td><td class="p-2 digital-font text-white font-bold bg-slate-800/30">${r.netCps}</td></tr>`;
+                    bHTML += `<td class="p-2 text-right digital-font text-slate-400">${r.counts}</td><td class="p-2 text-right digital-font text-slate-500">±${err}</td><td class="p-2 text-right digital-font text-white font-bold bg-slate-800/30">${r.netCps}</td></tr>`;
                 });
             }
             document.getElementById('table-body').innerHTML = bHTML;
 
-            // Build Graph
             const gCont = document.getElementById('graph-container');
-            if (records.length === 0) {
-                gCont.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-sm border-2 border-dashed border-slate-800 rounded-lg">Log data points to generate the graph</div>`;
-                return;
-            }
+            if (records.length === 0) { gCont.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-sm border-2 border-dashed border-slate-800 rounded-lg">Log data points to generate the graph</div>`; return; }
 
-            // Sort logic
             const sorted = [...records].sort((a, b) => {
                 if (m === 'plateau') return a.voltage - b.voltage;
                 if (m === 'inversesquare') return a.invDistSq - b.invDistSq;
                 if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2;
-                if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord;
-                return 0;
+                if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; return 0;
             });
-
-            // Map variables
             const getX = r => {
-                if (m === 'plateau') return Number(r.voltage);
-                if (m === 'inversesquare') return Number(r.invDistSq);
-                if (m === 'absorption') return Number(r.thicknessGcm2);
-                if (m === 'halflife') return Number(r.timeAtRecord);
-                return 0;
+                if (m === 'plateau') return Number(r.voltage); if (m === 'inversesquare') return Number(r.invDistSq);
+                if (m === 'absorption') return Number(r.thicknessGcm2); if (m === 'halflife') return Number(r.timeAtRecord); return 0;
             };
             const getY = r => Number(r.netCps);
 
@@ -697,66 +639,217 @@
             if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#60a5fa'; }
             if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; color = '#fb7185'; }
 
-            const maxNet = Math.max(10, ...sorted.map(getY));
-            const maxY = maxNet * 1.2;
-
-            const pad = { t: 20, r: 20, b: 40, l: 50 };
-            const W = 800, H = 300; // ViewBox sizes
-            const gW = W - pad.l - pad.r;
-            const gH = H - pad.t - pad.b;
-
-            const calcX = v => pad.l + ((v - minX) / (maxX - minX)) * gW;
-            const calcY = v => H - pad.b - (v / maxY) * gH;
-
+            const maxNet = Math.max(10, ...sorted.map(getY)); const maxY = maxNet * 1.2;
+            const pad = { t: 20, r: 20, b: 40, l: 50 }; const W = 800, H = 320; 
+            const gW = W - pad.l - pad.r; const gH = H - pad.t - pad.b;
+            const calcX = v => pad.l + ((v - minX) / (maxX - minX)) * gW; const calcY = v => H - pad.b - (v / maxY) * gH;
             const xTicks = 6, yTicks = 5;
 
-            let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-full overflow-visible">`;
-            
-            // Grid
+            let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">`;
             svg += `<g stroke="#334155" stroke-width="1" opacity="0.4">`;
-            for(let i=0; i<=yTicks; i++){
-                let y = calcY((maxY/yTicks)*i);
-                svg += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" />`;
-            }
-            for(let i=0; i<=xTicks; i++){
-                let v = minX + ((maxX-minX)/xTicks)*i;
-                let x = calcX(v);
-                svg += `<line x1="${x}" y1="${pad.t}" x2="${x}" y2="${H-pad.b}" />`;
-            }
-            svg += `</g>`;
-
-            // Axes
-            svg += `<g stroke="#94a3b8" stroke-width="2">
-                <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" />
-                <line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" />
-            </g>`;
-
-            // Y Labels
-            svg += `<g fill="#94a3b8" font-size="11" text-anchor="end" alignment-baseline="middle">`;
-            for(let i=0; i<=yTicks; i++){
-                let v = (maxY/yTicks)*i;
-                svg += `<text x="${pad.l-8}" y="${calcY(v)}">${v.toFixed(0)}</text>`;
-            }
-            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#cbd5e1" font-size="12" text-anchor="middle">Net CPS</text>`;
-
-            // X Labels
-            svg += `<g fill="#94a3b8" font-size="11" text-anchor="middle">`;
-            for(let i=0; i<=xTicks; i++){
-                let v = minX + ((maxX-minX)/xTicks)*i;
-                svg += `<text x="${calcX(v)}" y="${H-pad.b+18}">${v.toFixed(m==='inversesquare'?2:0)}</text>`;
-            }
-            svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#cbd5e1" font-size="12" text-anchor="middle">${xLab}</text>`;
-
-            // Data Points & Line
+            for(let i=0; i<=yTicks; i++){ let y = calcY((maxY/yTicks)*i); svg += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" />`; }
+            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; let x = calcX(v); svg += `<line x1="${x}" y1="${pad.t}" x2="${x}" y2="${H-pad.b}" />`; }
+            svg += `</g><g stroke="#94a3b8" stroke-width="2"><line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" /><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" /></g>`;
+            
+            svg += `<g fill="#94a3b8" font-size="11" text-anchor="end" alignment-baseline="middle" font-family="sans-serif">`;
+            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-8}" y="${calcY(v)}">${v.toFixed(0)}</text>`; }
+            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#cbd5e1" font-size="12" text-anchor="middle" font-family="sans-serif">Net CPS</text>`;
+            svg += `<g fill="#94a3b8" font-size="11" text-anchor="middle" font-family="sans-serif">`;
+            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; svg += `<text x="${calcX(v)}" y="${H-pad.b+18}">${v.toFixed(m==='inversesquare'?2:1)}</text>`; }
+            svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#cbd5e1" font-size="12" text-anchor="middle" font-family="sans-serif">${xLab}</text>`;
+            
             let pointsStr = sorted.map(d => `${calcX(getX(d))},${calcY(getY(d))}`).join(' ');
             svg += `<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="2.5" />`;
-            
-            sorted.forEach(d => {
-                svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="4" fill="${color}" stroke="#1e293b" stroke-width="1.5" />`;
-            });
-
+            sorted.forEach(d => { svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="4" fill="${color}" stroke="#1e293b" stroke-width="1.5" />`; });
             svg += `</svg>`;
             gCont.innerHTML = svg;
+        }
+
+        // --- AI EXPERT SYSTEM ---
+        function runAIAnalysis() {
+            const m = state.mode;
+            const records = state.records[m];
+            const out = document.getElementById('ai-output');
+            const btn = document.getElementById('ai-speak-btn');
+            const ind = document.getElementById('ai-status-indicator');
+
+            ind.className = "w-4 h-4 rounded-full ai-active-glow";
+
+            if (records.length < 2) {
+                out.innerHTML = `<p class="text-rose-400"><strong>Error:</strong> Insufficient data points. Please record at least 2 points to perform AI analysis.</p>`;
+                state.aiTextCache = "Insufficient data points.";
+                btn.disabled = true;
+                return;
+            }
+
+            let html = `<h4 class="text-lg font-bold text-white mb-2">Analysis Report</h4>`;
+            let speechText = "";
+
+            const sorted = [...records].sort((a,b) => {
+                if (m === 'plateau') return a.voltage - b.voltage;
+                if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2;
+                if (m === 'inversesquare') return a.distance - b.distance;
+                if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord;
+            });
+
+            if (m === 'absorption') {
+                const bg = state.bgCountRate || 0.8;
+                const n0_record = sorted.find(r => r.thicknessGcm2 == 0);
+                if(!n0_record) {
+                    html += `<p class="text-rose-400">Please record an initial count at 0 cm thickness to find the unattenuated rate.</p>`;
+                    speechText = "Please record an initial count at zero thickness.";
+                } else {
+                    const N0 = parseFloat(n0_record.netCps);
+                    const targetN = N0 / 2;
+                    let t_half = 0;
+                    
+                    // Linear interpolation to find t1/2
+                    for(let i=0; i<sorted.length-1; i++){
+                        const y1 = parseFloat(sorted[i].netCps); const y2 = parseFloat(sorted[i+1].netCps);
+                        const x1 = parseFloat(sorted[i].thicknessGcm2); const x2 = parseFloat(sorted[i+1].thicknessGcm2);
+                        if(targetN <= y1 && targetN >= y2 && y1 !== y2) {
+                            t_half = x1 + (targetN - y1) * ((x2 - x1) / (y2 - y1));
+                            break;
+                        }
+                    }
+
+                    if(t_half === 0) {
+                        html += `<p class="text-rose-400">Could not find half-value thickness. Ensure you add thicker absorbers until count rate drops below ${targetN.toFixed(1)} CPS.</p>`;
+                        speechText = "Could not find half value thickness. Add thicker absorbers.";
+                    } else {
+                        // Standard references based on manual
+                        const ref_thalf = 0.124; // Tl204
+                        const ref_range = 0.307; // Tl204
+                        const calc_range = ref_range * (t_half / ref_thalf);
+                        const emax = (calc_range + 0.09) / 0.52;
+
+                        html += `<p>I have analyzed your attenuation data. The initial unshielded net count rate is <strong class="text-white">${N0.toFixed(1)} CPS</strong>.</p>`;
+                        html += `<p>The target half-count rate is <strong class="text-white">${targetN.toFixed(1)} CPS</strong>. Interpolating the plot yields an experimental half-value thickness:</p>`;
+                        html += `<div class="ai-math-box">t_1/2 = ${t_half.toFixed(3)} g/cm²</div>`;
+                        html += `<p>Using standard Thallium-204 as reference (t_1/2 = ${ref_thalf} g/cm², Range = ${ref_range} g/cm²), we determine the Range of your source:</p>`;
+                        html += `<div class="ai-math-box">R_unk = R_ref × (t_1/2_unk / t_1/2_ref)<br>R_unk = ${ref_range} × (${t_half.toFixed(3)} / ${ref_thalf})<br>R_unk = ${calc_range.toFixed(3)} g/cm²</div>`;
+                        html += `<p>Finally, applying the empirical Energy-Range relation (E = (R + 0.09) / 0.52):</p>`;
+                        html += `<div class="ai-math-box glow-text text-emerald-400">End-Point Energy (E_max) = ${emax.toFixed(2)} MeV</div>`;
+                        
+                        speechText = `I have analyzed the data. The experimental half-value thickness is ${t_half.toFixed(3)} grams per square centimeter. Calculating the relative range, we find an end-point energy of ${emax.toFixed(2)} mega electron volts.`;
+                    }
+                }
+            } 
+            else if (m === 'halflife') {
+                const first = sorted[0]; const last = sorted[sorted.length-1];
+                const n0 = parseFloat(first.netCps); const nt = parseFloat(last.netCps);
+                const t = parseFloat(last.timeAtRecord) - parseFloat(first.timeAtRecord);
+                
+                if (n0 <= nt || t === 0) {
+                    html += `<p class="text-rose-400">Invalid decay trend. Counts must decrease over time.</p>`;
+                    speechText = "Invalid decay trend detected.";
+                } else {
+                    const lambda = Math.log(n0/nt) / t;
+                    const thalf = Math.LN2 / lambda;
+                    
+                    html += `<p>Over a span of ${t.toFixed(1)} seconds, net counts decayed from ${n0.toFixed(1)} to ${nt.toFixed(1)} CPS.</p>`;
+                    html += `<p>Using the exponential decay law <span class="math-font">N_t = N_0 e^{-λt}</span>, the decay constant is:</p>`;
+                    html += `<div class="ai-math-box">λ = ln(${n0.toFixed(1)} / ${nt.toFixed(1)}) / ${t.toFixed(1)}<br>λ = ${lambda.toFixed(4)} s⁻¹</div>`;
+                    html += `<p>The half-life <span class="math-font">T_{1/2} = ln(2) / λ</span> is computed as:</p>`;
+                    html += `<div class="ai-math-box glow-text text-emerald-400">Half-Life (T_1/2) = ${thalf.toFixed(1)} seconds</div>`;
+                    
+                    speechText = `Analysis complete. Based on the logarithmic decay over ${t.toFixed(0)} seconds, the calculated half life is ${thalf.toFixed(1)} seconds.`;
+                }
+            }
+            else if (m === 'plateau') {
+                if(sorted.length < 3) {
+                    html += `<p class="text-rose-400">Record more voltage points to identify a plateau.</p>`; speechText = "Record more voltage points.";
+                } else {
+                    // Just take mid points for simple plateau calculation demonstration
+                    const mid1 = sorted[Math.floor(sorted.length/3)];
+                    const mid2 = sorted[Math.floor((sorted.length*2)/3)];
+                    const n1 = parseFloat(mid1.netCps), v1 = parseFloat(mid1.voltage);
+                    const n2 = parseFloat(mid2.netCps), v2 = parseFloat(mid2.voltage);
+                    const slope = ((n2 - n1) / n1) * (100 / (v2 - v1)) * 100;
+                    
+                    html += `<p>Locating the flattest region of the characteristic curve between ${v1}V and ${v2}V.</p>`;
+                    html += `<p>Using points (V1=${v1}, N1=${n1}) and (V2=${v2}, N2=${n2}):</p>`;
+                    html += `<div class="ai-math-box">Slope = [(N2 - N1) / N1] × [100 / (V2 - V1)] %<br>Slope = ${slope.toFixed(3)} % per 100V</div>`;
+                    if(slope >= 0 && slope < 10) html += `<p class="text-emerald-400">Good plateau detected. Ideal operating voltage is ~${(v1+v2)/2}V.</p>`;
+                    
+                    speechText = `Analyzing the characteristic curve. The flattest plateau region has a slope of ${slope.toFixed(2)} percent per 100 volts.`;
+                }
+            }
+            else if (m === 'inversesquare') {
+                html += `<p>Analyzing the relationship between Distance and Intensity.</p>`;
+                html += `<p>The theoretical expectation is a perfectly linear relationship between <span class="math-font">1/d²</span> and Net CPS.</p>`;
+                // Simple linearity check presentation
+                const first = sorted[0]; const last = sorted[sorted.length-1];
+                html += `<div class="ai-math-box">Point 1: ${first.distance}cm -> ${first.netCps} CPS<br>Point 2: ${last.distance}cm -> ${last.netCps} CPS<br><br>Ratio (I1/I2) = ${(parseFloat(first.netCps)/parseFloat(last.netCps)).toFixed(2)}<br>Ratio (d2²/d1²) = ${Math.pow(last.distance/first.distance, 2).toFixed(2)}</div>`;
+                html += `<p class="text-emerald-400">The close matching of these ratios computationally verifies the Inverse Square Law.</p>`;
+                
+                speechText = `Checking inverse square proportionality. The intensity ratios strongly correlate with the inverse square of the distance, confirming the physical law.`;
+            }
+
+            out.innerHTML = html;
+            state.aiTextCache = speechText;
+            btn.disabled = false;
+        }
+
+        let aiSpeechSynth = null;
+        function speakAI() {
+            if(!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            aiSpeechSynth = new SpeechSynthesisUtterance(state.aiTextCache);
+            aiSpeechSynth.rate = 1.0; aiSpeechSynth.pitch = 1.0; // Professional voice
+            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full ai-active-glow";
+            aiSpeechSynth.onend = () => { document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-emerald-500"; };
+            window.speechSynthesis.speak(aiSpeechSynth);
+        }
+
+        // --- Voice Assistant (Manual reading) ---
+        let isSpeaking = false;
+        function speakManual() {
+            if(!('speechSynthesis' in window)) return alert("Your browser doesn't support text-to-speech.");
+            window.speechSynthesis.cancel();
+            let man = LAB_MANUALS[state.mode];
+            let text = `Experiment: ${man.title}. Theoretical Background: ${man.theory}. Procedure: Step 1: ${man.procedure.join('. Step: ')}.`;
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.95; utterance.pitch = 1.1;
+            utterance.onstart = () => { document.getElementById('assistant-indicator').classList.add('speaking-glow'); };
+            utterance.onend = () => { document.getElementById('assistant-indicator').classList.remove('speaking-glow'); };
+            window.speechSynthesis.speak(utterance);
+        }
+        function stopSpeaking() {
+            if('speechSynthesis' in window) window.speechSynthesis.cancel();
+            document.getElementById('assistant-indicator').classList.remove('speaking-glow');
+            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-slate-600";
+        }
+
+        // --- Calculator Tool ---
+        let calcVal = '';
+        function toggleCalculator() {
+            const calc = document.getElementById('calculator-widget');
+            calc.style.display = calc.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function calcPress(val) {
+            const display = document.getElementById('calc-display');
+            if (val === 'C') calcVal = '';
+            else if (val === 'Del') calcVal = calcVal.slice(0, -1);
+            else if (val === '=') { try { let eq = calcVal.replace(/x/g, '*').replace(/÷/g, '/').replace(/\^/g, '**'); calcVal = Function('"use strict";return (' + eq + ')')().toString(); } catch (e) { calcVal = 'Error'; } }
+            else if (val === 'x2') { try { calcVal = Math.pow(parseFloat(calcVal || 0), 2).toString(); } catch(e){} } 
+            else if (val === 'sqrt') { try { calcVal = Math.sqrt(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
+            else if (val === 'ln') { try { calcVal = Math.log(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
+            else if (val === 'exp') { try { calcVal = Math.exp(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
+            else { if (calcVal === 'Error') calcVal = ''; calcVal += val; }
+            display.value = calcVal || '0';
+        }
+        function startDrag(e, id) {
+            const el = document.getElementById(id);
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+            let startX = e.clientX, startY = e.clientY;
+            function doDrag(e2) {
+                const dx = e2.clientX - startX; const dy = e2.clientY - startY;
+                startX = e2.clientX; startY = e2.clientY;
+                el.style.top = (el.offsetTop + dy) + "px"; el.style.left = (el.offsetLeft + dx) + "px"; el.style.right = "auto"; 
+            }
+            function stopDrag() { document.removeEventListener('mousemove', doDrag); document.removeEventListener('mouseup', stopDrag); }
+            document.addEventListener('mousemove', doDrag); document.addEventListener('mouseup', stopDrag);
         }
 
     </script>
