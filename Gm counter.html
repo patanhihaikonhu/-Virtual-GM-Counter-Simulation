@@ -3,291 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Nuclear Physics Lab | AI Expert Edition</title>
+    <title>Virtual Physics Lab | Liquid AI Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
-        .glow-text { text-shadow: 0 0 10px currentColor; }
-        .digital-font { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
-        .math-font { font-family: 'Times New Roman', Times, serif; font-style: italic; }
-
-        /* Calculator Dragging styling */
-        #calculator-widget { transition: opacity 0.2s; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .calc-btn { background-color: #334155; color: white; padding: 0.5rem; border-radius: 0.25rem; font-weight: 600; font-family: monospace; transition: all 0.1s; }
-        .calc-btn:hover { background-color: #475569; }
-        .calc-btn:active { background-color: #64748b; transform: scale(0.95); }
-        .calc-op { background-color: #2563eb; }
-        .calc-op:hover { background-color: #3b82f6; }
-        
-        /* Assistant Animations */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        :root {
+            --glass-bg: rgba(15, 23, 42, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --liquid-accent: #10b981;
         }
-        .ai-active-glow { animation: pulse-ring 2s infinite; background-color: #10b981 !important; }
 
-        .ai-math-box { background: rgba(15, 23, 42, 0.6); border-left: 4px solid #3b82f6; padding: 12px; margin: 10px 0; border-radius: 4px; font-family: monospace; color: #93c5fd; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .digital-font { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        /* Liquid Drop Background Animation */
+        .liquid-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; filter: blur(90px); opacity: 0.5; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #3b82f6; top: -10%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 600px; height: 600px; background: #8b5cf6; bottom: -20%; right: -10%; animation-delay: -5s; }
+        .blob-3 { width: 400px; height: 400px; background: #10b981; top: 40%; left: 40%; animation-delay: -10s; opacity: 0.3; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 40px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Floating Widgets */
+        .floating-widget {
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .widget-hidden { opacity: 0; transform: scale(0.95) translateY(10px); pointer-events: none; }
+
+        /* Calculator Buttons */
+        .calc-btn { background: rgba(255,255,255,0.05); color: white; padding: 0.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.02); }
+        .calc-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .calc-btn:active { transform: scale(0.95); }
+        
+        /* Modern Inputs */
+        input[type="range"] { -webkit-appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: white; border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.5); cursor: pointer; transition: transform 0.1s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        /* AI Chat Bubbles */
+        .chat-bubble-user { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 1rem 1rem 0 1rem; }
+        .chat-bubble-ai { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 1rem 1rem 1rem 0; }
+        .typing-indicator span { display: inline-block; width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Voice Animation */
+        @keyframes sound-wave {
+            0% { height: 4px; }
+            50% { height: 16px; }
+            100% { height: 4px; }
+        }
+        .speaking-bar { width: 3px; background: #10b981; border-radius: 3px; display: inline-block; margin: 0 1px; animation: sound-wave 1s infinite; }
+        .speaking-bar:nth-child(2) { animation-delay: 0.2s; }
+        .speaking-bar:nth-child(3) { animation-delay: 0.4s; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans min-h-screen pb-10">
+<body class="pb-10 min-h-screen flex flex-col">
+
+    <!-- Liquid Background -->
+    <div class="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
     <!-- Header -->
-    <header class="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-40 shadow-xl">
+    <header class="glass-panel mx-4 mt-4 p-4 sticky top-4 z-40">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] text-xl">☢</div>
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] text-2xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+                    <span class="relative z-10">☢</span>
+                </div>
                 <div>
-                    <h1 class="text-xl font-bold text-white leading-tight">Virtual Nuclear Physics Lab</h1>
-                    <p class="text-xs text-emerald-400 font-medium tracking-wide">AI EXPERT EDITION</p>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">Nuclear Lab<span class="text-emerald-400 font-light">.AI</span></h1>
+                    <p class="text-xs text-slate-400 font-medium tracking-widest uppercase">iOS Liquid Theme Edition</p>
                 </div>
             </div>
 
-            <div class="flex space-x-4 items-center flex-wrap justify-center gap-y-2">
-                <div class="flex space-x-2 bg-slate-800 p-1 rounded-lg" id="mode-selector">
+            <div class="flex space-x-3 items-center flex-wrap justify-center gap-y-2">
+                <div class="flex space-x-1 bg-black/30 p-1 rounded-xl backdrop-blur-md border border-white/5" id="mode-selector">
                     <!-- Modes injected via JS -->
                 </div>
                 
                 <div class="flex space-x-2">
-                    <button onclick="toggleSound()" id="sound-toggle-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-3 py-1.5 rounded-md text-sm font-bold flex items-center transition-all shadow-md">
-                        🔈 Sound: OFF
+                    <button onclick="toggleSound()" id="sound-toggle-btn" class="glass-panel hover:bg-white/10 px-4 py-2 rounded-xl text-sm font-bold flex items-center transition-all cursor-pointer">
+                        🔈 Off
                     </button>
-                    <button onclick="toggleCalculator()" class="bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border border-blue-800 px-3 py-1.5 rounded-md text-sm font-bold flex items-center transition-all shadow-md">
-                        🖩 Calculator
+                    <button onclick="toggleWidget('calculator-widget')" class="glass-panel hover:bg-blue-500/20 text-blue-300 border-blue-500/30 px-4 py-2 rounded-xl text-sm font-bold flex items-center transition-all cursor-pointer">
+                        🖩 Calc
+                    </button>
+                    <button onclick="toggleWidget('ai-chat-widget')" class="bg-gradient-to-r from-emerald-500 to-cyan-600 hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] cursor-pointer">
+                        ✨ Ask AI
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-6 mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="max-w-7xl mx-auto w-full p-4 mt-2 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
         
-        <!-- LEFT COLUMN: Controls & Apparatus -->
+        <!-- LEFT COLUMN: Apparatus -->
         <div class="lg:col-span-4 space-y-6">
             
             <!-- Control Console -->
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-
-                <div class="flex justify-between items-center mb-5 border-b border-slate-700 pb-4">
-                    <h2 class="text-lg font-bold text-white flex items-center">Control Unit</h2>
-                    <button id="power-btn" onclick="togglePower()" class="bg-slate-900 text-slate-500 border border-slate-700 p-2 rounded-full transition-all shadow-inner flex items-center">
-                        <span class="w-4 h-4 rounded-full border-2 border-current block mr-2"></span>
-                        <span id="power-text" class="text-xs font-bold uppercase mr-1">OFF</span>
+            <div class="glass-panel p-6 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-white tracking-wide">Control Unit</h2>
+                    <button id="power-btn" onclick="togglePower()" class="bg-black/40 text-slate-500 border border-white/10 px-4 py-2 rounded-full transition-all shadow-inner flex items-center cursor-pointer hover:bg-black/60">
+                        <span class="w-3 h-3 rounded-full border-2 border-current block mr-2"></span>
+                        <span id="power-text" class="text-xs font-bold uppercase tracking-wider">OFF</span>
                     </button>
                 </div>
 
                 <!-- Digital Displays -->
                 <div class="flex space-x-4 mb-6">
-                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center relative overflow-hidden">
-                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Time (s)</div>
-                        <div id="time-display" class="digital-font text-3xl tracking-wider text-slate-700">00.0</div>
+                    <div class="flex-1 bg-black/50 p-4 rounded-2xl border border-white/5 shadow-inner text-center">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Time (s)</div>
+                        <div id="time-display" class="digital-font text-3xl text-slate-600">00.0</div>
                     </div>
-                    <div class="flex-1 bg-slate-950 p-3 rounded-lg border border-slate-700 shadow-inner text-center relative overflow-hidden">
-                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Counts</div>
-                        <div id="count-display" class="digital-font text-3xl tracking-wider text-slate-700">00000</div>
+                    <div class="flex-1 bg-black/50 p-4 rounded-2xl border border-white/5 shadow-inner text-center">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Counts</div>
+                        <div id="count-display" class="digital-font text-3xl text-slate-600">00000</div>
                     </div>
                 </div>
 
-                <!-- Playback Controls -->
-                <div class="flex space-x-2 mb-6 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50">
-                    <button id="start-btn" onclick="startCount()" disabled class="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all shadow-md">▶ Start</button>
-                    <button id="stop-btn" onclick="stopCount()" disabled class="flex-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all">■ Stop</button>
-                    <button id="reset-btn" onclick="resetCount()" disabled class="flex-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white py-2 rounded-md font-medium text-sm transition-all">↻ Reset</button>
+                <!-- Playback -->
+                <div class="flex space-x-2 mb-6">
+                    <button id="start-btn" onclick="startCount()" disabled class="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:hover:bg-blue-600 text-white py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-900/20 cursor-pointer">▶ Start</button>
+                    <button id="stop-btn" onclick="stopCount()" disabled class="flex-1 bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white py-3 rounded-xl font-bold text-sm transition-all cursor-pointer">■ Stop</button>
+                    <button id="reset-btn" onclick="resetCount()" disabled class="flex-1 bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white py-3 rounded-xl font-bold text-sm transition-all cursor-pointer">↻ Reset</button>
                 </div>
 
-                <!-- Experiment Parameters -->
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between text-xs mb-1.5">
-                            <label class="text-slate-400 font-medium">Preset Count Time</label>
+                <!-- Settings -->
+                <div class="space-y-5">
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                        <div class="flex justify-between text-xs mb-2">
+                            <label class="text-slate-400 font-medium">Preset Timer</label>
                             <span id="preset-time-val" class="text-blue-300 digital-font">30 s</span>
                         </div>
-                        <input type="range" id="preset-time" min="10" max="60" step="10" value="30" class="w-full accent-blue-500" oninput="updateParams()">
+                        <input type="range" id="preset-time" min="10" max="60" step="10" value="30" class="w-full" oninput="updateParams()">
                     </div>
 
-                    <div id="ctrl-voltage" class="p-3 rounded-lg border bg-slate-900/50 border-slate-700/50 hidden">
-                        <div class="flex justify-between text-xs mb-1.5">
-                            <label class="font-medium text-blue-300">Operating Voltage</label>
-                            <span id="voltage-val" class="text-slate-200 digital-font">500 V</span>
+                    <div id="ctrl-voltage" class="bg-black/20 p-4 rounded-2xl border border-white/5 hidden">
+                        <div class="flex justify-between text-xs mb-2">
+                            <label class="text-slate-400 font-medium">Voltage</label>
+                            <span id="voltage-val" class="text-yellow-300 digital-font">500 V</span>
                         </div>
-                        <input type="range" id="voltage" min="300" max="1000" step="25" value="500" class="w-full accent-yellow-500" oninput="updateParams()">
+                        <input type="range" id="voltage" min="300" max="1000" step="25" value="500" class="w-full" oninput="updateParams()">
                     </div>
 
-                    <div id="ctrl-distance" class="p-3 rounded-lg border bg-slate-900/50 border-slate-700/50 hidden">
-                        <div class="flex justify-between text-xs mb-1.5">
-                            <label class="font-medium text-blue-300">Source-Detector Distance</label>
-                            <span id="distance-val" class="text-slate-200 digital-font">2 cm</span>
+                    <div id="ctrl-distance" class="bg-black/20 p-4 rounded-2xl border border-white/5 hidden">
+                        <div class="flex justify-between text-xs mb-2">
+                            <label class="text-slate-400 font-medium">Distance</label>
+                            <span id="distance-val" class="text-emerald-300 digital-font">2 cm</span>
                         </div>
-                        <input type="range" id="distance" min="2" max="50" step="1" value="2" class="w-full accent-emerald-500" oninput="updateParams()">
+                        <input type="range" id="distance" min="2" max="50" step="1" value="2" class="w-full" oninput="updateParams()">
                     </div>
 
-                    <div id="ctrl-thickness" class="p-3 rounded-lg border bg-slate-900/50 border-slate-700/50 hidden">
-                        <div class="flex justify-between text-xs mb-1.5">
-                            <label class="font-medium text-blue-300">Aluminum Absorber</label>
-                            <span id="thickness-val" class="text-slate-200 digital-font">0.00 cm</span>
+                    <div id="ctrl-thickness" class="bg-black/20 p-4 rounded-2xl border border-white/5 hidden">
+                        <div class="flex justify-between text-xs mb-2">
+                            <label class="text-slate-400 font-medium">Al Absorber</label>
+                            <span id="thickness-val" class="text-blue-300 digital-font">0.00 cm</span>
                         </div>
-                        <select id="thickness" class="w-full bg-slate-800 border border-slate-600 rounded p-1.5 text-sm outline-none focus:border-blue-500 text-slate-200" onchange="updateParams()">
-                            <!-- Populated via JS -->
-                        </select>
+                        <select id="thickness" class="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-sm outline-none text-slate-200 cursor-pointer" onchange="updateParams()"></select>
                     </div>
                 </div>
             </div>
 
             <!-- Virtual Lab Bench -->
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl relative min-h-[250px]">
-                <div id="halflife-clock" class="hidden absolute top-4 right-4 bg-slate-900 border border-rose-900 p-2 rounded-lg text-center flex-col items-center shadow-lg z-30">
-                    <div class="text-[10px] text-slate-400 uppercase">Lab Clock</div>
-                    <div id="global-time-val" class="digital-font text-rose-400 font-bold">0 s</div>
+            <div class="glass-panel p-6 relative min-h-[250px] flex flex-col justify-between">
+                <div id="halflife-clock" class="hidden absolute top-4 right-4 bg-rose-500/20 border border-rose-500/30 backdrop-blur-md p-2 rounded-xl text-center flex-col items-center z-30">
+                    <div class="text-[9px] text-rose-200 uppercase tracking-wider mb-1">Decay Clock</div>
+                    <div id="global-time-val" class="digital-font text-rose-400 font-bold text-lg">0 s</div>
                 </div>
-                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Lab Bench</h2>
-                <div class="flex flex-col items-center py-2 relative">
-                    <div id="gm-tube" class="w-16 h-20 bg-gradient-to-b from-slate-300 to-slate-500 rounded-t-full border-4 border-slate-600 shadow-[0_10px_20px_rgba(0,0,0,0.5)] z-20 flex flex-col items-center justify-end pb-2 relative transition-all">
-                        <div class="text-[8px] text-slate-800 font-bold absolute top-6 rotate-90 tracking-widest">DETECTOR</div>
-                        <div class="w-full h-3 bg-slate-800/50"></div>
-                        <div id="spark-effect" class="absolute inset-0 bg-yellow-400/20 rounded-t-full animate-pulse z-30 hidden"></div>
+
+                <div class="flex flex-col items-center py-2 relative flex-1 justify-center">
+                    <div id="gm-tube" class="w-16 h-20 bg-gradient-to-b from-slate-400 to-slate-600 rounded-t-[2rem] border-4 border-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.8)] z-20 flex flex-col items-center justify-end pb-2 relative transition-all">
+                        <div class="w-full h-3 bg-slate-900/80 mb-1 rounded-sm"></div>
+                        <div id="spark-effect" class="absolute inset-0 bg-yellow-400/30 rounded-t-[2rem] animate-pulse z-30 hidden mix-blend-overlay"></div>
                     </div>
-                    <div id="visual-distance" class="w-1.5 relative flex flex-col items-center z-10 bg-slate-700/50 transition-all duration-300" style="height: 16px;">
-                        <div class="absolute left-3 top-0 bottom-0 border-l border-slate-600 flex flex-col justify-between py-1 text-[8px] text-slate-500 digital-font">
-                            <span>0</span><span id="visual-dist-label">2cm</span>
+                    <div id="visual-distance" class="w-2 relative flex flex-col items-center z-10 bg-slate-800/80 transition-all duration-300 shadow-inner" style="height: 16px;">
+                        <div class="absolute left-4 top-0 bottom-0 border-l border-white/20 flex flex-col justify-between py-1 text-[9px] text-slate-400 digital-font">
+                            <span>0</span><span id="visual-dist-label">2</span>
                         </div>
-                        <div id="visual-absorber" class="hidden absolute top-2 w-20 bg-slate-300/90 border border-slate-400 shadow-lg z-20" style="left: -38px; height: 4px;"></div>
+                        <div id="visual-absorber" class="hidden absolute top-2 w-20 bg-gradient-to-r from-slate-200 to-slate-400 border border-white/50 shadow-[0_5px_15px_rgba(0,0,0,0.5)] z-20 rounded-sm" style="left: -38px; height: 4px;"></div>
                     </div>
-                    <div class="w-24 h-6 bg-slate-700 border-2 border-slate-600 rounded shadow-xl flex items-center justify-center relative z-20">
-                        <div id="visual-source" class="hidden w-4 h-4 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse bg-amber-500"></div>
+                    <div class="w-28 h-8 bg-slate-800 border-t border-white/10 rounded-2xl shadow-2xl flex items-center justify-center relative z-20">
+                        <div id="visual-source" class="hidden w-4 h-4 rounded-full shadow-[0_0_20px_rgba(0,0,0,1)] animate-pulse bg-amber-500"></div>
                     </div>
                 </div>
 
-                <div class="mt-4 border-t border-slate-700 pt-4">
-                    <label class="block text-xs text-slate-400 mb-1.5 font-medium">Source Material</label>
-                    <select id="source-select" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-sm outline-none focus:border-blue-500 text-slate-200" onchange="updateParams()"></select>
-                    <button id="elute-btn" onclick="eluteSource()" class="hidden mt-3 w-full bg-rose-900/30 hover:bg-rose-900/50 border border-rose-800 text-rose-300 py-1.5 rounded text-sm transition-colors flex items-center justify-center shadow-inner">↻ Elute Fresh Ba-137m</button>
+                <div class="mt-6 pt-4 border-t border-white/10">
+                    <select id="source-select" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm outline-none text-slate-200 cursor-pointer" onchange="updateParams()"></select>
+                    <button id="elute-btn" onclick="eluteSource()" class="hidden mt-3 w-full bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 py-3 rounded-xl text-sm font-bold transition-colors shadow-inner cursor-pointer">↻ Elute Fresh Ba-137m</button>
                 </div>
 
-                <button id="record-btn" onclick="recordData()" class="hidden w-full mt-6 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-pulse border border-emerald-400">
-                    Log Data Reading
+                <button id="record-btn" onclick="recordData()" class="hidden w-full mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-3 rounded-xl font-bold tracking-wide transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] animate-pulse cursor-pointer">
+                    Log Reading to Table
                 </button>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Tabs -->
-        <div class="lg:col-span-8 bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-xl flex flex-col h-[880px]">
+        <!-- RIGHT COLUMN: Analysis & Data -->
+        <div class="lg:col-span-8 flex flex-col h-[880px]">
             
-            <div class="flex border-b border-slate-700 p-2 space-x-2 bg-slate-800/50 rounded-t-xl">
-                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white shadow flex items-center justify-center">
+            <div class="glass-panel p-2 flex space-x-2 mb-4">
+                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2.5 text-sm font-bold rounded-xl transition-all bg-white/10 text-white shadow-lg cursor-pointer">
                     📊 Data & Plot
                 </button>
-                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-emerald-400 hover:text-emerald-300 hover:bg-slate-700 flex items-center justify-center border border-transparent hover:border-emerald-800">
-                    <span class="mr-2">🧠</span> AI Auto-Solver
+                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-2.5 text-sm font-bold rounded-xl transition-all text-slate-400 hover:bg-white/5 cursor-pointer">
+                    🧠 AI Auto-Solver
                 </button>
-                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-slate-300 flex items-center justify-center">
+                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2.5 text-sm font-bold rounded-xl transition-all text-slate-400 hover:bg-white/5 cursor-pointer">
                     📖 Manual
                 </button>
             </div>
 
-            <div class="flex-1 overflow-hidden p-4 flex flex-col relative">
+            <div class="glass-panel flex-1 overflow-hidden p-6 flex flex-col relative">
                 
                 <!-- TAB 1: DATA & GRAPH -->
-                <div id="tab-simulation" class="h-full flex flex-col space-y-4">
-                    <div class="flex-1 bg-slate-900 rounded-lg border border-slate-700 overflow-hidden flex flex-col min-h-[250px] max-h-[350px]">
-                        <div class="p-2 border-b border-slate-700 flex justify-between items-center bg-slate-800">
-                            <span class="text-xs font-bold text-slate-400 uppercase ml-2">Observation Table</span>
+                <div id="tab-simulation" class="h-full flex flex-col space-y-6">
+                    <div class="flex-1 bg-black/40 rounded-2xl border border-white/5 overflow-hidden flex flex-col min-h-[250px] max-h-[350px]">
+                        <div class="p-3 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="text-xs font-bold text-slate-300 uppercase tracking-widest ml-2">Observations</span>
                             <div class="space-x-2 flex">
-                                <button onclick="exportCSV()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded transition-colors border border-slate-600 flex items-center shadow-sm">📄 CSV</button>
-                                <button onclick="exportGraphPNG()" class="text-xs bg-indigo-900/60 hover:bg-indigo-900/80 text-indigo-300 px-3 py-1 rounded transition-colors border border-indigo-700 flex items-center shadow-sm">📸 Export PNG</button>
-                                <button onclick="clearData()" class="text-xs bg-rose-900/30 text-rose-400 px-3 py-1 rounded hover:bg-rose-900/50 transition-colors border border-rose-800 ml-2">🗑 Clear</button>
+                                <button onclick="exportCSV()" class="text-xs bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-lg transition-colors cursor-pointer">CSV</button>
+                                <button onclick="exportGraphPNG()" class="text-xs bg-indigo-500/30 hover:bg-indigo-500/50 text-indigo-200 px-4 py-1.5 rounded-lg transition-colors cursor-pointer">📸 PNG</button>
+                                <button onclick="clearData()" class="text-xs bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 px-4 py-1.5 rounded-lg transition-colors cursor-pointer">Clear</button>
                             </div>
                         </div>
-                        <div class="overflow-y-auto flex-1">
+                        <div class="overflow-y-auto flex-1 p-2">
                             <table class="w-full text-xs text-left whitespace-nowrap">
-                                <thead id="table-head" class="bg-slate-950 text-slate-400 sticky top-0 shadow"></thead>
+                                <thead id="table-head" class="text-slate-400 sticky top-0 bg-[#0b1120] z-10 shadow-sm"></thead>
                                 <tbody id="table-body" class="text-slate-300"></tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="h-[430px] bg-slate-900 rounded-lg border border-slate-700 p-4 flex flex-col relative shadow-inner">
-                        <h3 id="graph-title" class="text-sm font-bold text-slate-300 mb-2">Plot</h3>
-                        <div id="graph-container" class="flex-1 w-full h-full relative bg-slate-900 rounded"></div>
+                    
+                    <div class="h-[430px] bg-black/40 rounded-2xl border border-white/5 p-5 flex flex-col relative shadow-inner">
+                        <div id="graph-container" class="flex-1 w-full h-full relative rounded-xl overflow-hidden"></div>
                     </div>
                 </div>
 
                 <!-- TAB 2: AI AUTO-SOLVER -->
                 <div id="tab-ai" class="hidden h-full flex flex-col space-y-4">
-                    <div class="bg-slate-900 p-4 rounded-lg border border-emerald-900/50 flex justify-between items-center shadow-inner">
-                        <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-emerald-900/40 to-cyan-900/40 p-5 rounded-2xl border border-emerald-500/30 flex justify-between items-center shadow-lg">
+                        <div class="flex items-center space-x-4">
                             <div id="ai-status-indicator" class="w-4 h-4 rounded-full bg-slate-600"></div>
                             <div>
-                                <h3 class="text-emerald-400 font-bold">Physics AI Expert System</h3>
-                                <p class="text-xs text-slate-400">Analyzes data, performs detailed physical calculations, and estimates statistical error.</p>
+                                <h3 class="text-emerald-400 font-extrabold text-lg">AI Expert System</h3>
+                                <p class="text-xs text-slate-400">Automatic data interpolation & physical computation.</p>
                             </div>
                         </div>
-                        <div class="flex space-x-2">
-                            <button onclick="runAIAnalysis()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-bold text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all">
-                                🧠 Analyze Data
+                        <div class="flex space-x-3">
+                            <button onclick="runAIAnalysis()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all cursor-pointer">
+                                🧠 Analyze
                             </button>
-                            <button onclick="speakAI()" id="ai-speak-btn" class="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white px-3 py-2 rounded-md text-sm font-bold transition-all" disabled>
+                            <button onclick="speakAI()" id="ai-speak-btn" class="bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer" disabled>
                                 🔊 Explain
                             </button>
                         </div>
                     </div>
                     
-                    <div id="ai-output" class="flex-1 bg-slate-950 rounded-lg border border-slate-800 p-6 overflow-y-auto text-slate-300 text-sm leading-relaxed shadow-inner">
-                        <div class="flex h-full items-center justify-center text-slate-600 flex-col">
-                            <span class="text-4xl mb-3">🤖</span>
-                            <p>Awaiting data analysis command...</p>
-                            <p class="text-xs mt-2">Log points in the Simulation tab, then click "Analyze Data".</p>
+                    <div id="ai-output" class="flex-1 bg-black/50 rounded-2xl border border-white/5 p-8 overflow-y-auto text-slate-200 text-sm leading-relaxed shadow-inner">
+                        <div class="flex h-full items-center justify-center text-slate-500 flex-col">
+                            <span class="text-5xl mb-4 opacity-50">🤖</span>
+                            <p class="font-medium text-lg">Awaiting Dataset</p>
+                            <p class="text-xs mt-2 opacity-70">Log points in the Simulation tab, then click Analyze.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB 3: LAB MANUAL -->
-                <div id="tab-manual" class="hidden h-full overflow-y-auto pr-2 space-y-6 text-slate-300">
-                    <div class="flex justify-between items-center pb-4 border-b border-slate-700">
-                        <h2 id="man-title" class="text-2xl font-bold text-white">Title</h2>
-                        <div class="flex items-center space-x-2 bg-slate-900 border border-blue-900/50 p-1.5 rounded-lg shadow-inner">
-                            <div id="assistant-indicator" class="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
-                            <button onclick="speakManual()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors">🔊 Read</button>
-                            <button onclick="stopSpeaking()" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-xs font-bold transition-colors">■ Stop</button>
+                <div id="tab-manual" class="hidden h-full overflow-y-auto pr-2 space-y-8 text-slate-300">
+                    <div class="flex justify-between items-center pb-4 border-b border-white/10">
+                        <h2 id="man-title" class="text-2xl font-extrabold text-white">Title</h2>
+                        <div class="flex items-center space-x-2 bg-black/40 border border-white/5 p-1.5 rounded-xl">
+                            <div id="assistant-indicator" class="hidden h-4 flex items-center justify-center px-2">
+                                <span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span>
+                            </div>
+                            <button onclick="speakManual()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">🔊 Read</button>
+                            <button onclick="stopSpeaking()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">■</button>
                         </div>
                     </div>
-                    <section><h3 class="text-lg font-semibold text-blue-400 mb-2">Theory</h3><p id="man-theory" class="text-sm leading-relaxed text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></p></section>
-                    <section><h3 class="text-lg font-semibold text-emerald-400 mb-2">Procedure</h3><ol id="man-procedure" class="list-decimal pl-5 space-y-2 text-sm text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50"></ol></section>
-                    <section><h3 class="text-lg font-semibold text-yellow-400 mb-2">Key Formula</h3><div id="man-formula" class="bg-slate-900 digital-font p-4 rounded-lg border border-slate-700/50 text-center text-sm text-yellow-300"></div></section>
+                    <section><h3 class="text-lg font-bold text-blue-400 mb-3">Theory</h3><p id="man-theory" class="bg-black/30 p-5 rounded-2xl border border-white/5 leading-relaxed text-slate-300"></p></section>
+                    <section><h3 class="text-lg font-bold text-emerald-400 mb-3">Procedure</h3><ol id="man-procedure" class="list-decimal pl-6 space-y-3 bg-black/30 p-5 rounded-2xl border border-white/5 text-slate-300"></ol></section>
+                    <section><h3 class="text-lg font-bold text-yellow-400 mb-3">Formula</h3><div id="man-formula" class="bg-black/50 digital-font p-5 rounded-2xl border border-white/5 text-center text-yellow-300 text-base"></div></section>
                 </div>
 
             </div>
         </div>
-
     </main>
 
     <!-- Floating Calculator -->
-    <div id="calculator-widget" class="fixed top-24 right-6 bg-slate-800 border border-slate-600 rounded-xl p-4 w-72 z-50 hidden flex-col cursor-move" onmousedown="startDrag(event, 'calculator-widget')">
-        <div class="flex justify-between items-center mb-3">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest pointer-events-none">🖩 Calculator</span>
-            <button onclick="toggleCalculator()" class="text-slate-400 hover:text-rose-400">✖</button>
+    <div id="calculator-widget" class="floating-widget widget-hidden fixed top-24 left-6 glass-panel p-5 w-72 z-50 flex-col cursor-move" onmousedown="startDrag(event, 'calculator-widget')">
+        <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-widest pointer-events-none">Calc</span>
+            <button onclick="toggleWidget('calculator-widget')" class="text-slate-400 hover:text-white bg-white/10 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer">✕</button>
         </div>
-        <input type="text" id="calc-display" readonly class="w-full bg-slate-950 text-emerald-400 border border-slate-700 text-right p-2 rounded mb-3 digital-font text-xl shadow-inner focus:outline-none" value="0">
-        <div class="grid grid-cols-4 gap-1.5">
-            <button class="calc-btn calc-clear col-span-2" onclick="calcPress('C')">CLEAR</button><button class="calc-btn calc-op" onclick="calcPress('Del')">DEL</button><button class="calc-btn calc-op" onclick="calcPress('/')">÷</button>
-            <button class="calc-btn" onclick="calcPress('7')">7</button><button class="calc-btn" onclick="calcPress('8')">8</button><button class="calc-btn" onclick="calcPress('9')">9</button><button class="calc-btn calc-op" onclick="calcPress('*')">×</button>
-            <button class="calc-btn" onclick="calcPress('4')">4</button><button class="calc-btn" onclick="calcPress('5')">5</button><button class="calc-btn" onclick="calcPress('6')">6</button><button class="calc-btn calc-op" onclick="calcPress('-')">-</button>
-            <button class="calc-btn" onclick="calcPress('1')">1</button><button class="calc-btn" onclick="calcPress('2')">2</button><button class="calc-btn" onclick="calcPress('3')">3</button><button class="calc-btn calc-op" onclick="calcPress('+')">+</button>
-            <button class="calc-btn" onclick="calcPress('0')">0</button><button class="calc-btn" onclick="calcPress('.')">.</button><button class="calc-btn bg-purple-600" onclick="calcPress('x2')">x²</button><button class="calc-btn bg-emerald-600 row-span-2" onclick="calcPress('=')">=</button>
-            <button class="calc-btn bg-purple-600" onclick="calcPress('sqrt')">√</button><button class="calc-btn bg-purple-600" onclick="calcPress('ln')">ln</button><button class="calc-btn bg-purple-600" onclick="calcPress('exp')">e^</button>
+        <input type="text" id="calc-display" readonly class="w-full bg-black/60 text-emerald-400 border border-white/10 text-right p-3 rounded-xl mb-4 digital-font text-2xl shadow-inner outline-none" value="0">
+        <div class="grid grid-cols-4 gap-2">
+            <button class="calc-btn bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 col-span-2" onclick="calcPress('C')">CLEAR</button><button class="calc-btn bg-orange-500/20 text-orange-300 hover:bg-orange-500/40" onclick="calcPress('Del')">DEL</button><button class="calc-btn bg-blue-500/20 text-blue-300" onclick="calcPress('/')">÷</button>
+            <button class="calc-btn" onclick="calcPress('7')">7</button><button class="calc-btn" onclick="calcPress('8')">8</button><button class="calc-btn" onclick="calcPress('9')">9</button><button class="calc-btn bg-blue-500/20 text-blue-300" onclick="calcPress('*')">×</button>
+            <button class="calc-btn" onclick="calcPress('4')">4</button><button class="calc-btn" onclick="calcPress('5')">5</button><button class="calc-btn" onclick="calcPress('6')">6</button><button class="calc-btn bg-blue-500/20 text-blue-300" onclick="calcPress('-')">-</button>
+            <button class="calc-btn" onclick="calcPress('1')">1</button><button class="calc-btn" onclick="calcPress('2')">2</button><button class="calc-btn" onclick="calcPress('3')">3</button><button class="calc-btn bg-blue-500/20 text-blue-300" onclick="calcPress('+')">+</button>
+            <button class="calc-btn" onclick="calcPress('0')">0</button><button class="calc-btn" onclick="calcPress('.')">.</button><button class="calc-btn bg-purple-500/30 text-purple-200" onclick="calcPress('x2')">x²</button><button class="calc-btn bg-emerald-500 hover:bg-emerald-400 row-span-2 text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]" onclick="calcPress('=')">=</button>
+            <button class="calc-btn bg-purple-500/30 text-purple-200" onclick="calcPress('sqrt')">√</button><button class="calc-btn bg-purple-500/30 text-purple-200" onclick="calcPress('ln')">ln</button><button class="calc-btn bg-purple-500/30 text-purple-200" onclick="calcPress('exp')">e^</button>
+        </div>
+    </div>
+
+    <!-- Floating Gemini AI Chatbot -->
+    <div id="ai-chat-widget" class="floating-widget widget-hidden fixed bottom-6 right-6 glass-panel p-0 w-80 h-[450px] z-50 flex flex-col overflow-hidden">
+        <div class="bg-gradient-to-r from-emerald-600 to-cyan-600 p-4 flex justify-between items-center cursor-move" onmousedown="startDrag(event, 'ai-chat-widget')">
+            <span class="text-sm font-bold text-white flex items-center"><span class="mr-2">✨</span> Gemini Lab Assistant</span>
+            <button onclick="toggleWidget('ai-chat-widget')" class="text-white/70 hover:text-white cursor-pointer">✕</button>
+        </div>
+        <div id="chat-history" class="flex-1 p-4 overflow-y-auto space-y-3 bg-black/40 text-sm">
+            <div class="chat-bubble-ai p-3 text-slate-200">Hello! I am your AI physics assistant. Ask me anything about GM Counters, Half-Life, Beta Absorption, or Inverse Square laws!</div>
+        </div>
+        <div class="p-3 bg-black/60 border-t border-white/10 flex">
+            <input type="text" id="chat-input" placeholder="Ask a physics question..." class="flex-1 bg-white/10 border border-white/10 rounded-l-xl px-3 py-2 text-sm text-white outline-none focus:border-emerald-500 transition-colors" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-3 rounded-r-xl font-bold cursor-pointer transition-colors">↑</button>
         </div>
     </div>
 
     <!-- CORE LOGIC -->
     <script>
-        const DENSITY_AL = 2.71; 
-        const BG_RATE = 0.8; 
+        // --- 1. GLOBALS & CONFIG ---
+        const DENSITY_AL = 2.71; const BG_RATE = 0.8; 
         const THICKNESS_OPTS = [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50];
-
         const SOURCES = {
             None: { name: 'None (Background)', type: 'bg', rate: 0, range: 0, halfLifeThick: 1, halfLifeSec: Infinity },
             Tl204: { name: 'Thallium-204 (Beta)', type: 'beta', rate: 120, range: 0.307, halfLifeThick: 0.124, halfLifeSec: Infinity },
@@ -311,92 +386,80 @@
             aiTextCache: ''
         };
         let timers = { count: null, global: null };
+        
+        // --- 2. AUDIO & VOICE ---
         let audioCtx;
-
-        function initAudio() {
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
+        function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
         function toggleSound() {
             state.soundEnabled = !state.soundEnabled;
             const btn = document.getElementById('sound-toggle-btn');
-            if(state.soundEnabled) {
-                initAudio();
-                btn.innerHTML = '🔊 Sound: ON';
-                btn.className = "bg-green-900/30 hover:bg-green-900/50 text-green-400 border border-green-800 px-3 py-1.5 rounded-md text-sm font-bold flex items-center shadow-md";
-            } else {
-                btn.innerHTML = '🔈 Sound: OFF';
-                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-3 py-1.5 rounded-md text-sm font-bold flex items-center shadow-md";
-            }
+            if(state.soundEnabled) { initAudio(); btn.innerHTML = '🔊 On'; btn.classList.add('bg-white/20'); } 
+            else { btn.innerHTML = '🔈 Off'; btn.classList.remove('bg-white/20'); }
         }
-
         function playClickSound(count) {
             if(!state.soundEnabled || count <= 0 || !audioCtx) return;
-            let clicks = Math.min(count, 5); 
+            let clicks = Math.min(count, 4); 
             for(let i=0; i<clicks; i++) {
                 setTimeout(() => {
                     if(audioCtx.state !== 'running') return;
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
+                    let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
                     osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(100 + Math.random()*400, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+                    osc.type = 'square'; osc.frequency.setValueAtTime(100 + Math.random()*400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
                     osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.015);
                 }, Math.random() * 90); 
             }
         }
 
-        function poissonRandom(lambda) {
-            let L = Math.exp(-lambda), k = 0, p = 1;
-            do { k++; p *= Math.random(); } while (p > L);
-            return k - 1;
+        function getBestVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            // Look for high quality natural female voices
+            return voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Samantha') || v.name.includes('Natural') || (v.name.includes('Female') && v.lang.startsWith('en'))) || voices[0];
         }
 
-        function getInstantRate() {
-            const src = SOURCES[state.sourceKey];
-            const v = state.voltage, d = state.distance, th = state.thicknessCm;
-            let vEff = 0;
-            if (v >= 350 && v < 400) vEff = (v - 350) / 50;
-            else if (v >= 400 && v <= 700) vEff = 1 + (v - 400) * 0.0003;
-            else if (v > 700) vEff = 1.09 + Math.pow(v - 700, 2) * 0.001;
-            if (vEff === 0) return 0;
+        let isSpeaking = false;
+        function speakText(text, isAssistant = false) {
+            if(!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = getBestVoice();
+            utterance.rate = 0.95; utterance.pitch = 1.05;
+            utterance.onstart = () => { 
+                if(!isAssistant) document.getElementById('assistant-indicator').style.display = 'flex'; 
+                else document.getElementById('ai-status-indicator').classList.add('ai-active-glow');
+            };
+            utterance.onend = () => { 
+                document.getElementById('assistant-indicator').style.display = 'none'; 
+                document.getElementById('ai-status-indicator').classList.remove('ai-active-glow');
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+        function speakManual() { const m = LAB_MANUALS[state.mode]; speakText(`Experiment: ${m.title}. Theory: ${m.theory}. Procedure step 1: ${m.procedure.join('. Step: ')}.`); }
+        function speakAI() { speakText(state.aiTextCache, true); }
+        function stopSpeaking() { window.speechSynthesis.cancel(); document.getElementById('assistant-indicator').style.display = 'none'; document.getElementById('ai-status-indicator').classList.remove('ai-active-glow'); }
 
-            let expectedBase = src.rate;
-            if (src.halfLifeSec < Infinity) expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
-            if (expectedBase > 0) expectedBase = expectedBase * Math.pow(2 / d, 2);
-            if (th > 0 && expectedBase > 0) {
-                const thGcm2 = th * DENSITY_AL;
-                if (src.type === 'beta') {
-                    if (thGcm2 < src.range) expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick);
-                    else expectedBase = 0;
-                } else if (src.type === 'gamma') {
-                    expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick);
-                }
-            }
-            return (expectedBase + BG_RATE) * vEff;
+        // --- 3. WIDGETS & UI FLOW ---
+        function toggleWidget(id) {
+            const w = document.getElementById(id);
+            if (w.classList.contains('widget-hidden')) { w.classList.remove('widget-hidden'); w.style.display = 'flex'; } 
+            else { w.classList.add('widget-hidden'); }
         }
 
         window.onload = () => {
             const srcSel = document.getElementById('source-select');
-            for (let key in SOURCES) {
-                let opt = document.createElement('option'); opt.value = key; opt.textContent = SOURCES[key].name; srcSel.appendChild(opt);
-            }
+            for (let key in SOURCES) { let opt = document.createElement('option'); opt.value = key; opt.textContent = SOURCES[key].name; srcSel.appendChild(opt); }
             const thSel = document.getElementById('thickness');
-            THICKNESS_OPTS.forEach(val => {
-                let opt = document.createElement('option'); opt.value = val; opt.textContent = val === 0 ? 'None (0 cm)' : `${val.toFixed(2)} cm (${(val*DENSITY_AL).toFixed(3)} g/cm²)`; thSel.appendChild(opt);
-            });
+            THICKNESS_OPTS.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.textContent = val === 0 ? 'None (0 cm)' : `${val.toFixed(2)} cm (${(val*DENSITY_AL).toFixed(3)} g/cm²)`; thSel.appendChild(opt); });
+            
             const modesDiv = document.getElementById('mode-selector');
             Object.keys(LAB_MANUALS).forEach(m => {
-                let btn = document.createElement('button'); btn.onclick = () => changeMode(m); btn.className = `px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn`; btn.id = `mode-${m}`; btn.textContent = LAB_MANUALS[m].title; modesDiv.appendChild(btn);
+                let btn = document.createElement('button'); btn.onclick = () => changeMode(m); btn.className = `px-3 py-1.5 rounded-lg text-sm font-bold transition-all mode-btn text-slate-400 cursor-pointer`; btn.id = `mode-${m}`; btn.textContent = LAB_MANUALS[m].title.split(' ')[0]; modesDiv.appendChild(btn);
             });
             changeMode('plateau');
-            setInterval(() => {
-                state.globalTime += 0.1;
-                if (state.mode === 'halflife') document.getElementById('global-time-val').textContent = Math.floor(state.globalTime) + ' s';
-            }, 100);
+            timers.global = setInterval(() => { state.globalTime += 0.1; if (state.mode === 'halflife') document.getElementById('global-time-val').textContent = Math.floor(state.globalTime) + ' s'; }, 100);
+            
+            // Pre-load voices
+            if('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = () => {};
         };
 
         function setTab(tab) {
@@ -404,17 +467,15 @@
             document.getElementById('tab-simulation').style.display = tab === 'simulation' ? 'flex' : 'none';
             document.getElementById('tab-ai').style.display = tab === 'ai' ? 'flex' : 'none';
             document.getElementById('tab-manual').style.display = tab === 'manual' ? 'block' : 'none';
-            
-            document.getElementById('tab-sim-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='simulation' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`;
-            document.getElementById('tab-ai-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='ai' ? 'bg-slate-700 text-emerald-400 shadow border-emerald-500' : 'text-emerald-500 hover:text-emerald-400 border border-transparent'}`;
-            document.getElementById('tab-man-btn').className = `flex-1 py-2 text-sm font-medium rounded-md transition-colors ${tab==='manual' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`;
+            document.getElementById('tab-sim-btn').className = `flex-1 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${tab==='simulation' ? 'bg-white/20 text-white shadow-lg' : 'bg-transparent text-slate-400 hover:bg-white/5'}`;
+            document.getElementById('tab-ai-btn').className = `flex-1 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${tab==='ai' ? 'bg-emerald-500/20 text-emerald-300 shadow-lg border border-emerald-500/30' : 'bg-transparent text-slate-400 hover:bg-white/5'}`;
+            document.getElementById('tab-man-btn').className = `flex-1 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${tab==='manual' ? 'bg-white/20 text-white shadow-lg' : 'bg-transparent text-slate-400 hover:bg-white/5'}`;
         }
 
         function changeMode(mode) {
             state.mode = mode; resetCount(); stopSpeaking();
-            document.getElementById('ai-output').innerHTML = `<div class="flex h-full items-center justify-center text-slate-600 flex-col"><span class="text-4xl mb-3">🤖</span><p>Awaiting data analysis command...</p><p class="text-xs mt-2">Log points in the Simulation tab, then click "Analyze Data".</p></div>`;
+            document.getElementById('ai-output').innerHTML = `<div class="flex h-full items-center justify-center text-slate-500 flex-col"><span class="text-5xl mb-4 opacity-50">🤖</span><p class="font-medium text-lg">Awaiting Dataset</p><p class="text-xs mt-2 opacity-70">Log points in the Simulation tab, then click Analyze.</p></div>`;
             document.getElementById('ai-speak-btn').disabled = true;
-            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-slate-600";
 
             const distInput = document.getElementById('distance');
             if (mode === 'plateau') { state.sourceKey = 'Co60'; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; distInput.max = 20;}
@@ -422,42 +483,40 @@
             if (mode === 'absorption') { state.sourceKey = 'Sr90'; state.voltage = 500; state.distance = 2; state.presetTime = 30; distInput.max = 20;}
             if (mode === 'halflife') { state.sourceKey = 'Ba137m'; state.voltage = 500; state.distance = 2; state.thicknessCm = 0; state.presetTime = 10; state.globalTime = 0; distInput.max = 20;}
 
-            document.getElementById('preset-time').value = state.presetTime;
-            document.getElementById('voltage').value = state.voltage;
-            document.getElementById('distance').value = state.distance;
-            document.getElementById('thickness').value = state.thicknessCm;
-            document.getElementById('source-select').value = state.sourceKey;
+            document.getElementById('preset-time').value = state.presetTime; document.getElementById('voltage').value = state.voltage; document.getElementById('distance').value = state.distance; document.getElementById('thickness').value = state.thicknessCm; document.getElementById('source-select').value = state.sourceKey;
 
-            document.querySelectorAll('.mode-btn').forEach(b => { b.className = 'px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn text-slate-400 hover:text-slate-200 hover:bg-slate-700'; });
-            document.getElementById(`mode-${mode}`).className = 'px-3 py-1.5 rounded-md text-sm font-medium transition-all mode-btn bg-blue-600 text-white shadow';
+            document.querySelectorAll('.mode-btn').forEach(b => { b.className = 'px-3 py-1.5 rounded-lg text-sm font-bold transition-all mode-btn text-slate-400 hover:text-slate-200 cursor-pointer'; });
+            document.getElementById(`mode-${mode}`).className = 'px-3 py-1.5 rounded-lg text-sm font-bold transition-all mode-btn bg-white/20 text-white shadow-lg cursor-pointer';
 
             let man = LAB_MANUALS[mode];
-            document.getElementById('man-title').textContent = man.title;
-            document.getElementById('graph-title').textContent = man.title + ' Plot';
-            document.getElementById('man-theory').textContent = man.theory;
-            document.getElementById('man-formula').textContent = man.formula;
-            document.getElementById('man-procedure').innerHTML = man.procedure.map(step => `<li>${step}</li>`).join('');
-
+            document.getElementById('man-title').textContent = man.title; document.getElementById('graph-title').textContent = man.title + ' Plot'; document.getElementById('man-theory').textContent = man.theory; document.getElementById('man-formula').textContent = man.formula; document.getElementById('man-procedure').innerHTML = man.procedure.map(step => `<li>${step}</li>`).join('');
             updateUI();
+        }
+
+        // --- 4. PHYSICS ENGINE ---
+        function poissonRandom(lambda) { let L = Math.exp(-lambda), k = 0, p = 1; do { k++; p *= Math.random(); } while (p > L); return k - 1; }
+        function getInstantRate() {
+            const src = SOURCES[state.sourceKey]; const v = state.voltage, d = state.distance, th = state.thicknessCm;
+            let vEff = 0;
+            if (v >= 350 && v < 400) vEff = (v - 350) / 50; else if (v >= 400 && v <= 700) vEff = 1 + (v - 400) * 0.0003; else if (v > 700) vEff = 1.09 + Math.pow(v - 700, 2) * 0.001;
+            if (vEff === 0) return 0;
+            let expectedBase = src.rate;
+            if (src.halfLifeSec < Infinity) expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
+            if (expectedBase > 0) expectedBase = expectedBase * Math.pow(2 / d, 2);
+            if (th > 0 && expectedBase > 0) {
+                const thGcm2 = th * DENSITY_AL;
+                if (src.type === 'beta') { if (thGcm2 < src.range) expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick); else expectedBase = 0; } 
+                else if (src.type === 'gamma') { expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick); }
+            }
+            return (expectedBase + BG_RATE) * vEff;
         }
 
         function updateParams() {
             if (state.status === 'counting') return;
-            state.presetTime = parseInt(document.getElementById('preset-time').value);
-            state.voltage = parseInt(document.getElementById('voltage').value);
-            state.distance = parseInt(document.getElementById('distance').value);
-            state.thicknessCm = parseFloat(document.getElementById('thickness').value);
-            state.sourceKey = document.getElementById('source-select').value;
+            state.presetTime = parseInt(document.getElementById('preset-time').value); state.voltage = parseInt(document.getElementById('voltage').value); state.distance = parseInt(document.getElementById('distance').value); state.thicknessCm = parseFloat(document.getElementById('thickness').value); state.sourceKey = document.getElementById('source-select').value;
             updateUI();
         }
-
-        function togglePower() {
-            if(!audioCtx && state.soundEnabled) initAudio(); 
-            state.isPowered = !state.isPowered;
-            if (state.isPowered) resetCount();
-            updateUI();
-        }
-
+        function togglePower() { if(!audioCtx && state.soundEnabled) initAudio(); state.isPowered = !state.isPowered; if (state.isPowered) resetCount(); updateUI(); }
         function eluteSource() { if (state.status !== 'counting') state.globalTime = 0; }
 
         function startCount() {
@@ -468,16 +527,13 @@
             updateUI();
             timers.count = setInterval(() => {
                 ticks++; state.elapsedTime += 0.1;
-                const ratePerSec = getInstantRate();
-                const countsThisTick = poissonRandom(ratePerSec * 0.1);
+                const ratePerSec = getInstantRate(); const countsThisTick = poissonRandom(ratePerSec * 0.1);
                 state.currentCount += countsThisTick;
                 playClickSound(countsThisTick);
-                document.getElementById('time-display').textContent = state.elapsedTime.toFixed(1).padStart(4, '0');
-                document.getElementById('count-display').textContent = state.currentCount.toString().padStart(5, '0');
+                document.getElementById('time-display').textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); document.getElementById('count-display').textContent = state.currentCount.toString().padStart(5, '0');
                 if (ticks >= targetTicks) { clearInterval(timers.count); state.status = 'done'; updateUI(); }
             }, 100);
         }
-
         function stopCount() { if (state.status === 'counting') { clearInterval(timers.count); state.status = 'done'; updateUI(); } }
         function resetCount() { clearInterval(timers.count); state.status = 'idle'; state.elapsedTime = 0; state.currentCount = 0; updateUI(); }
 
@@ -485,159 +541,125 @@
             if (state.status !== 'done') return;
             const cps = (state.currentCount / state.presetTime).toFixed(2);
             if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) state.bgCountRate = parseFloat(cps);
-            const bg = state.bgCountRate || 0;
-            const net = Math.max(0, (cps - bg)).toFixed(2);
-            state.records[state.mode].push({
-                id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance,
-                invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4),
-                timeAtRecord: state.globalTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net
-            });
+            const net = Math.max(0, (cps - (state.bgCountRate || 0))).toFixed(2);
+            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: state.globalTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net });
             updateTableAndGraph();
         }
         function clearData() { state.records[state.mode] = []; updateTableAndGraph(); }
 
-        // --- Exports ---
+        // --- 5. EXPORTS (FIXED PNG) ---
         function exportCSV() {
             const m = state.mode; const records = state.records[m];
             if (records.length === 0) return alert("No data to export!");
             let csv = "Source,";
-            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n";
-            else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n";
-            else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n";
-            else if (m === 'halflife') csv += "Time (s),Counts,CPS,Net CPS\n";
+            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n"; else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n"; else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n"; else if (m === 'halflife') csv += "Time (s),Counts,CPS,Net CPS\n";
             records.forEach(r => {
-                csv += `${r.source},`;
-                if (m === 'plateau') csv += `${r.voltage},`;
-                else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`;
-                else if (m === 'absorption') csv += `${r.thicknessGcm2},`;
-                else if (m === 'halflife') csv += `${r.timeAtRecord},`;
+                csv += `${r.source},`; if (m === 'plateau') csv += `${r.voltage},`; else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`; else if (m === 'absorption') csv += `${r.thicknessGcm2},`; else if (m === 'halflife') csv += `${r.timeAtRecord},`;
                 csv += `${r.counts},${r.cps},${r.netCps}\n`;
             });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-            link.download = `Lab_Data_${m}.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = `Lab_Data_${m}.csv`; link.click();
         }
 
+        // FIXED PNG EXPORT
         function exportGraphPNG() {
             const svgElement = document.querySelector('#graph-container svg');
             if (!svgElement) return alert("Graph is empty!");
             
-            // Serialize SVG
+            // Clone the node to apply export-specific styles without breaking the UI
+            const clone = svgElement.cloneNode(true);
+            clone.setAttribute('width', '800');
+            clone.setAttribute('height', '320');
+            // Ensure XML namespace exists
+            if(!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            
+            // Add an explicit background rectangle to the SVG so it's not transparent in the PNG
+            const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            bgRect.setAttribute("width", "100%"); bgRect.setAttribute("height", "100%");
+            bgRect.setAttribute("fill", "#020617"); // Dark background
+            clone.insertBefore(bgRect, clone.firstChild);
+
             const serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svgElement);
-            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+            const svgString = serializer.serializeToString(clone);
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
             
-            const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = 800; canvas.height = 320;
-            const ctx = canvas.getContext('2d');
             const img = new Image();
-            
             img.onload = function() {
-                ctx.fillStyle = '#0f172a'; // tailwind slate-900
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const canvas = document.createElement('canvas');
+                canvas.width = 800; canvas.height = 320;
+                const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
                 
-                const pngUrl = canvas.toDataURL('image/png');
                 const link = document.createElement("a");
-                link.href = pngUrl;
+                link.href = canvas.toDataURL('image/png');
                 link.download = `Plot_${state.mode}.png`;
                 link.click();
             };
+            img.onerror = () => alert("Export failed to render.");
             img.src = url;
         }
 
-        // --- UI Updates ---
+        // --- 6. RENDER LOGIC ---
         function updateUI() {
             const pBtn = document.getElementById('power-btn'); const pTxt = document.getElementById('power-text');
             const tDisp = document.getElementById('time-display'); const cDisp = document.getElementById('count-display');
             if (state.isPowered) {
-                pBtn.className = "bg-green-500/10 text-green-400 border border-green-500/30 p-2 rounded-full transition-all shadow-[0_0_15px_rgba(74,222,128,0.2)] flex items-center";
-                pTxt.textContent = "ON"; tDisp.className = "digital-font text-3xl tracking-wider text-blue-400 glow-text";
-                cDisp.className = "digital-font text-3xl tracking-wider text-green-400 glow-text";
+                pBtn.className = "bg-green-500/20 text-green-400 border border-green-500/50 px-4 py-2 rounded-full transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center cursor-pointer";
+                pTxt.textContent = "ON"; tDisp.className = "digital-font text-3xl tracking-wider text-blue-400 glow-text"; cDisp.className = "digital-font text-3xl tracking-wider text-green-400 glow-text";
                 tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0');
             } else {
-                pBtn.className = "bg-slate-900 text-slate-500 border border-slate-700 p-2 rounded-full transition-all shadow-inner flex items-center";
-                pTxt.textContent = "OFF"; tDisp.className = "digital-font text-3xl tracking-wider text-slate-700";
-                cDisp.className = "digital-font text-3xl tracking-wider text-slate-700";
+                pBtn.className = "bg-black/40 text-slate-500 border border-white/10 px-4 py-2 rounded-full transition-all shadow-inner flex items-center cursor-pointer hover:bg-black/60";
+                pTxt.textContent = "OFF"; tDisp.className = "digital-font text-3xl tracking-wider text-slate-600"; cDisp.className = "digital-font text-3xl tracking-wider text-slate-600";
                 tDisp.textContent = "00.0"; cDisp.textContent = "00000";
             }
-            document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting';
-            document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting';
-            document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting';
-            document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
+            document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting'; document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
 
             const cm = state.mode;
-            document.getElementById('ctrl-voltage').style.display = 'block'; document.getElementById('ctrl-voltage').className = `p-3 rounded-lg border ${cm === 'plateau' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('voltage').disabled = state.status === 'counting' || (!state.isPowered && cm !== 'plateau');
-            document.getElementById('ctrl-distance').style.display = 'block'; document.getElementById('ctrl-distance').className = `p-3 rounded-lg border ${cm === 'inversesquare' ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('distance').disabled = state.status === 'counting';
-            document.getElementById('ctrl-thickness').style.display = 'block'; document.getElementById('ctrl-thickness').className = `p-3 rounded-lg border ${cm === 'absorption' ? 'bg-blue-900/20 border-blue-500/30' : 'bg-slate-900/50 border-slate-700/50'}`; document.getElementById('thickness').disabled = state.status === 'counting';
+            document.getElementById('ctrl-voltage').style.display = 'block'; document.getElementById('ctrl-voltage').className = `bg-black/20 p-4 rounded-2xl border ${cm === 'plateau' ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/5'}`; document.getElementById('voltage').disabled = state.status === 'counting' || (!state.isPowered && cm !== 'plateau');
+            document.getElementById('ctrl-distance').style.display = 'block'; document.getElementById('ctrl-distance').className = `bg-black/20 p-4 rounded-2xl border ${cm === 'inversesquare' ? 'border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-white/5'}`; document.getElementById('distance').disabled = state.status === 'counting';
+            document.getElementById('ctrl-thickness').style.display = 'block'; document.getElementById('ctrl-thickness').className = `bg-black/20 p-4 rounded-2xl border ${cm === 'absorption' ? 'border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'border-white/5'}`; document.getElementById('thickness').disabled = state.status === 'counting';
             
-            document.getElementById('halflife-clock').style.display = cm === 'halflife' ? 'flex' : 'none';
-            document.getElementById('elute-btn').style.display = cm === 'halflife' ? 'flex' : 'none';
-            document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
-            
+            document.getElementById('halflife-clock').style.display = cm === 'halflife' ? 'flex' : 'none'; document.getElementById('elute-btn').style.display = cm === 'halflife' ? 'block' : 'none'; document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
             document.getElementById('preset-time-val').textContent = state.presetTime + ' s'; document.getElementById('voltage-val').textContent = state.voltage + ' V'; document.getElementById('distance-val').textContent = state.distance + ' cm'; document.getElementById('thickness-val').textContent = state.thicknessCm.toFixed(2) + ' cm';
             
-            const maxVisDist = cm === 'inversesquare' ? 50 : 20; const pixelHeight = Math.max(16, (state.distance / maxVisDist) * 160);
+            const maxVisDist = cm === 'inversesquare' ? 50 : 20; const pixelHeight = Math.max(16, (state.distance / maxVisDist) * 150);
             document.getElementById('visual-distance').style.height = pixelHeight + 'px'; document.getElementById('visual-dist-label').textContent = state.distance + 'cm';
             
-            const visAbsorber = document.getElementById('visual-absorber');
-            if (state.thicknessCm > 0) { visAbsorber.style.display = 'block'; visAbsorber.style.height = Math.max(4, state.thicknessCm * 30) + 'px'; } else { visAbsorber.style.display = 'none'; }
-            
-            const visSrc = document.getElementById('visual-source');
-            if (state.sourceKey !== 'None') { visSrc.style.display = 'block'; visSrc.className = `w-4 h-4 rounded-full shadow-[0_0_15px_rgba(0,0,0,1)] animate-pulse ${SOURCES[state.sourceKey].type === 'gamma' ? 'bg-purple-500' : 'bg-amber-500'}`; } else { visSrc.style.display = 'none'; }
+            const visAbsorber = document.getElementById('visual-absorber'); if (state.thicknessCm > 0) { visAbsorber.style.display = 'block'; visAbsorber.style.height = Math.max(4, state.thicknessCm * 30) + 'px'; } else { visAbsorber.style.display = 'none'; }
+            const visSrc = document.getElementById('visual-source'); if (state.sourceKey !== 'None') { visSrc.style.display = 'block'; visSrc.className = `w-4 h-4 rounded-full shadow-[0_0_20px_rgba(245,158,11,1)] animate-pulse ${SOURCES[state.sourceKey].type === 'gamma' ? 'bg-purple-500' : 'bg-amber-400'}`; } else { visSrc.style.display = 'none'; }
             document.getElementById('spark-effect').style.display = (state.isPowered && state.voltage > 700 && state.status === 'counting') ? 'block' : 'none';
-
             updateTableAndGraph();
         }
 
         function updateTableAndGraph() {
             const m = state.mode; const records = state.records[m];
-            let hHTML = '<tr><th class="p-2 pl-3">Source</th>';
-            if (m === 'plateau') hHTML += '<th class="p-2 text-yellow-300">Voltage (V)</th>';
-            if (m === 'inversesquare') hHTML += '<th class="p-2 text-emerald-300">Dist (cm)</th><th class="p-2">1/d²</th>';
-            if (m === 'absorption') hHTML += '<th class="p-2 text-blue-300">Thick (g/cm²)</th>';
-            if (m === 'halflife') hHTML += '<th class="p-2 text-rose-300">Time (s)</th>';
-            hHTML += '<th class="p-2 text-right">Counts (N)</th><th class="p-2 text-right">Error (±√N)</th><th class="p-2 text-white text-right">Net CPS</th></tr>';
+            let hHTML = '<tr><th class="p-3 pl-4">Source</th>';
+            if (m === 'plateau') hHTML += '<th class="p-3 text-yellow-300">Voltage (V)</th>'; else if (m === 'inversesquare') hHTML += '<th class="p-3 text-emerald-300">Dist (cm)</th><th class="p-3">1/d²</th>'; else if (m === 'absorption') hHTML += '<th class="p-3 text-blue-300">Thick (g/cm²)</th>'; else if (m === 'halflife') hHTML += '<th class="p-3 text-rose-300">Time (s)</th>';
+            hHTML += '<th class="p-3 text-right">Counts</th><th class="p-3 text-right">Error (±√N)</th><th class="p-3 text-white text-right">Net CPS</th></tr>';
             document.getElementById('table-head').innerHTML = hHTML;
 
             let bHTML = '';
-            if (records.length === 0) { bHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-600 italic">Run experiment to log data.</td></tr>`; } 
+            if (records.length === 0) { bHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500 italic">Run experiment to log data.</td></tr>`; } 
             else {
                 records.forEach(r => {
                     const err = Math.sqrt(r.counts).toFixed(1);
-                    bHTML += `<tr class="border-b border-slate-800 hover:bg-slate-800/50"><td class="p-2 pl-3">${r.source}</td>`;
-                    if (m === 'plateau') bHTML += `<td class="p-2 text-yellow-200">${r.voltage}</td>`;
-                    if (m === 'inversesquare') bHTML += `<td class="p-2 text-emerald-200">${r.distance}</td><td class="p-2 text-slate-400">${r.invDistSq}</td>`;
-                    if (m === 'absorption') bHTML += `<td class="p-2 text-blue-200">${r.thicknessGcm2}</td>`;
-                    if (m === 'halflife') bHTML += `<td class="p-2 text-rose-200">${r.timeAtRecord}</td>`;
-                    bHTML += `<td class="p-2 text-right digital-font text-slate-400">${r.counts}</td><td class="p-2 text-right digital-font text-slate-500">±${err}</td><td class="p-2 text-right digital-font text-white font-bold bg-slate-800/30">${r.netCps}</td></tr>`;
+                    bHTML += `<tr class="border-b border-white/5 hover:bg-white/5 transition-colors"><td class="p-3 pl-4 font-medium">${r.source}</td>`;
+                    if (m === 'plateau') bHTML += `<td class="p-3 text-yellow-200">${r.voltage}</td>`; else if (m === 'inversesquare') bHTML += `<td class="p-3 text-emerald-200">${r.distance}</td><td class="p-3 text-slate-400">${r.invDistSq}</td>`; else if (m === 'absorption') bHTML += `<td class="p-3 text-blue-200">${r.thicknessGcm2}</td>`; else if (m === 'halflife') bHTML += `<td class="p-3 text-rose-200">${r.timeAtRecord}</td>`;
+                    bHTML += `<td class="p-3 text-right digital-font text-slate-400">${r.counts}</td><td class="p-3 text-right digital-font text-slate-500">±${err}</td><td class="p-3 text-right digital-font text-white font-bold bg-white/5">${r.netCps}</td></tr>`;
                 });
             }
             document.getElementById('table-body').innerHTML = bHTML;
 
             const gCont = document.getElementById('graph-container');
-            if (records.length === 0) { gCont.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-sm border-2 border-dashed border-slate-800 rounded-lg">Log data points to generate the graph</div>`; return; }
+            if (records.length === 0) { gCont.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-slate-500 text-sm">Log points to view plot</div>`; return; }
 
-            const sorted = [...records].sort((a, b) => {
-                if (m === 'plateau') return a.voltage - b.voltage;
-                if (m === 'inversesquare') return a.invDistSq - b.invDistSq;
-                if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2;
-                if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; return 0;
-            });
-            const getX = r => {
-                if (m === 'plateau') return Number(r.voltage); if (m === 'inversesquare') return Number(r.invDistSq);
-                if (m === 'absorption') return Number(r.thicknessGcm2); if (m === 'halflife') return Number(r.timeAtRecord); return 0;
-            };
+            const sorted = [...records].sort((a, b) => { if (m === 'plateau') return a.voltage - b.voltage; if (m === 'inversesquare') return a.invDistSq - b.invDistSq; if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2; if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; return 0; });
+            const getX = r => { if (m === 'plateau') return Number(r.voltage); if (m === 'inversesquare') return Number(r.invDistSq); if (m === 'absorption') return Number(r.thicknessGcm2); if (m === 'halflife') return Number(r.timeAtRecord); return 0; };
             const getY = r => Number(r.netCps);
 
             let minX = 0, maxX = 1, xLab = '', color = '#60a5fa';
-            if (m === 'plateau') { minX = 300; maxX = 1000; xLab = 'Voltage (V)'; color = '#eab308'; }
-            if (m === 'inversesquare') { minX = 0; maxX = 0.3; xLab = '1 / Distance² (cm⁻²)'; color = '#34d399'; }
-            if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#60a5fa'; }
-            if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; color = '#fb7185'; }
+            if (m === 'plateau') { minX = 300; maxX = 1000; xLab = 'Voltage (V)'; color = '#facc15'; } else if (m === 'inversesquare') { minX = 0; maxX = 0.3; xLab = '1 / Distance² (cm⁻²)'; color = '#34d399'; } else if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#3b82f6'; } else if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; color = '#fb7185'; }
 
             const maxNet = Math.max(10, ...sorted.map(getY)); const maxY = maxNet * 1.2;
             const pad = { t: 20, r: 20, b: 40, l: 50 }; const W = 800, H = 320; 
@@ -646,208 +668,146 @@
             const xTicks = 6, yTicks = 5;
 
             let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">`;
-            svg += `<g stroke="#334155" stroke-width="1" opacity="0.4">`;
+            svg += `<g stroke="rgba(255,255,255,0.1)" stroke-width="1">`;
             for(let i=0; i<=yTicks; i++){ let y = calcY((maxY/yTicks)*i); svg += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" />`; }
             for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; let x = calcX(v); svg += `<line x1="${x}" y1="${pad.t}" x2="${x}" y2="${H-pad.b}" />`; }
-            svg += `</g><g stroke="#94a3b8" stroke-width="2"><line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" /><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" /></g>`;
+            svg += `</g><g stroke="rgba(255,255,255,0.3)" stroke-width="2"><line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" /><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" /></g>`;
             
-            svg += `<g fill="#94a3b8" font-size="11" text-anchor="end" alignment-baseline="middle" font-family="sans-serif">`;
-            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-8}" y="${calcY(v)}">${v.toFixed(0)}</text>`; }
-            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#cbd5e1" font-size="12" text-anchor="middle" font-family="sans-serif">Net CPS</text>`;
-            svg += `<g fill="#94a3b8" font-size="11" text-anchor="middle" font-family="sans-serif">`;
-            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; svg += `<text x="${calcX(v)}" y="${H-pad.b+18}">${v.toFixed(m==='inversesquare'?2:1)}</text>`; }
-            svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#cbd5e1" font-size="12" text-anchor="middle" font-family="sans-serif">${xLab}</text>`;
+            svg += `<g fill="#94a3b8" font-size="11" text-anchor="end" alignment-baseline="middle" font-family="system-ui, sans-serif">`;
+            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-10}" y="${calcY(v)}">${v.toFixed(0)}</text>`; }
+            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#cbd5e1" font-size="12" font-weight="600" text-anchor="middle" font-family="system-ui, sans-serif">Net CPS</text>`;
+            svg += `<g fill="#94a3b8" font-size="11" text-anchor="middle" font-family="system-ui, sans-serif">`;
+            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; svg += `<text x="${calcX(v)}" y="${H-pad.b+20}">${v.toFixed(m==='inversesquare'?2:1)}</text>`; }
+            svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#cbd5e1" font-size="12" font-weight="600" text-anchor="middle" font-family="system-ui, sans-serif">${xLab}</text>`;
             
             let pointsStr = sorted.map(d => `${calcX(getX(d))},${calcY(getY(d))}`).join(' ');
-            svg += `<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="2.5" />`;
-            sorted.forEach(d => { svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="4" fill="${color}" stroke="#1e293b" stroke-width="1.5" />`; });
+            svg += `<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="3" style="filter: drop-shadow(0 0 8px ${color});" />`;
+            sorted.forEach(d => { svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="5" fill="#0f172a" stroke="${color}" stroke-width="2" />`; });
             svg += `</svg>`;
             gCont.innerHTML = svg;
         }
 
-        // --- AI EXPERT SYSTEM ---
+        // --- 7. AI EXPERT SYSTEM (AUTO-SOLVER) ---
         function runAIAnalysis() {
-            const m = state.mode;
-            const records = state.records[m];
-            const out = document.getElementById('ai-output');
-            const btn = document.getElementById('ai-speak-btn');
-            const ind = document.getElementById('ai-status-indicator');
+            const m = state.mode; const records = state.records[m]; const out = document.getElementById('ai-output'); const btn = document.getElementById('ai-speak-btn');
+            if (records.length < 2) { out.innerHTML = `<div class="text-rose-400 text-center mt-10 p-4 bg-rose-500/10 rounded-xl border border-rose-500/20"><strong>Error:</strong> Insufficient data. Record at least 2 points.</div>`; btn.disabled = true; return; }
 
-            ind.className = "w-4 h-4 rounded-full ai-active-glow";
-
-            if (records.length < 2) {
-                out.innerHTML = `<p class="text-rose-400"><strong>Error:</strong> Insufficient data points. Please record at least 2 points to perform AI analysis.</p>`;
-                state.aiTextCache = "Insufficient data points.";
-                btn.disabled = true;
-                return;
-            }
-
-            let html = `<h4 class="text-lg font-bold text-white mb-2">Analysis Report</h4>`;
-            let speechText = "";
-
-            const sorted = [...records].sort((a,b) => {
-                if (m === 'plateau') return a.voltage - b.voltage;
-                if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2;
-                if (m === 'inversesquare') return a.distance - b.distance;
-                if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord;
-            });
+            let html = `<h4 class="text-xl font-extrabold text-white mb-4 border-b border-white/10 pb-2">Analysis Report</h4>`; let speechText = "";
+            const sorted = [...records].sort((a,b) => { if (m === 'plateau') return a.voltage - b.voltage; if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2; if (m === 'inversesquare') return a.distance - b.distance; if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; });
 
             if (m === 'absorption') {
-                const bg = state.bgCountRate || 0.8;
                 const n0_record = sorted.find(r => r.thicknessGcm2 == 0);
-                if(!n0_record) {
-                    html += `<p class="text-rose-400">Please record an initial count at 0 cm thickness to find the unattenuated rate.</p>`;
-                    speechText = "Please record an initial count at zero thickness.";
-                } else {
-                    const N0 = parseFloat(n0_record.netCps);
-                    const targetN = N0 / 2;
-                    let t_half = 0;
-                    
-                    // Linear interpolation to find t1/2
-                    for(let i=0; i<sorted.length-1; i++){
-                        const y1 = parseFloat(sorted[i].netCps); const y2 = parseFloat(sorted[i+1].netCps);
-                        const x1 = parseFloat(sorted[i].thicknessGcm2); const x2 = parseFloat(sorted[i+1].thicknessGcm2);
-                        if(targetN <= y1 && targetN >= y2 && y1 !== y2) {
-                            t_half = x1 + (targetN - y1) * ((x2 - x1) / (y2 - y1));
-                            break;
-                        }
-                    }
-
-                    if(t_half === 0) {
-                        html += `<p class="text-rose-400">Could not find half-value thickness. Ensure you add thicker absorbers until count rate drops below ${targetN.toFixed(1)} CPS.</p>`;
-                        speechText = "Could not find half value thickness. Add thicker absorbers.";
-                    } else {
-                        // Standard references based on manual
-                        const ref_thalf = 0.124; // Tl204
-                        const ref_range = 0.307; // Tl204
-                        const calc_range = ref_range * (t_half / ref_thalf);
-                        const emax = (calc_range + 0.09) / 0.52;
-
-                        html += `<p>I have analyzed your attenuation data. The initial unshielded net count rate is <strong class="text-white">${N0.toFixed(1)} CPS</strong>.</p>`;
-                        html += `<p>The target half-count rate is <strong class="text-white">${targetN.toFixed(1)} CPS</strong>. Interpolating the plot yields an experimental half-value thickness:</p>`;
-                        html += `<div class="ai-math-box">t_1/2 = ${t_half.toFixed(3)} g/cm²</div>`;
-                        html += `<p>Using standard Thallium-204 as reference (t_1/2 = ${ref_thalf} g/cm², Range = ${ref_range} g/cm²), we determine the Range of your source:</p>`;
-                        html += `<div class="ai-math-box">R_unk = R_ref × (t_1/2_unk / t_1/2_ref)<br>R_unk = ${ref_range} × (${t_half.toFixed(3)} / ${ref_thalf})<br>R_unk = ${calc_range.toFixed(3)} g/cm²</div>`;
-                        html += `<p>Finally, applying the empirical Energy-Range relation (E = (R + 0.09) / 0.52):</p>`;
-                        html += `<div class="ai-math-box glow-text text-emerald-400">End-Point Energy (E_max) = ${emax.toFixed(2)} MeV</div>`;
-                        
-                        speechText = `I have analyzed the data. The experimental half-value thickness is ${t_half.toFixed(3)} grams per square centimeter. Calculating the relative range, we find an end-point energy of ${emax.toFixed(2)} mega electron volts.`;
+                if(!n0_record) { html += `<p class="text-rose-400">Missing reading at 0 cm thickness.</p>`; } 
+                else {
+                    const N0 = parseFloat(n0_record.netCps); const targetN = N0 / 2; let t_half = 0;
+                    for(let i=0; i<sorted.length-1; i++){ const y1 = parseFloat(sorted[i].netCps); const y2 = parseFloat(sorted[i+1].netCps); const x1 = parseFloat(sorted[i].thicknessGcm2); const x2 = parseFloat(sorted[i+1].thicknessGcm2); if(targetN <= y1 && targetN >= y2 && y1 !== y2) { t_half = x1 + (targetN - y1) * ((x2 - x1) / (y2 - y1)); break; } }
+                    if(t_half === 0) { html += `<p class="text-rose-400">Could not find half-value thickness. Add thicker absorbers.</p>`; } 
+                    else {
+                        const ref_thalf = 0.124; const ref_range = 0.307; const calc_range = ref_range * (t_half / ref_thalf); const emax = (calc_range + 0.09) / 0.52;
+                        html += `<p class="mb-2">Initial rate: <strong class="text-white">${N0.toFixed(1)} CPS</strong>. Target half-rate: <strong class="text-white">${targetN.toFixed(1)} CPS</strong>.</p>`;
+                        html += `<div class="bg-black/30 p-4 rounded-xl border-l-4 border-blue-500 mb-4 font-mono text-blue-200">t_1/2 = ${t_half.toFixed(3)} g/cm²</div>`;
+                        html += `<p class="mb-2">Calculating Range using Tl-204 reference:</p>`;
+                        html += `<div class="bg-black/30 p-4 rounded-xl border-l-4 border-purple-500 mb-4 font-mono text-purple-200">R_unk = ${ref_range} × (${t_half.toFixed(3)} / ${ref_thalf})<br>R_unk = ${calc_range.toFixed(3)} g/cm²</div>`;
+                        html += `<div class="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/30 text-center font-bold text-emerald-400 text-lg shadow-[0_0_15px_rgba(16,185,129,0.2)]">E_max = ${emax.toFixed(2)} MeV</div>`;
+                        speechText = `The experimental half-value thickness is ${t_half.toFixed(3)} grams per square centimeter. The resulting end-point energy is calculated as ${emax.toFixed(2)} mega electron volts.`;
                     }
                 }
             } 
             else if (m === 'halflife') {
-                const first = sorted[0]; const last = sorted[sorted.length-1];
-                const n0 = parseFloat(first.netCps); const nt = parseFloat(last.netCps);
-                const t = parseFloat(last.timeAtRecord) - parseFloat(first.timeAtRecord);
-                
-                if (n0 <= nt || t === 0) {
-                    html += `<p class="text-rose-400">Invalid decay trend. Counts must decrease over time.</p>`;
-                    speechText = "Invalid decay trend detected.";
-                } else {
-                    const lambda = Math.log(n0/nt) / t;
-                    const thalf = Math.LN2 / lambda;
-                    
-                    html += `<p>Over a span of ${t.toFixed(1)} seconds, net counts decayed from ${n0.toFixed(1)} to ${nt.toFixed(1)} CPS.</p>`;
-                    html += `<p>Using the exponential decay law <span class="math-font">N_t = N_0 e^{-λt}</span>, the decay constant is:</p>`;
-                    html += `<div class="ai-math-box">λ = ln(${n0.toFixed(1)} / ${nt.toFixed(1)}) / ${t.toFixed(1)}<br>λ = ${lambda.toFixed(4)} s⁻¹</div>`;
-                    html += `<p>The half-life <span class="math-font">T_{1/2} = ln(2) / λ</span> is computed as:</p>`;
-                    html += `<div class="ai-math-box glow-text text-emerald-400">Half-Life (T_1/2) = ${thalf.toFixed(1)} seconds</div>`;
-                    
-                    speechText = `Analysis complete. Based on the logarithmic decay over ${t.toFixed(0)} seconds, the calculated half life is ${thalf.toFixed(1)} seconds.`;
+                const first = sorted[0]; const last = sorted[sorted.length-1]; const n0 = parseFloat(first.netCps); const nt = parseFloat(last.netCps); const t = parseFloat(last.timeAtRecord) - parseFloat(first.timeAtRecord);
+                if (n0 <= nt || t === 0) { html += `<p class="text-rose-400">Invalid decay trend.</p>`; } 
+                else {
+                    const lambda = Math.log(n0/nt) / t; const thalf = Math.LN2 / lambda;
+                    html += `<p class="mb-2">Decay from ${n0.toFixed(1)} to ${nt.toFixed(1)} CPS over ${t.toFixed(1)}s.</p>`;
+                    html += `<div class="bg-black/30 p-4 rounded-xl border-l-4 border-blue-500 mb-4 font-mono text-blue-200">λ = ln(${n0.toFixed(1)} / ${nt.toFixed(1)}) / ${t.toFixed(1)}<br>λ = ${lambda.toFixed(4)} s⁻¹</div>`;
+                    html += `<div class="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/30 text-center font-bold text-emerald-400 text-lg shadow-[0_0_15px_rgba(16,185,129,0.2)]">Half-Life (T_1/2) = ${thalf.toFixed(1)} s</div>`;
+                    speechText = `Based on the logarithmic decay, the calculated half life is ${thalf.toFixed(1)} seconds.`;
                 }
             }
             else if (m === 'plateau') {
-                if(sorted.length < 3) {
-                    html += `<p class="text-rose-400">Record more voltage points to identify a plateau.</p>`; speechText = "Record more voltage points.";
-                } else {
-                    // Just take mid points for simple plateau calculation demonstration
-                    const mid1 = sorted[Math.floor(sorted.length/3)];
-                    const mid2 = sorted[Math.floor((sorted.length*2)/3)];
-                    const n1 = parseFloat(mid1.netCps), v1 = parseFloat(mid1.voltage);
-                    const n2 = parseFloat(mid2.netCps), v2 = parseFloat(mid2.voltage);
+                if(sorted.length < 3) { html += `<p class="text-rose-400">Record more voltage points.</p>`; } 
+                else {
+                    const mid1 = sorted[Math.floor(sorted.length/3)]; const mid2 = sorted[Math.floor((sorted.length*2)/3)];
+                    const n1 = parseFloat(mid1.netCps), v1 = parseFloat(mid1.voltage), n2 = parseFloat(mid2.netCps), v2 = parseFloat(mid2.voltage);
                     const slope = ((n2 - n1) / n1) * (100 / (v2 - v1)) * 100;
-                    
-                    html += `<p>Locating the flattest region of the characteristic curve between ${v1}V and ${v2}V.</p>`;
-                    html += `<p>Using points (V1=${v1}, N1=${n1}) and (V2=${v2}, N2=${n2}):</p>`;
-                    html += `<div class="ai-math-box">Slope = [(N2 - N1) / N1] × [100 / (V2 - V1)] %<br>Slope = ${slope.toFixed(3)} % per 100V</div>`;
-                    if(slope >= 0 && slope < 10) html += `<p class="text-emerald-400">Good plateau detected. Ideal operating voltage is ~${(v1+v2)/2}V.</p>`;
-                    
-                    speechText = `Analyzing the characteristic curve. The flattest plateau region has a slope of ${slope.toFixed(2)} percent per 100 volts.`;
+                    html += `<p class="mb-2">Evaluating plateau between ${v1}V and ${v2}V:</p>`;
+                    html += `<div class="bg-black/30 p-4 rounded-xl border-l-4 border-yellow-500 mb-4 font-mono text-yellow-200">Slope = [(N2 - N1) / N1] × [100 / (V2 - V1)] %<br>Slope = ${slope.toFixed(3)} % per 100V</div>`;
+                    if(slope >= 0 && slope < 10) html += `<div class="bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/30 text-emerald-400 font-bold text-center">Ideal operating voltage: ~${(v1+v2)/2}V</div>`;
+                    speechText = `The flattest plateau region has a slope of ${slope.toFixed(2)} percent per 100 volts.`;
                 }
             }
             else if (m === 'inversesquare') {
-                html += `<p>Analyzing the relationship between Distance and Intensity.</p>`;
-                html += `<p>The theoretical expectation is a perfectly linear relationship between <span class="math-font">1/d²</span> and Net CPS.</p>`;
-                // Simple linearity check presentation
                 const first = sorted[0]; const last = sorted[sorted.length-1];
-                html += `<div class="ai-math-box">Point 1: ${first.distance}cm -> ${first.netCps} CPS<br>Point 2: ${last.distance}cm -> ${last.netCps} CPS<br><br>Ratio (I1/I2) = ${(parseFloat(first.netCps)/parseFloat(last.netCps)).toFixed(2)}<br>Ratio (d2²/d1²) = ${Math.pow(last.distance/first.distance, 2).toFixed(2)}</div>`;
-                html += `<p class="text-emerald-400">The close matching of these ratios computationally verifies the Inverse Square Law.</p>`;
-                
-                speechText = `Checking inverse square proportionality. The intensity ratios strongly correlate with the inverse square of the distance, confirming the physical law.`;
+                html += `<p class="mb-2">Verifying Inverse Square Law linearity:</p>`;
+                html += `<div class="bg-black/30 p-4 rounded-xl border-l-4 border-emerald-500 mb-4 font-mono text-emerald-200">Point 1: ${first.distance}cm -> ${first.netCps} CPS<br>Point 2: ${last.distance}cm -> ${last.netCps} CPS<br><br>Ratio (I1/I2) = ${(parseFloat(first.netCps)/parseFloat(last.netCps)).toFixed(2)}<br>Ratio (d2²/d1²) = ${Math.pow(last.distance/first.distance, 2).toFixed(2)}</div>`;
+                html += `<p class="text-emerald-400 font-bold text-center">Close matching ratios verify the law mathematically.</p>`;
+                speechText = `The intensity ratios match the inverse square of the distance, confirming the law.`;
+            }
+            out.innerHTML = html; state.aiTextCache = speechText; btn.disabled = false;
+        }
+
+        // --- 8. GEMINI AI CHATBOT ---
+        const apiKey = ""; // Exec environment injects this if available
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            const hist = document.getElementById('chat-history');
+            // User Message
+            hist.innerHTML += `<div class="chat-bubble-user p-3 text-white self-end ml-8 shadow-md">${text}</div>`;
+            input.value = '';
+            
+            // Loading Indicator
+            const loaderId = 'loader-' + Date.now();
+            hist.innerHTML += `<div id="${loaderId}" class="chat-bubble-ai p-3 w-16 mr-8"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+            hist.scrollTop = hist.scrollHeight;
+
+            if(!apiKey) { // Mock response if no key
+                setTimeout(() => {
+                    document.getElementById(loaderId).remove();
+                    hist.innerHTML += `<div class="chat-bubble-ai p-3 text-slate-200 mr-8 shadow-md">I am currently operating in restricted mode without an API key, but for this experiment: always ensure your count times are long enough to reduce statistical error ($\pm\\sqrt{N}$).</div>`;
+                    hist.scrollTop = hist.scrollHeight;
+                }, 1500);
+                return;
             }
 
-            out.innerHTML = html;
-            state.aiTextCache = speechText;
-            btn.disabled = false;
+            // Real Gemini Call
+            const sysPrompt = "You are an expert AI physics lab assistant. Answer questions ONLY related to Geiger-Muller counters, Inverse Square Law, Beta Particle Absorption (End-Point Energy), Radioactive Half-Life (Ba-137m), and Plateau Region. Provide concise, highly accurate physics explanations. Do not answer non-physics questions.";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = { systemInstruction: { parts: [{ text: sysPrompt }] }, contents: [{ parts: [{ text }] }] };
+
+            try {
+                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await res.json();
+                document.getElementById(loaderId).remove();
+                let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I encountered an error analyzing your request.";
+                // Simple markdown parsing for bold
+                reply = reply.replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>');
+                hist.innerHTML += `<div class="chat-bubble-ai p-3 text-slate-200 mr-8 shadow-md">${reply}</div>`;
+            } catch(e) {
+                document.getElementById(loaderId).remove();
+                hist.innerHTML += `<div class="chat-bubble-ai p-3 text-rose-300 mr-8 border-rose-500/30">Network error connecting to AI brain.</div>`;
+            }
+            hist.scrollTop = hist.scrollHeight;
         }
 
-        let aiSpeechSynth = null;
-        function speakAI() {
-            if(!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-            aiSpeechSynth = new SpeechSynthesisUtterance(state.aiTextCache);
-            aiSpeechSynth.rate = 1.0; aiSpeechSynth.pitch = 1.0; // Professional voice
-            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full ai-active-glow";
-            aiSpeechSynth.onend = () => { document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-emerald-500"; };
-            window.speechSynthesis.speak(aiSpeechSynth);
-        }
-
-        // --- Voice Assistant (Manual reading) ---
-        let isSpeaking = false;
-        function speakManual() {
-            if(!('speechSynthesis' in window)) return alert("Your browser doesn't support text-to-speech.");
-            window.speechSynthesis.cancel();
-            let man = LAB_MANUALS[state.mode];
-            let text = `Experiment: ${man.title}. Theoretical Background: ${man.theory}. Procedure: Step 1: ${man.procedure.join('. Step: ')}.`;
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.95; utterance.pitch = 1.1;
-            utterance.onstart = () => { document.getElementById('assistant-indicator').classList.add('speaking-glow'); };
-            utterance.onend = () => { document.getElementById('assistant-indicator').classList.remove('speaking-glow'); };
-            window.speechSynthesis.speak(utterance);
-        }
-        function stopSpeaking() {
-            if('speechSynthesis' in window) window.speechSynthesis.cancel();
-            document.getElementById('assistant-indicator').classList.remove('speaking-glow');
-            document.getElementById('ai-status-indicator').className = "w-4 h-4 rounded-full bg-slate-600";
-        }
-
-        // --- Calculator Tool ---
-        let calcVal = '';
-        function toggleCalculator() {
-            const calc = document.getElementById('calculator-widget');
-            calc.style.display = calc.style.display === 'flex' ? 'none' : 'flex';
-        }
+        // --- 9. WIDGET DRAG & CALC ---
         function calcPress(val) {
-            const display = document.getElementById('calc-display');
-            if (val === 'C') calcVal = '';
-            else if (val === 'Del') calcVal = calcVal.slice(0, -1);
-            else if (val === '=') { try { let eq = calcVal.replace(/x/g, '*').replace(/÷/g, '/').replace(/\^/g, '**'); calcVal = Function('"use strict";return (' + eq + ')')().toString(); } catch (e) { calcVal = 'Error'; } }
-            else if (val === 'x2') { try { calcVal = Math.pow(parseFloat(calcVal || 0), 2).toString(); } catch(e){} } 
-            else if (val === 'sqrt') { try { calcVal = Math.sqrt(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
-            else if (val === 'ln') { try { calcVal = Math.log(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
-            else if (val === 'exp') { try { calcVal = Math.exp(parseFloat(calcVal || 0)).toString(); } catch(e){} } 
-            else { if (calcVal === 'Error') calcVal = ''; calcVal += val; }
-            display.value = calcVal || '0';
+            const disp = document.getElementById('calc-display'); let cv = disp.value;
+            if (val === 'C') cv = ''; else if (val === 'Del') cv = cv.slice(0, -1);
+            else if (val === '=') { try { cv = Function('"use strict";return (' + cv.replace(/x/g, '*').replace(/÷/g, '/').replace(/\^/g, '**') + ')')().toString(); } catch(e) { cv = 'Error'; } }
+            else if (val === 'x2') { try { cv = Math.pow(parseFloat(cv||0), 2).toString(); } catch(e){} } 
+            else if (val === 'sqrt') { try { cv = Math.sqrt(parseFloat(cv||0)).toString(); } catch(e){} } 
+            else if (val === 'ln') { try { cv = Math.log(parseFloat(cv||0)).toString(); } catch(e){} } 
+            else if (val === 'exp') { try { cv = Math.exp(parseFloat(cv||0)).toString(); } catch(e){} } 
+            else { if (cv === 'Error' || cv === '0') cv = ''; cv += val; }
+            disp.value = cv || '0';
         }
         function startDrag(e, id) {
-            const el = document.getElementById(id);
             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-            let startX = e.clientX, startY = e.clientY;
-            function doDrag(e2) {
-                const dx = e2.clientX - startX; const dy = e2.clientY - startY;
-                startX = e2.clientX; startY = e2.clientY;
-                el.style.top = (el.offsetTop + dy) + "px"; el.style.left = (el.offsetLeft + dx) + "px"; el.style.right = "auto"; 
-            }
+            const el = document.getElementById(id); let sx = e.clientX, sy = e.clientY;
+            function doDrag(e2) { el.style.top = (el.offsetTop + (e2.clientY - sy)) + "px"; el.style.left = (el.offsetLeft + (e2.clientX - sx)) + "px"; el.style.right = "auto"; el.style.bottom = "auto"; sx = e2.clientX; sy = e2.clientY; }
             function stopDrag() { document.removeEventListener('mousemove', doDrag); document.removeEventListener('mouseup', stopDrag); }
             document.addEventListener('mousemove', doDrag); document.addEventListener('mouseup', stopDrag);
         }
