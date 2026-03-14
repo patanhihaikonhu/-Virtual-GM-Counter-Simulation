@@ -3,62 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuclear Physics Lab | AstraLab Galactic OS</title>
+    <title>Nuclear Physics Lab | Holographic HUD Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-cyan: #06b6d4;
             --neon-green: #10b981;
-            --neon-rose: #f43f5e;
-            --hud-bg: rgba(6, 11, 25, 0.75);
+            --hud-bg: rgba(6, 11, 25, 0.85);
             --hud-border: rgba(6, 182, 212, 0.3);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: #010308;
+            background-color: #030712;
             color: #e2e8f0;
-            overflow: hidden; /* Prevent scrolling in fullscreen mode */
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
             /* Security: Block text selection and long-presses */
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         h1, h2, h3, .hud-title { font-family: 'Orbitron', sans-serif; }
         .digital-font { font-family: 'Share Tech Mono', monospace; }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--neon-green); }
-
-        /* Galaxy Background Canvas */
-        #galaxy-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.8; }
 
         /* Holographic Panels */
         .hud-panel {
             background: var(--hud-bg);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--hud-border);
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(6, 182, 212, 0.1), inset 0 0 20px rgba(6, 182, 212, 0.05);
             position: relative;
         }
         
-        .hud-panel::before { content: ''; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
-        .hud-panel::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 20px; height: 20px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+        .hud-panel::before {
+            content: ''; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px;
+            border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan);
+        }
+        .hud-panel::after {
+            content: ''; position: absolute; bottom: -1px; right: -1px; width: 20px; height: 20px;
+            border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan);
+        }
 
-        /* Intro Screen & Atom Animation */
+        /* Intro Screen Animation */
         #intro-screen {
             position: fixed; inset: 0; background: #010308; z-index: 99999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
         }
-        .atom { position: relative; width: 120px; height: 120px; margin-bottom: 30px; }
+        .atom { position: relative; width: 120px; height: 120px; margin-bottom: 40px; }
         .nucleus { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 30px var(--neon-cyan); animation: pulse-core 1.5s infinite alternate; }
-        .orbit { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid rgba(6, 182, 212, 0.3); border-radius: 50%; }
-        .orbit-1 { animation: spin 2s linear infinite; } .orbit-2 { animation: spin 2.5s linear infinite; } .orbit-3 { animation: spin 3s linear infinite; }
+        .orbit { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid rgba(6, 182, 212, 0.2); border-radius: 50%; }
+        .orbit-1 { animation: spin 2s linear infinite; }
+        .orbit-2 { animation: spin 2.5s linear infinite; }
+        .orbit-3 { animation: spin 3s linear infinite; }
         .orbit-1-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(0deg); }
         .orbit-2-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(60deg); }
         .orbit-3-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(120deg); }
@@ -68,9 +81,9 @@
 
         /* Scanline Animation */
         .scanline {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 15vh;
-            background: linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.15), transparent);
-            animation: scan 8s linear infinite; pointer-events: none; z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 10vh;
+            background: linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.1), transparent);
+            animation: scan 6s linear infinite; pointer-events: none; z-index: 100;
         }
         @keyframes scan { 0% { transform: translateY(-100vh); } 100% { transform: translateY(200vh); } }
 
@@ -85,34 +98,40 @@
         .hud-btn-active { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
         .hud-btn-green { border-color: var(--neon-green); color: var(--neon-green); }
         .hud-btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
-        .hud-btn-red { border-color: var(--neon-rose); color: var(--neon-rose); }
-        .hud-btn-red:hover { background: var(--neon-rose); color: #000; box-shadow: 0 0 15px var(--neon-rose); }
 
-        /* Widgets & Animations */
-        .floating-widget { transition: opacity 0.3s, transform 0.3s; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(6, 182, 212, 0.2); }
+        /* Widgets & Rows */
+        .floating-widget {
+            transition: opacity 0.3s, transform 0.3s;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(6, 182, 212, 0.2);
+        }
         .widget-hidden { opacity: 0; transform: scale(0.95) translateY(10px); pointer-events: none; }
+        
         .row-animate { animation: slideIn 0.3s ease-out forwards; opacity: 0; transform: translateX(-10px); }
         @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
 
-        /* Custom Inputs */
-        input[type="range"] { -webkit-appearance: none; background: rgba(6, 182, 212, 0.3); height: 4px; border-radius: 2px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 24px; background: var(--neon-cyan); cursor: pointer; box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s; }
+        /* Inputs */
+        input[type="range"] { -webkit-appearance: none; background: rgba(6, 182, 212, 0.2); height: 4px; border-radius: 2px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 24px; background: var(--neon-cyan); cursor: pointer; box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s; }
         input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
-        select, input[type="text"], input[type="number"] { background: rgba(0,0,0,0.6); border: 1px solid var(--hud-border); color: var(--neon-cyan); font-family: 'Share Tech Mono', monospace; }
+
+        select, input[type="text"], input[type="number"] {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--hud-border);
+            color: var(--neon-cyan); font-family: 'Share Tech Mono', monospace;
+        }
         select:focus, input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(6,182,212,0.5); outline: none; }
 
-        /* AI Glow */
+        /* AI Glowing elements */
         .ai-glow { animation: pulse-green 2s infinite; }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
 <body class="pb-16 min-h-screen flex flex-col relative" oncontextmenu="return false;">
 
-    <!-- Background Galaxy Canvas -->
-    <canvas id="galaxy-canvas"></canvas>
-    <div class="scanline"></div>
-
-    <!-- Intro Screen (Instructions + Animation) -->
+    <!-- Intro Screen -->
     <div id="intro-screen">
         <div class="atom">
             <div class="nucleus"></div>
@@ -120,27 +139,15 @@
             <div class="orbit-2-container"><div class="orbit orbit-2"><div class="electron"></div></div></div>
             <div class="orbit-3-container"><div class="orbit orbit-3"><div class="electron"></div></div></div>
         </div>
-        <h1 class="text-5xl font-black text-white tracking-widest uppercase mb-2" style="font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px #06b6d4;">Astra<span class="text-cyan-400">Lab</span>.OS</h1>
-        <p class="text-cyan-600 digital-font tracking-widest mb-8 text-lg">GALACTIC PHYSICS SIMULATION V3.0</p>
-        
-        <!-- Instructions Panel -->
-        <div class="hud-panel p-6 mb-8 max-w-lg text-center border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-            <h3 class="text-emerald-400 font-bold tracking-widest uppercase mb-3">Commander's Briefing</h3>
-            <ul class="text-sm text-emerald-100 text-left space-y-2 digital-font">
-                <li><strong class="text-emerald-300">[1]</strong> Select a Mission Profile (Experiment) from the top navigation.</li>
-                <li><strong class="text-emerald-300">[2]</strong> Turn the Reactor <b>SYS.ON</b> and set your parameters (Timer, Voltage, Dist).</li>
-                <li><strong class="text-emerald-300">[3]</strong> Press <b>▶ INIT</b> to start the counter, wait, then <b>[LOG TELEMETRY]</b>.</li>
-                <li><strong class="text-emerald-300">[4]</strong> Use the <b>A.I. ANALYSIS</b> tab to automatically solve complex physics equations.</li>
-            </ul>
-        </div>
-
-        <button onclick="startSimulation()" class="hud-btn hud-btn-green px-10 py-4 text-xl font-bold tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.4)] animate-pulse hover:animate-none">
-            INITIALIZE FULLSCREEN LAB
-        </button>
+        <h1 class="text-4xl font-black text-white tracking-widest uppercase mb-2" style="font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px #06b6d4;">Astra<span class="text-cyan-400">Lab</span>.OS</h1>
+        <p class="text-cyan-600 digital-font tracking-widest mb-10">SIMULATION ENGINE V2.6 INITIALIZING...</p>
+        <button onclick="startSimulation()" class="hud-btn px-8 py-3 text-lg font-bold tracking-widest shadow-[0_0_20px_rgba(6,182,212,0.4)]">INITIALIZE LAB</button>
     </div>
 
+    <div class="scanline"></div>
+
     <!-- Header -->
-    <header class="hud-panel mx-4 mt-4 p-4 z-40">
+    <header class="hud-panel mx-4 mt-4 p-4 sticky top-4 z-40">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 border-2 border-cyan-400 bg-cyan-900/50 flex items-center justify-center font-bold text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.6)] text-2xl" onmouseenter="playHover()">
@@ -148,29 +155,34 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-extrabold text-white tracking-widest uppercase" style="text-shadow: 0 0 10px rgba(6,182,212,0.5);">Astra<span class="text-cyan-400">Lab</span>.OS</h1>
-                    <p class="text-xs text-cyan-500 font-bold tracking-widest uppercase digital-font">Galactic Simulation v3.0</p>
+                    <p class="text-xs text-cyan-500 font-bold tracking-widest uppercase digital-font">Tactical Physics Simulation v2.6</p>
                 </div>
             </div>
 
             <div class="flex space-x-3 items-center flex-wrap justify-center gap-y-2">
-                <div class="flex space-x-2 bg-black/50 p-1.5 rounded border border-cyan-900/50" id="mode-selector">
+                <div class="flex space-x-2 bg-black/40 p-1.5 rounded border border-cyan-900/50" id="mode-selector">
                     <!-- Modes injected via JS -->
                 </div>
                 
                 <div class="flex space-x-2 border-l border-cyan-900/50 pl-3">
-                    <button onclick="toggleSound()" id="sound-toggle-btn" class="hud-btn px-3 py-2 rounded text-xs font-bold flex items-center" onmouseenter="playHover()">🔈 SOUND: OFF</button>
-                    <button onclick="toggleWidget('calculator-widget')" class="hud-btn px-3 py-2 rounded text-xs font-bold flex items-center" onmouseenter="playHover()">🖩 SYS.CALC</button>
-                    <button onclick="toggleWidget('ai-chat-widget')" class="hud-btn hud-btn-green px-3 py-2 rounded text-xs font-bold flex items-center shadow-[0_0_10px_rgba(16,185,129,0.3)]" onmouseenter="playHover()">✨ A.I. COMMS</button>
-                    <button onclick="masterReset()" class="hud-btn hud-btn-red px-3 py-2 rounded text-xs font-bold flex items-center shadow-[0_0_10px_rgba(244,63,94,0.3)]" onmouseenter="playHover()">🔴 SYS.REBOOT</button>
+                    <button onclick="toggleSound()" id="sound-toggle-btn" class="hud-btn px-4 py-2 rounded text-xs font-bold flex items-center" onmouseenter="playHover()">
+                        🔈 SOUND: OFF
+                    </button>
+                    <button onclick="toggleWidget('calculator-widget')" class="hud-btn px-4 py-2 rounded text-xs font-bold flex items-center" onmouseenter="playHover()">
+                        🖩 SYS.CALC
+                    </button>
+                    <button onclick="toggleWidget('ai-chat-widget')" class="hud-btn hud-btn-green px-4 py-2 rounded text-xs font-bold flex items-center shadow-[0_0_10px_rgba(16,185,129,0.3)]" onmouseenter="playHover()">
+                        ✨ A.I. COMMS
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto w-full p-4 mt-2 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 relative z-10 h-full overflow-hidden">
+    <main class="max-w-7xl mx-auto w-full p-4 mt-2 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 relative z-10">
         
         <!-- LEFT COLUMN: Apparatus -->
-        <div class="lg:col-span-4 space-y-6 h-full overflow-y-auto pr-2 pb-20">
+        <div class="lg:col-span-4 space-y-6">
             
             <!-- Control Console -->
             <div class="hud-panel p-6">
@@ -181,19 +193,19 @@
                     </button>
                 </div>
 
-                <!-- Digital Displays -->
+                <!-- Digital Displays (Now with Synced Decay Clock) -->
                 <div class="flex space-x-2 mb-6">
                     <div id="decay-display-container" class="flex-1 bg-black/80 p-4 border border-rose-900/50 text-center relative shadow-[inset_0_0_20px_rgba(0,0,0,1)] hidden">
                         <div class="text-[10px] text-rose-600 uppercase font-bold tracking-widest mb-1 absolute top-1 left-2">DECAY(s)</div>
-                        <div id="global-time-val" class="digital-font text-3xl xl:text-4xl text-rose-900 mt-2 transition-colors">000</div>
+                        <div id="global-time-val" class="digital-font text-4xl text-rose-900 mt-2 transition-colors">000</div>
                     </div>
                     <div class="flex-1 bg-black/80 p-4 border border-cyan-900/50 text-center relative shadow-[inset_0_0_20px_rgba(0,0,0,1)]">
                         <div class="text-[10px] text-cyan-600 uppercase font-bold tracking-widest mb-1 absolute top-1 left-2">T(s)</div>
-                        <div id="time-display" class="digital-font text-3xl xl:text-4xl text-cyan-900 mt-2 transition-colors">00.0</div>
+                        <div id="time-display" class="digital-font text-4xl text-cyan-900 mt-2 transition-colors">00.0</div>
                     </div>
                     <div class="flex-1 bg-black/80 p-4 border border-cyan-900/50 text-center relative shadow-[inset_0_0_20px_rgba(0,0,0,1)]">
                         <div class="text-[10px] text-cyan-600 uppercase font-bold tracking-widest mb-1 absolute top-1 left-2">CNT</div>
-                        <div id="count-display" class="digital-font text-3xl xl:text-4xl text-cyan-900 mt-2 transition-colors">00000</div>
+                        <div id="count-display" class="digital-font text-4xl text-cyan-900 mt-2 transition-colors">00000</div>
                     </div>
                 </div>
 
@@ -213,22 +225,34 @@
                 <!-- Settings -->
                 <div class="space-y-4">
                     <div class="bg-black/40 p-3 border border-cyan-900/30">
-                        <div class="flex justify-between text-xs mb-2"><span class="text-cyan-500 font-bold uppercase tracking-widest">Timer</span><span id="preset-time-val" class="text-cyan-300 digital-font">30 s</span></div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-cyan-500 font-bold uppercase tracking-widest">Timer</span>
+                            <span id="preset-time-val" class="text-cyan-300 digital-font">30 s</span>
+                        </div>
                         <input type="range" id="preset-time" min="10" max="60" step="10" value="30" class="w-full" oninput="updateParams(); playTick()">
                     </div>
 
                     <div id="ctrl-voltage" class="bg-black/40 p-3 border border-yellow-900/50 hidden">
-                        <div class="flex justify-between text-xs mb-2"><span class="text-yellow-500 font-bold uppercase tracking-widest">Voltage</span><span id="voltage-val" class="text-yellow-300 digital-font">500 V</span></div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-yellow-500 font-bold uppercase tracking-widest">Voltage</span>
+                            <span id="voltage-val" class="text-yellow-300 digital-font">500 V</span>
+                        </div>
                         <input type="range" id="voltage" min="300" max="1000" step="25" value="500" class="w-full" oninput="updateParams(); playTick()" style="background: rgba(234,179,8,0.2)">
                     </div>
 
                     <div id="ctrl-distance" class="bg-black/40 p-3 border border-green-900/50 hidden">
-                        <div class="flex justify-between text-xs mb-2"><span class="text-green-500 font-bold uppercase tracking-widest">Distance</span><span id="distance-val" class="text-green-300 digital-font">2 cm</span></div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-green-500 font-bold uppercase tracking-widest">Distance</span>
+                            <span id="distance-val" class="text-green-300 digital-font">2 cm</span>
+                        </div>
                         <input type="range" id="distance" min="2" max="50" step="1" value="2" class="w-full" oninput="updateParams(); playTick()" style="background: rgba(16,185,129,0.2)">
                     </div>
 
                     <div id="ctrl-thickness" class="bg-black/40 p-3 border border-blue-900/50 hidden">
-                        <div class="flex justify-between text-xs mb-2"><span class="text-blue-500 font-bold uppercase tracking-widest">Absorber (Al)</span><span id="thickness-val" class="text-blue-300 digital-font">0.00 cm</span></div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-blue-500 font-bold uppercase tracking-widest">Absorber (Al)</span>
+                            <span id="thickness-val" class="text-blue-300 digital-font">0.00 cm</span>
+                        </div>
                         <select id="thickness" class="w-full p-1.5 text-sm" onchange="updateParams(); playClick()"></select>
                     </div>
 
@@ -241,35 +265,48 @@
 
             <!-- Virtual Lab Bench -->
             <div class="hud-panel p-6 relative min-h-[250px] flex flex-col justify-between">
+                
                 <div class="flex flex-col items-center py-4 relative flex-1 justify-center">
+                    <!-- GM TUBE -->
                     <div id="gm-tube" class="w-16 h-20 bg-gradient-to-b from-slate-700 to-slate-900 border-x-2 border-t-2 border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] z-20 flex flex-col items-center justify-end pb-1 relative transition-all">
                         <div class="text-[8px] text-cyan-300 font-bold absolute top-6 rotate-90 tracking-widest opacity-50">DETECTOR</div>
                         <div class="w-full h-2 bg-cyan-900 border-y border-cyan-400/50"></div>
                         <div id="spark-effect" class="absolute inset-0 bg-yellow-400/20 animate-pulse z-30 hidden mix-blend-screen"></div>
                     </div>
+                    
+                    <!-- DISTANCE TRACK -->
                     <div id="visual-distance" class="w-1 relative flex flex-col items-center z-10 bg-cyan-900/50 transition-all duration-300" style="height: 16px;">
                         <div class="absolute left-3 top-0 bottom-0 border-l border-cyan-500/30 flex flex-col justify-between py-1 text-[8px] text-cyan-400 digital-font">
                             <span>0</span><span id="visual-dist-label">2</span>
                         </div>
                         <div id="visual-absorber" class="hidden absolute top-2 w-16 bg-blue-400 border border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-20" style="left: -32px; height: 4px;"></div>
                     </div>
+                    
+                    <!-- SOURCE -->
                     <div class="w-24 h-6 bg-black border border-cyan-700 flex items-center justify-center relative z-20 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
                         <div id="visual-source" class="hidden w-3 h-3 bg-amber-400 shadow-[0_0_20px_rgba(245,158,11,1)] animate-pulse rounded-full"></div>
                     </div>
                 </div>
+
             </div>
         </div>
 
         <!-- RIGHT COLUMN: Analysis & Data -->
-        <div class="lg:col-span-8 flex flex-col h-[85vh]">
+        <div class="lg:col-span-8 flex flex-col h-[850px]">
             
             <div class="flex space-x-2 mb-4">
-                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2 text-sm font-bold border border-cyan-500 bg-cyan-900/30 text-cyan-300 transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(6,182,212,0.3)]" onmouseenter="playHover()">Data Stream</button>
-                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-2 text-sm font-bold border border-transparent text-emerald-600 hover:border-emerald-900 transition-all uppercase tracking-widest" onmouseenter="playHover()">A.I. Analysis</button>
-                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2 text-sm font-bold border border-transparent text-slate-500 hover:border-slate-700 transition-all uppercase tracking-widest" onmouseenter="playHover()">Database</button>
+                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-2 text-sm font-bold border border-cyan-500 bg-cyan-900/30 text-cyan-300 transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(6,182,212,0.3)]" onmouseenter="playHover()">
+                    Data Stream
+                </button>
+                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-2 text-sm font-bold border border-transparent text-emerald-600 hover:border-emerald-900 transition-all uppercase tracking-widest" onmouseenter="playHover()">
+                    A.I. Analysis
+                </button>
+                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-2 text-sm font-bold border border-transparent text-slate-500 hover:border-slate-700 transition-all uppercase tracking-widest" onmouseenter="playHover()">
+                    Database
+                </button>
             </div>
 
-            <div class="hud-panel flex-1 overflow-hidden p-1 flex flex-col relative pb-10">
+            <div class="hud-panel flex-1 overflow-hidden p-1 flex flex-col relative">
                 
                 <!-- TAB 1: DATA & GRAPH -->
                 <div id="tab-simulation" class="h-full flex flex-col p-3 space-y-4">
@@ -290,8 +327,8 @@
                         </div>
                     </div>
                     
-                    <div class="flex-1 bg-black/60 border border-cyan-900/30 p-2 flex flex-col relative min-h-[250px]">
-                        <div id="graph-container" class="flex-1 w-full h-full relative overflow-hidden bg-transparent"></div>
+                    <div class="h-[430px] bg-black/60 border border-cyan-900/30 p-2 flex flex-col relative">
+                        <div id="graph-container" class="flex-1 w-full h-full relative overflow-hidden bg-[#020617]"></div>
                     </div>
                 </div>
 
@@ -313,10 +350,12 @@
                     
                     <div id="ai-output" class="flex-1 bg-black/80 border border-emerald-900/30 p-6 overflow-y-auto text-emerald-100 text-sm leading-relaxed digital-font shadow-[inset_0_0_30px_rgba(0,0,0,0.8)]">
                         <div class="flex h-full items-center justify-center text-emerald-900/50 flex-col">
-                            <span class="text-6xl mb-4">⎔</span><p class="uppercase tracking-widest">Awaiting Telemetry</p>
+                            <span class="text-6xl mb-4">⎔</span>
+                            <p class="uppercase tracking-widest">Awaiting Telemetry</p>
                         </div>
                     </div>
 
+                    <!-- Generate Lab Report Button -->
                     <div id="report-btn-container" class="hidden">
                         <button onclick="generateLabReport()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-3 uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all" onmouseenter="playHover()">
                             📄 GENERATE FULL LAB REPORT
@@ -329,6 +368,9 @@
                     <div class="flex justify-between items-center pb-2 border-b border-cyan-900/50">
                         <h2 id="man-title" class="text-xl font-bold text-cyan-300 uppercase tracking-widest">Title</h2>
                         <div class="flex items-center space-x-2">
+                            <div id="assistant-indicator" class="hidden h-4 flex items-center justify-center px-2">
+                                <span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span>
+                            </div>
                             <button onclick="speakManual()" class="hud-btn px-3 py-1 text-[10px]" onmouseenter="playHover()">AUDIO</button>
                             <button onclick="stopSpeaking()" class="hud-btn px-2 py-1 text-[10px]" onmouseenter="playHover()">MUTE</button>
                         </div>
@@ -398,71 +440,26 @@
     </div>
 
     <!-- Fixed Footer -->
-    <div class="fixed bottom-0 left-0 w-full text-center z-[100] pointer-events-none pb-1">
-        <p class="text-[10px] text-cyan-600 digital-font tracking-widest pointer-events-auto inline-block bg-black/80 px-4 py-1 rounded-t-lg border-x border-t border-cyan-900/50 shadow-[0_0_10px_rgba(0,0,0,0.8)]">
+    <div class="fixed bottom-2 left-0 w-full text-center z-[100] pointer-events-none">
+        <p class="text-[10px] text-cyan-600 digital-font tracking-widest pointer-events-auto inline-block bg-black/80 px-4 py-1.5 rounded-full border border-cyan-900/50 backdrop-blur-md shadow-[0_0_10px_rgba(0,0,0,0.8)]">
             © 2026 AstraLab.OS | <a href="https://github.com/patanhihaikonhu/-Virtual-GM-Counter-Simulation" target="_blank" class="text-emerald-500 hover:text-emerald-300 transition-colors pointer-events-auto">GitHub Repository</a>
         </p>
     </div>
 
     <!-- CORE LOGIC & PHYSICS -->
     <script>
-        // --- 0. GALAXY CANVAS ANIMATION ---
-        const canvas = document.getElementById('galaxy-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles;
-        
-        function initGalaxy() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<300; i++) {
-                particles.push({
-                    x: Math.random() * width, y: Math.random() * height,
-                    r: Math.random() * 1.5,
-                    a: Math.random() * Math.PI * 2,
-                    s: Math.random() * 0.002 + 0.0005,
-                    c: Math.random() > 0.5 ? '#06b6d4' : '#10b981'
-                });
-            }
-        }
-        function drawGalaxy() {
-            ctx.clearRect(0, 0, width, height);
-            const cx = width/2, cy = height/2;
-            particles.forEach(p => {
-                p.a += p.s;
-                const dx = p.x - cx, dy = p.y - cy;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                p.x = cx + Math.cos(p.a) * dist; p.y = cy + Math.sin(p.a) * dist;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                ctx.fillStyle = p.c; ctx.fill();
-            });
-            requestAnimationFrame(drawGalaxy);
-        }
-        window.addEventListener('resize', initGalaxy);
-        initGalaxy(); drawGalaxy();
-
-        // --- SECURITY & INTRO ---
+        // --- 0. SECURITY & INTRO ---
         document.addEventListener('keydown', event => {
             if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 'i' || event.key === 's')) event.preventDefault();
             if (event.key === 'F12') event.preventDefault();
         });
 
         function startSimulation() {
-            // Fullscreen request
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(e => console.log(e)); }
-            
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
             setTimeout(() => { intro.style.visibility = 'hidden'; }, 1500);
             if(state.soundEnabled) initAudio();
             playSuccess();
-        }
-
-        function masterReset() {
-            if(confirm("CRITICAL WARNING: This will purge all telemetry and reboot AstraLab.OS. Proceed?")) {
-                location.reload();
-            }
         }
 
         // --- 1. GLOBALS & CONFIG ---
@@ -472,7 +469,7 @@
             None: { name: 'None (Background)', type: 'bg', rate: 0, range: 0, halfLifeThick: 1, halfLifeSec: Infinity },
             Tl204: { name: 'Thallium-204 (Beta)', type: 'beta', rate: 120, range: 0.307, halfLifeThick: 0.124, halfLifeSec: Infinity },
             Sr90: { name: 'Strontium-90 (Beta)', type: 'beta', rate: 180, range: 0.966, halfLifeThick: 0.390, halfLifeSec: Infinity },
-            Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 15000, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity }, // High rate to fix Inverse Square Law at 50cm
+            Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 5000, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity }, 
             Ba137m: { name: 'Barium-137m (Gamma)', type: 'gamma', rate: 400, range: Infinity, halfLifeThick: 4.5, halfLifeSec: 153 }
         };
 
@@ -566,12 +563,15 @@
             window.speechSynthesis.cancel();
             let utterance = new SpeechSynthesisUtterance(text);
             utterance.voice = getBestVoice(); utterance.rate = 1.0; utterance.pitch = 1.0;
-            // Hack to force voices to load on some browsers before speaking
-            if(speechSynthesis.getVoices().length === 0) {
-                speechSynthesis.addEventListener('voiceschanged', () => { utterance.voice = getBestVoice(); window.speechSynthesis.speak(utterance); }, {once:true});
-            } else {
-                window.speechSynthesis.speak(utterance);
-            }
+            utterance.onstart = () => { 
+                if(!isAssistant) document.getElementById('assistant-indicator').style.display = 'flex'; 
+                else document.getElementById('ai-status-indicator').classList.add('ai-glow', 'bg-emerald-400');
+            };
+            utterance.onend = () => { 
+                document.getElementById('assistant-indicator').style.display = 'none'; 
+                document.getElementById('ai-status-indicator').classList.remove('ai-glow', 'bg-emerald-400');
+            };
+            window.speechSynthesis.speak(utterance);
         }
         function speakManual() { playClick(); const m = LAB_MANUALS[state.mode]; speakText(`Experiment. ${m.title}. Theory. ${m.theory}. Procedure step 1. ${m.procedure.join('. Step: ')}.`); }
         function speakAI() { playClick(); speakText(state.aiTextCache, true); }
@@ -600,11 +600,10 @@
             timers.global = setInterval(() => { 
                 state.globalTime += 0.1; 
                 if (state.mode === 'halflife') {
-                    const gt = document.getElementById('global-time-val');
-                    if(gt) gt.textContent = Math.floor(state.globalTime); 
+                    document.getElementById('global-time-val').textContent = Math.floor(state.globalTime); 
                 }
             }, 100);
-            if('speechSynthesis' in window) window.speechSynthesis.getVoices(); // init voices
+            if('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = () => {};
         };
 
         function setTab(tab) {
@@ -652,6 +651,7 @@
             let expectedBase = src.rate;
             if (src.halfLifeSec < Infinity) expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
             
+            // ISL Physics: I = I_0 * (d_0 / d)^2. We normalized d_0 to 2cm, so (2/d)^2
             if (expectedBase > 0) expectedBase = expectedBase * Math.pow(2 / d, 2);
             
             if (th > 0 && expectedBase > 0) {
@@ -693,13 +693,15 @@
             if (state.status !== 'done') return;
             const cps = (state.currentCount / state.presetTime).toFixed(2);
             if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) state.bgCountRate = parseFloat(cps);
-            const bg = state.bgCountRate || 0;
-            const netCps = Math.max(0, (cps - bg)).toFixed(2);
+            const net = Math.max(0, (cps - (state.bgCountRate || 0))).toFixed(2);
             
             let recordTime = state.globalTime;
-            if (state.mode === 'halflife') { recordTime = Math.max(0, state.globalTime - (state.presetTime / 2)); }
+            // Physics Correction: The representative time for a count interval is the MIDPOINT of that interval
+            if (state.mode === 'halflife') {
+                recordTime = Math.max(0, state.globalTime - (state.presetTime / 2));
+            }
 
-            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: recordTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : netCps });
+            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: recordTime.toFixed(1), counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : net });
             updateTableAndGraph();
         }
         function clearData() { playClick(); state.records[state.mode] = []; updateTableAndGraph(); }
@@ -710,17 +712,10 @@
             const m = state.mode; const records = state.records[m];
             if (records.length === 0) return alert("No data to export!");
             let csv = "Source,";
-            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n"; else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n"; else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n"; else if (m === 'halflife') csv += "S.No,Elapsed Time(s),Duration(min),Counts Reading,Corrected Counts/min,Log(N)\n";
-            records.forEach((r, i) => {
-                if (m === 'halflife') {
-                    const durMin = (r.timeSpan / 60).toFixed(2);
-                    const corCpm = (r.netCps * 60).toFixed(1);
-                    const logN = corCpm > 0 ? Math.log10(corCpm).toFixed(3) : 0;
-                    csv += `${i+1},${r.timeAtRecord},${durMin},${r.counts},${corCpm},${logN}\n`;
-                } else {
-                    csv += `${r.source},`; if (m === 'plateau') csv += `${r.voltage},`; else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`; else if (m === 'absorption') csv += `${r.thicknessGcm2},`;
-                    csv += `${r.counts},${r.cps},${r.netCps}\n`;
-                }
+            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n"; else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n"; else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n"; else if (m === 'halflife') csv += "Time (s),Counts,CPS,Net CPS\n";
+            records.forEach(r => {
+                csv += `${r.source},`; if (m === 'plateau') csv += `${r.voltage},`; else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`; else if (m === 'absorption') csv += `${r.thicknessGcm2},`; else if (m === 'halflife') csv += `${r.timeAtRecord},`;
+                csv += `${r.counts},${r.cps},${r.netCps}\n`;
             });
             const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = `AstraLab_Data_${m}.csv`; link.click();
         }
@@ -757,12 +752,14 @@
             const gtDisp = document.getElementById('global-time-val');
             if (state.isPowered) {
                 pBtn.className = "bg-cyan-900 border border-cyan-400 text-cyan-200 px-4 py-1 rounded transition-all flex items-center shadow-[0_0_10px_rgba(6,182,212,0.5)] cursor-pointer";
-                pTxt.textContent = "SYS.ON"; if(tDisp) { tDisp.className = "digital-font text-3xl xl:text-4xl text-cyan-300 mt-2 glow-text"; cDisp.className = "digital-font text-3xl xl:text-4xl text-emerald-400 mt-2 glow-text"; tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0'); }
-                if(gtDisp) gtDisp.className = "digital-font text-3xl xl:text-4xl text-rose-400 mt-2 glow-text";
+                pTxt.textContent = "SYS.ON"; tDisp.className = "digital-font text-4xl text-cyan-300 mt-2 glow-text"; cDisp.className = "digital-font text-4xl text-emerald-400 mt-2 glow-text";
+                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-400 mt-2 glow-text";
+                tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0');
             } else {
                 pBtn.className = "bg-black border border-cyan-700 text-cyan-700 px-4 py-1 rounded transition-all flex items-center hover:border-cyan-400 hover:text-cyan-400 cursor-pointer";
-                pTxt.textContent = "SYS.OFF"; if(tDisp) { tDisp.className = "digital-font text-3xl xl:text-4xl text-cyan-900 mt-2"; cDisp.className = "digital-font text-3xl xl:text-4xl text-cyan-900 mt-2"; tDisp.textContent = "00.0"; cDisp.textContent = "00000"; }
-                if(gtDisp) gtDisp.className = "digital-font text-3xl xl:text-4xl text-rose-900 mt-2";
+                pTxt.textContent = "SYS.OFF"; tDisp.className = "digital-font text-4xl text-cyan-900 mt-2"; cDisp.className = "digital-font text-4xl text-cyan-900 mt-2";
+                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-900 mt-2";
+                tDisp.textContent = "00.0"; cDisp.textContent = "00000";
             }
             document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting'; document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
 
@@ -786,14 +783,9 @@
 
         function updateTableAndGraph() {
             const m = state.mode; const records = state.records[m];
-            let hHTML = '<tr>';
-            if (m === 'halflife') {
-                hHTML += '<th class="p-2 pl-3">S.No</th><th class="p-2 text-rose-500">ELPSD TIME(s)</th><th class="p-2 text-cyan-300">DUR(min)</th><th class="p-2 text-right">COUNTS (N)</th><th class="p-2 text-right text-emerald-400">COR. CPM</th><th class="p-2 text-right text-yellow-400">LOG(N)</th></tr>';
-            } else {
-                hHTML += '<th class="p-2 pl-3">SRC</th>';
-                if (m === 'plateau') hHTML += '<th class="p-2 text-yellow-500">VOLT (V)</th>'; else if (m === 'inversesquare') hHTML += '<th class="p-2 text-emerald-500">DIST (cm)</th><th class="p-2">1/d²</th>'; else if (m === 'absorption') hHTML += '<th class="p-2 text-blue-500">THK (g/cm²)</th>';
-                hHTML += '<th class="p-2 text-right">CNT</th><th class="p-2 text-right">ERR(±√N)</th><th class="p-2 text-cyan-300 text-right">NET CPS</th></tr>';
-            }
+            let hHTML = '<tr><th class="p-2 pl-3">SRC</th>';
+            if (m === 'plateau') hHTML += '<th class="p-2 text-yellow-500">VOLT (V)</th>'; else if (m === 'inversesquare') hHTML += '<th class="p-2 text-emerald-500">DIST (cm)</th><th class="p-2">1/d²</th>'; else if (m === 'absorption') hHTML += '<th class="p-2 text-blue-500">THK (g/cm²)</th>'; else if (m === 'halflife') hHTML += '<th class="p-2 text-rose-500">TIME (s)</th>';
+            hHTML += '<th class="p-2 text-right">CNT</th><th class="p-2 text-right">ERR(±√N)</th><th class="p-2 text-cyan-300 text-right">NET CPS</th></tr>';
             document.getElementById('table-head').innerHTML = hHTML;
 
             let bHTML = '';
@@ -801,20 +793,11 @@
             else {
                 records.forEach((r, idx) => {
                     const err = Math.sqrt(r.counts).toFixed(1);
+                    // Apply animation class to the last added row
                     const animClass = (idx === records.length - 1) ? 'row-animate' : '';
-                    bHTML += `<tr class="border-b border-cyan-900/30 hover:bg-cyan-900/20 ${animClass}">`;
-                    
-                    if (m === 'halflife') {
-                        const durMin = (r.timeSpan / 60).toFixed(2);
-                        const corCpm = (r.netCps * 60).toFixed(1);
-                        const logN = corCpm > 0 ? Math.log10(corCpm).toFixed(3) : 0;
-                        bHTML += `<td class="p-2 pl-3">${idx+1}</td><td class="p-2 text-rose-300">${r.timeAtRecord}</td><td class="p-2 text-cyan-200">${durMin}</td><td class="p-2 text-right text-cyan-600">${r.counts}</td><td class="p-2 text-right text-emerald-300 font-bold bg-cyan-900/20">${corCpm}</td><td class="p-2 text-right text-yellow-300">${logN}</td>`;
-                    } else {
-                        bHTML += `<td class="p-2 pl-3">${r.source}</td>`;
-                        if (m === 'plateau') bHTML += `<td class="p-2 text-yellow-300">${r.voltage}</td>`; else if (m === 'inversesquare') bHTML += `<td class="p-2 text-emerald-300">${r.distance}</td><td class="p-2 text-slate-400">${r.invDistSq}</td>`; else if (m === 'absorption') bHTML += `<td class="p-2 text-blue-300">${r.thicknessGcm2}</td>`;
-                        bHTML += `<td class="p-2 text-right text-cyan-600">${r.counts}</td><td class="p-2 text-right text-cyan-700">±${err}</td><td class="p-2 text-right text-cyan-300 font-bold bg-cyan-900/20">${r.netCps}</td>`;
-                    }
-                    bHTML += `</tr>`;
+                    bHTML += `<tr class="border-b border-cyan-900/30 hover:bg-cyan-900/20 ${animClass}"><td class="p-2 pl-3">${r.source}</td>`;
+                    if (m === 'plateau') bHTML += `<td class="p-2 text-yellow-300">${r.voltage}</td>`; else if (m === 'inversesquare') bHTML += `<td class="p-2 text-emerald-300">${r.distance}</td><td class="p-2 text-slate-400">${r.invDistSq}</td>`; else if (m === 'absorption') bHTML += `<td class="p-2 text-blue-300">${r.thicknessGcm2}</td>`; else if (m === 'halflife') bHTML += `<td class="p-2 text-rose-300">${r.timeAtRecord}</td>`;
+                    bHTML += `<td class="p-2 text-right text-cyan-600">${r.counts}</td><td class="p-2 text-right text-cyan-700">±${err}</td><td class="p-2 text-right text-cyan-300 font-bold bg-cyan-900/20">${r.netCps}</td></tr>`;
                 });
             }
             document.getElementById('table-body').innerHTML = bHTML;
@@ -824,13 +807,10 @@
 
             const sorted = [...records].sort((a, b) => { if (m === 'plateau') return a.voltage - b.voltage; if (m === 'inversesquare') return a.invDistSq - b.invDistSq; if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2; if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; return 0; });
             const getX = r => { if (m === 'plateau') return Number(r.voltage); if (m === 'inversesquare') return Number(r.invDistSq); if (m === 'absorption') return Number(r.thicknessGcm2); if (m === 'halflife') return Number(r.timeAtRecord); return 0; };
-            const getY = r => {
-                if(m === 'halflife') return r.netCps * 60 > 0 ? Math.log10(r.netCps * 60) : 0; // Plot Log(N) for half-life
-                return Number(r.netCps);
-            };
+            const getY = r => Number(r.netCps);
 
-            let minX = 0, maxX = 1, xLab = '', yLab = 'NET CPS', color = '#06b6d4';
-            if (m === 'plateau') { minX = 300; maxX = 1000; xLab = 'Voltage (V)'; color = '#facc15'; } else if (m === 'inversesquare') { minX = 0; maxX = 0.3; xLab = '1 / Distance² (cm⁻²)'; color = '#10b981'; } else if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#3b82f6'; } else if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; yLab = 'Log(N)'; color = '#fb7185'; }
+            let minX = 0, maxX = 1, xLab = '', color = '#06b6d4';
+            if (m === 'plateau') { minX = 300; maxX = 1000; xLab = 'Voltage (V)'; color = '#facc15'; } else if (m === 'inversesquare') { minX = 0; maxX = 0.3; xLab = '1 / Distance² (cm⁻²)'; color = '#10b981'; } else if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#3b82f6'; } else if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; color = '#fb7185'; }
 
             const maxNet = Math.max(10, ...sorted.map(getY)); const maxY = maxNet * 1.2;
             const pad = { t: 20, r: 20, b: 40, l: 50 }; const W = 800, H = 320; 
@@ -845,26 +825,12 @@
             svg += `</g><g stroke="rgba(6,182,212,0.5)" stroke-width="2"><line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" /><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" /></g>`;
             
             svg += `<g fill="#0891b2" font-size="12" text-anchor="end" alignment-baseline="middle">`;
-            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-10}" y="${calcY(v)}">${v.toFixed(m==='halflife'?1:0)}</text>`; }
-            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#22d3ee" font-size="14" text-anchor="middle">${yLab}</text>`;
+            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-10}" y="${calcY(v)}">${v.toFixed(0)}</text>`; }
+            svg += `</g><text x="-${H/2}" y="15" transform="rotate(-90)" fill="#22d3ee" font-size="14" text-anchor="middle">NET CPS</text>`;
             svg += `<g fill="#0891b2" font-size="12" text-anchor="middle">`;
             for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; svg += `<text x="${calcX(v)}" y="${H-pad.b+20}">${v.toFixed(m==='inversesquare'?2:1)}</text>`; }
             svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#22d3ee" font-size="14" text-anchor="middle">${xLab}</text>`;
             
-            // Draw expected inverse square curve overlay
-            if(m === 'inversesquare' && sorted.length > 0) {
-                let curvePoints = "";
-                const firstP = sorted[0]; const I0 = firstP.netCps; const d0Sq = firstP.invDistSq;
-                for(let ix=0; ix<=xTicks*5; ix++) {
-                    let v = minX + ((maxX-minX)/(xTicks*5))*ix;
-                    if(v > 0) {
-                        let expI = I0 * (v / d0Sq);
-                        curvePoints += `${calcX(v)},${calcY(expI)} `;
-                    }
-                }
-                svg += `<polyline points="${curvePoints}" fill="none" stroke="rgba(16,185,129,0.3)" stroke-width="2" stroke-dasharray="5,5" />`;
-            }
-
             let pointsStr = sorted.map(d => `${calcX(getX(d))},${calcY(getY(d))}`).join(' ');
             svg += `<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="3" style="filter: drop-shadow(0 0 5px ${color});" />`;
             sorted.forEach(d => { svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="4" fill="#000" stroke="${color}" stroke-width="2" />`; });
@@ -927,6 +893,7 @@
                 const first = sorted[0]; const last = sorted[sorted.length-1];
                 html += `<p>> Verifying spatial intensity decay. Note: Background noise impacts true deep space physics unless activity is extremely high.</p>`;
                 
+                // Detailed Breakdown to show physical correlation clearly
                 let ratioString = "";
                 for(let i=1; i<sorted.length; i++) {
                     let calcI = (parseFloat(first.netCps) * Math.pow(parseFloat(first.distance)/parseFloat(sorted[i].distance), 2)).toFixed(2);
@@ -941,7 +908,7 @@
             }
             
             out.innerHTML = html; state.aiTextCache = speechText; state.aiHTMLCache = html; btn.disabled = false;
-            document.getElementById('report-btn-container').style.display = 'block'; 
+            document.getElementById('report-btn-container').style.display = 'block'; // Show lab report button
         }
 
         // --- FULL LAB REPORT GENERATOR ---
@@ -950,17 +917,7 @@
             const m = LAB_MANUALS[state.mode];
             const records = state.records[state.mode];
             
-            let tableHTML = "";
-            if (state.mode === 'halflife') {
-                tableHTML = `
-                    <thead><tr><th>S.No</th><th>Elapsed Time (s)</th><th>Duration (min)</th><th>Counts (N)</th><th>Corrected CPM</th><th>Log(N)</th></tr></thead>
-                    <tbody>${records.map((r,i) => `<tr><td>${i+1}</td><td>${r.timeAtRecord}</td><td>${(r.timeSpan/60).toFixed(2)}</td><td>${r.counts}</td><td>${(r.netCps*60).toFixed(1)}</td><td>${r.netCps*60>0?Math.log10(r.netCps*60).toFixed(3):0}</td></tr>`).join('')}</tbody>`;
-            } else {
-                tableHTML = `
-                    <thead><tr><th>Source</th><th>Variable Parameter</th><th>Counts (N)</th><th>Error (±√N)</th><th>Net CPS</th></tr></thead>
-                    <tbody>${records.map(r => `<tr><td>${r.source}</td><td>${state.mode === 'plateau' ? r.voltage+' V' : state.mode === 'inversesquare' ? r.distance+' cm' : state.mode === 'absorption' ? r.thicknessGcm2+' g/cm²' : r.timeAtRecord+' s'}</td><td>${r.counts}</td><td>±${Math.sqrt(r.counts).toFixed(1)}</td><td>${r.netCps}</td></tr>`).join('')}</tbody>`;
-            }
-
+            // Build the HTML for the report
             let reportHTML = `
             <!DOCTYPE html>
             <html>
@@ -979,33 +936,88 @@
             </head>
             <body>
                 <h1>LABORATORY REPORT</h1>
-                <h2>1. Experiment Title</h2><p>${m.title}</p>
-                <h2>2. Aim</h2><p>${m.aim}</p>
-                <h2>3. Apparatus Required</h2><p>${m.apparatus}</p>
-                <h2>4. Theory & Formula</h2><p>${m.theory}</p><p><strong>Formula Used:</strong> ${m.formula}</p>
-                <h2>5. Procedure</h2><ol>${m.procedure.map(step => `<li>${step}</li>`).join('')}</ol>
-                <h2>6. Observations</h2><table>${tableHTML}</table>
-                <h2>7. Calculations & Result</h2><div class="result-box">${state.aiHTMLCache.replace(/class="[^"]*"/g, '')}</div>
-                <h2>8. Precautions & Sources of Error</h2><ul>${m.precautions.map(step => `<li>${step}</li>`).join('')}<li>Statistical error due to random nature of radioactive decay (Poisson distribution).</li></ul>
-                <div class="footer">Generated by AstraLab.OS Virtual Physics Environment<br>Date: ${new Date().toLocaleString()}</div>
-            </body>
-            </html>`;
+                <h2>1. Experiment Title</h2>
+                <p>${m.title}</p>
+                
+                <h2>2. Aim</h2>
+                <p>${m.aim}</p>
+                
+                <h2>3. Apparatus Required</h2>
+                <p>${m.apparatus}</p>
+                
+                <h2>4. Theory & Formula</h2>
+                <p>${m.theory}</p>
+                <p><strong>Formula Used:</strong> ${m.formula}</p>
+                
+                <h2>5. Procedure</h2>
+                <ol>
+                    ${m.procedure.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+                
+                <h2>6. Observations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Variable Parameter</th>
+                            <th>Counts (N)</th>
+                            <th>Error (±√N)</th>
+                            <th>Net CPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${records.map(r => `
+                            <tr>
+                                <td>${r.source}</td>
+                                <td>${state.mode === 'plateau' ? r.voltage+' V' : state.mode === 'inversesquare' ? r.distance+' cm' : state.mode === 'absorption' ? r.thicknessGcm2+' g/cm²' : r.timeAtRecord+' s'}</td>
+                                <td>${r.counts}</td>
+                                <td>±${Math.sqrt(r.counts).toFixed(1)}</td>
+                                <td>${r.netCps}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h2>7. Calculations & Result</h2>
+                <div class="result-box">
+                    ${state.aiHTMLCache.replace(/class="[^"]*"/g, '')}
+                </div>
 
+                <h2>8. Precautions & Sources of Error</h2>
+                <ul>
+                    ${m.precautions.map(step => `<li>${step}</li>`).join('')}
+                    <li>Statistical error due to the random nature of radioactive decay (Poisson distribution) was accounted for as ±√N.</li>
+                </ul>
+
+                <div class="footer">
+                    Generated by AstraLab.OS Virtual Physics Environment<br>
+                    Date: ${new Date().toLocaleString()}
+                </div>
+            </body>
+            </html>
+            `;
+
+            // Create a Blob and trigger download
             const blob = new Blob([reportHTML], { type: 'text/html' });
-            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Lab_Report_${state.mode}.html`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Lab_Report_${state.mode}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // --- 8. AI CHATBOT ---
-        const apiKey = ""; 
+        // --- 8. AI CHATBOT (HYBRID GEMINI + LOCAL FALLBACK) ---
+        const apiKey = ""; // Canvas runtime injects here
         
         function localAIFallback(query) {
             const q = query.toLowerCase();
-            if(q.includes('half life') || q.includes('half-life') || q.includes('ba-137m')) return "The half-life (T½) is the time required for exactly half of the radioactive nuclei in a sample to decay. For Ba-137m, this is approximately 2.55 minutes. You can calculate it using T½ = ln(2) / λ.";
-            if(q.includes('plateau') || q.includes('operating voltage')) return "The plateau region is the flat portion of the counts vs. voltage curve where count rate remains relatively constant despite voltage changes. We operate the tube here to ensure stable readings.";
+            if(q.includes('half life') || q.includes('half-life') || q.includes('ba-137m')) return "The half-life (T½) is the time required for exactly half of the radioactive nuclei in a sample to decay. For Ba-137m, this is approximately 2.55 minutes (153 seconds). You can calculate it using the formula T½ = ln(2) / λ.";
+            if(q.includes('plateau') || q.includes('operating voltage')) return "The plateau region of a GM tube is the flat portion of the counts vs. voltage curve where the count rate remains relatively constant despite voltage changes. We operate the tube in the middle of this region to ensure stable readings even if the power supply fluctuates.";
             if(q.includes('inverse square') || q.includes('distance')) return "The Inverse Square Law states that radiation intensity is inversely proportional to the square of the distance from a point source (I ∝ 1/d²). As you double the distance, the intensity drops to one-quarter.";
-            if(q.includes('end point') || q.includes('absorption') || q.includes('range')) return "Beta particles are emitted with a continuous energy spectrum up to an 'End-Point Energy' (E_max). By inserting Aluminum absorbers until counts drop to background levels, we find the 'Range'. We use E_max = (Range + 0.09) / 0.52 to find energy.";
-            if(q.includes('error') || q.includes('poisson') || q.includes('fluctuation')) return "Radioactive decay is a random process governed by Poisson statistics. The standard deviation (error) of N counts is √N.";
+            if(q.includes('end point') || q.includes('absorption') || q.includes('range')) return "Beta particles are emitted with a continuous energy spectrum up to an 'End-Point Energy' (E_max). By inserting Aluminum absorbers until the counts drop to background levels, we find the 'Range'. We use the empirical formula E_max = (Range + 0.09) / 0.52 to find the energy.";
+            if(q.includes('error') || q.includes('poisson') || q.includes('fluctuation')) return "Radioactive decay is a random process governed by Poisson statistics. The standard deviation (error) of N counts is √N. To reduce relative error, you must take counts over a longer time period.";
+            if(q.includes('hello') || q.includes('hi')) return "Greetings. I am the AstraLab AI. Ask me about plateau regions, inverse square laws, absorption, or half-life.";
             return "Query not recognized in local database. Please ask specifically about GM counters, Plateau, Inverse Square Law, Beta Absorption, or Half-Life.";
         }
 
@@ -1021,6 +1033,7 @@
             hist.innerHTML += `<div id="${loaderId}" class="bg-emerald-900/20 border border-emerald-500/30 text-emerald-500 p-2 w-16">...</div>`;
             hist.scrollTop = hist.scrollHeight;
 
+            // If no API key is injected by the environment, use the Unbreakable Local Expert System
             if(!apiKey) {
                 setTimeout(() => {
                     document.getElementById(loaderId).remove();
@@ -1032,6 +1045,7 @@
                 return;
             }
 
+            // Real Gemini Call if key exists
             const sysPrompt = "You are the AstraLab AI, a futuristic physics assistant. Answer questions concisely and ONLY about GM counters, Inverse Square Law, Beta Particle Absorption, Radioactive Half-Life, and Plateau Region.";
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             try {
@@ -1043,6 +1057,7 @@
                 playTick();
             } catch(e) {
                 document.getElementById(loaderId).remove();
+                // Fallback to local AI even if fetch fails
                 const reply = localAIFallback(text);
                 hist.innerHTML += `<div class="bg-emerald-900/20 border border-emerald-500/30 text-emerald-200 p-2 rounded-br-lg rounded-tl-lg rounded-tr-lg w-5/6">[API OFFLINE. LOCAL DB:] ${reply}</div>`;
                 playError();
@@ -1068,6 +1083,12 @@
             function doDrag(e2) { el.style.top = (el.offsetTop + (e2.clientY - sy)) + "px"; el.style.left = (el.offsetLeft + (e2.clientX - sx)) + "px"; el.style.right = "auto"; el.style.bottom = "auto"; sx = e2.clientX; sy = e2.clientY; }
             function stopDrag() { document.removeEventListener('mousemove', doDrag); document.removeEventListener('mouseup', stopDrag); }
             document.addEventListener('mousemove', doDrag); document.addEventListener('mouseup', stopDrag);
+        }
+        
+        // Mouse parallax effect for background
+        function handleMouseMove() {
+            const scan = document.querySelector('.scanline');
+            scan.style.opacity = Math.random() * 0.5 + 0.5;
         }
     </script>
 </body>
