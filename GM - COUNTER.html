@@ -3,948 +3,1271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuclear Physics Lab | AstraLab</title>
+    <title>Advanced Virtual Nuclear Physics Lab | GM Counter Simulation</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Roboto Mono', 'monospace'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyan: { 400: '#06b6d4', 500: '#0ea5e9' },
+                        emerald: { 400: '#34d399', 500: '#10b981' },
+                        rose: { 400: '#fb7185', 500: '#f43f5e' },
+                        dark: { 900: '#0f172a', 800: '#1e293b', 700: '#334155' }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --neon-cyan: #06b6d4;
-            --neon-green: #10b981;
-            --neon-rose: #f43f5e;
-            --hud-bg: rgba(6, 11, 25, 0.85);
-            --hud-border: rgba(6, 182, 212, 0.4);
-        }
-
+        /* Security Constraints */
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: #010308;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            margin: 0;
+            background-color: #000;
             color: #e2e8f0;
-            overflow-x: hidden; /* Perfect scrolling restored */
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+            overflow-x: hidden;
         }
-
-        h1, h2, h3 { font-family: 'Orbitron', sans-serif; }
-        .digital-font { font-family: 'Share Tech Mono', monospace; }
-
+        
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
-        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-green); }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.8); }
 
-        #galaxy-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.6; }
+        /* Background Canvas */
+        #space-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+        }
 
-        .hud-panel {
-            background: var(--hud-bg);
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--hud-border);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(6, 182, 212, 0.05);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
+        .neon-text-cyan { text-shadow: 0 0 10px rgba(6, 182, 212, 0.7); }
+        .neon-text-emerald { text-shadow: 0 0 10px rgba(16, 185, 129, 0.7); }
+        .neon-border-cyan { box-shadow: 0 0 10px rgba(6, 182, 212, 0.4), inset 0 0 5px rgba(6, 182, 212, 0.2); border-color: rgba(6, 182, 212, 0.8); }
+
+        /* Intro Screen 3D Atom */
         #intro-screen {
-            position: fixed; inset: 0; background: #010308; z-index: 99999;
+            position: fixed; inset: 0; z-index: 9999;
+            background: radial-gradient(circle at center, #1e293b 0%, #000 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+            transition: opacity 1s ease-out;
         }
-        
-        .atom { position: relative; width: 120px; height: 120px; margin-bottom: 30px; }
-        .nucleus { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 30px var(--neon-cyan); animation: pulse-core 1.5s infinite alternate; }
-        .orbit { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid rgba(6, 182, 212, 0.3); border-radius: 50%; }
-        .orbit-1 { animation: spin 2s linear infinite; } .orbit-2 { animation: spin 2.5s linear infinite; } .orbit-3 { animation: spin 3s linear infinite; }
-        .orbit-1-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(0deg); }
-        .orbit-2-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(60deg); }
-        .orbit-3-container { position: absolute; width: 100%; height: 100%; transform: rotateX(65deg) rotateY(120deg); }
-        .electron { position: absolute; top: -6px; left: 50%; width: 12px; height: 12px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 15px var(--neon-green); transform: translateX(-50%); }
-        
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes pulse-core { 0% { box-shadow: 0 0 15px var(--neon-cyan); transform: translate(-50%, -50%) scale(0.9); } 100% { box-shadow: 0 0 40px var(--neon-cyan); transform: translate(-50%, -50%) scale(1.1); } }
-
-        .hud-btn {
-            background: rgba(6, 182, 212, 0.1); border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan); text-transform: uppercase; font-family: 'Orbitron', sans-serif;
-            transition: all 0.2s ease; cursor: pointer; border-radius: 6px;
+        .atom-container {
+            width: 200px; height: 200px; position: relative;
+            perspective: 1000px; transform-style: preserve-3d;
+            animation: rotate-atom 15s linear infinite;
         }
-        .hud-btn:hover:not(:disabled) { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
-        .hud-btn:active:not(:disabled) { transform: scale(0.95); }
-        .hud-btn-active { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
-        .hud-btn-green { border-color: var(--neon-green); color: var(--neon-green); }
-        .hud-btn-green:hover:not(:disabled) { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
-        .hud-btn-red { border-color: var(--neon-rose); color: var(--neon-rose); }
-        .hud-btn-red:hover:not(:disabled) { background: var(--neon-rose); color: #000; box-shadow: 0 0 15px var(--neon-rose); }
+        .nucleus {
+            width: 40px; height: 40px; background: #06b6d4; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px #06b6d4, 0 0 60px #06b6d4;
+        }
+        .orbit {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px solid rgba(6, 182, 212, 0.3); border-radius: 50%;
+            transform-style: preserve-3d;
+        }
+        .orbit:nth-child(2) { transform: rotateX(60deg) rotateY(0deg); }
+        .orbit:nth-child(3) { transform: rotateX(60deg) rotateY(60deg); }
+        .orbit:nth-child(4) { transform: rotateX(60deg) rotateY(120deg); }
+        .electron {
+            width: 10px; height: 10px; background: #10b981; border-radius: 50%;
+            position: absolute; top: -5px; left: 50%; margin-left: -5px;
+            box-shadow: 0 0 15px #10b981;
+            animation: orbit-spin 2s linear infinite;
+        }
+        .orbit:nth-child(3) .electron { animation-delay: -0.6s; background: #f43f5e; box-shadow: 0 0 15px #f43f5e; }
+        .orbit:nth-child(4) .electron { animation-delay: -1.3s; }
 
-        .floating-widget { transition: opacity 0.3s, transform 0.3s; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(6, 182, 212, 0.2); z-index: 1000; }
-        .widget-hidden { opacity: 0; transform: scale(0.95) translateY(10px); pointer-events: none; }
-        .row-animate { animation: slideIn 0.4s ease-out forwards; opacity: 0; transform: translateX(-20px); }
-        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        @keyframes rotate-atom { 0% { transform: rotateX(0) rotateY(0); } 100% { transform: rotateX(360deg) rotateY(360deg); } }
+        @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(100px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(100px) rotateZ(-360deg); } }
 
-        input[type="range"] { -webkit-appearance: none; background: rgba(6, 182, 212, 0.3); height: 6px; border-radius: 3px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 24px; background: var(--neon-cyan); cursor: pointer; box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s; border-radius: 2px; }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-        select, input[type="text"] { background: rgba(0,0,0,0.7); border: 1px solid var(--hud-border); color: var(--neon-cyan); font-family: 'Share Tech Mono', monospace; border-radius: 6px; padding: 8px; }
-        select:focus, input:focus { border-color: var(--neon-cyan); outline: none; box-shadow: 0 0 10px rgba(6,182,212,0.5); }
+        /* Draggable Widgets */
+        .widget {
+            position: absolute; top: 100px; z-index: 50;
+            display: none; flex-direction: column;
+            resize: both; overflow: hidden;
+        }
+        .widget-header { cursor: move; }
+        
+        /* Custom Inputs */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #06b6d4; cursor: pointer; margin-top: -6px;
+            box-shadow: 0 0 10px #06b6d4;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px;
+        }
+
+        table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+        th, td { border: 1px solid rgba(6, 182, 212, 0.3); padding: 8px; text-align: center; }
+        th { background: rgba(6, 182, 212, 0.1); color: #06b6d4; font-family: 'Orbitron', sans-serif; }
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+        tr:hover { background: rgba(6, 182, 212, 0.05); }
+
+        .segment-display { font-family: 'Orbitron', monospace; font-weight: bold; letter-spacing: 2px; }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(6,182,212,0.2); border-top: 3px solid #06b6d4;
+            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body class="font-sans antialiased min-h-screen flex flex-col relative" oncontextmenu="return false;">
 
-    <!-- Background -->
-    <canvas id="galaxy-canvas"></canvas>
+    <!-- Background Canvas -->
+    <canvas id="space-canvas"></canvas>
 
     <!-- Intro Screen -->
     <div id="intro-screen">
-        <div class="atom">
+        <div class="atom-container mb-12">
             <div class="nucleus"></div>
-            <div class="orbit-1-container"><div class="orbit orbit-1"><div class="electron"></div></div></div>
-            <div class="orbit-2-container"><div class="orbit orbit-2"><div class="electron"></div></div></div>
-            <div class="orbit-3-container"><div class="orbit orbit-3"><div class="electron"></div></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
         </div>
-        <h1 class="text-5xl font-black text-white tracking-widest uppercase mb-2" style="text-shadow: 0 0 20px #06b6d4;">Astra<span class="text-cyan-400">Lab</span>.OS</h1>
-        <p class="text-cyan-500 digital-font tracking-widest mb-8 text-lg">GALACTIC PHYSICS SIMULATION V3.1</p>
-        
-        <div class="hud-panel p-6 mb-8 max-w-2xl text-center shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-            <h3 class="text-emerald-400 font-bold tracking-widest uppercase mb-4 text-xl border-b border-emerald-900/50 pb-2">Student Briefing</h3>
-            <ul class="text-base text-emerald-100 text-left space-y-3 digital-font">
-                <li><span class="text-emerald-400 font-bold">[1]</span> Select an Experiment from the top navigation menu.</li>
-                <li><span class="text-emerald-400 font-bold">[2]</span> Click <b>SYS.OFF</b> to power the reactor. Set Timer to 30s.</li>
-                <li><span class="text-emerald-400 font-bold">[3]</span> Press <b>▶ INIT</b> to begin counting. Wait for completion.</li>
-                <li><span class="text-emerald-400 font-bold">[4]</span> Click <b>[ LOG TELEMETRY ]</b> to record your data to the table.</li>
-                <li><span class="text-emerald-400 font-bold">[5]</span> Use the <b>A.I. ANALYSIS</b> tab to automatically solve equations and generate your final Lab Report!</li>
-            </ul>
-        </div>
-
-        <button onclick="startSimulation()" class="hud-btn hud-btn-green px-12 py-4 text-xl font-bold tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.4)] animate-pulse hover:animate-none">
-            INITIALIZE LAB ENVIRONMENT
+        <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-4 neon-text-cyan tracking-wider text-center">VIRTUAL NUCLEAR LAB</h1>
+        <p class="text-emerald-400 font-mono mb-10 text-lg neon-text-emerald">Advanced GM Counter Simulation System v3.0</p>
+        <button id="btn-init" class="glass-panel text-cyan-400 border border-cyan-400 px-8 py-4 rounded-full font-display font-bold text-xl hover:bg-cyan-900/50 hover:neon-border-cyan transition-all duration-300 transform hover:scale-105">
+            <i class="fa-solid fa-power-off mr-2"></i> INITIALIZE LAB
         </button>
+        <p class="mt-8 text-gray-500 text-sm"><i class="fa-solid fa-shield-halved"></i> Security Protocols Active. Audio context will be enabled upon initialization.</p>
     </div>
 
-    <!-- Header -->
-    <header class="hud-panel mx-4 mt-4 p-4 z-40 sticky top-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 border-2 border-cyan-400 bg-cyan-900/50 flex items-center justify-center font-bold text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.6)] text-2xl rounded-lg">☢</div>
-                <div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-widest uppercase" style="text-shadow: 0 0 10px rgba(6,182,212,0.5);">Astra<span class="text-cyan-400">Lab</span>.OS</h1>
-                    <p class="text-xs text-cyan-500 font-bold tracking-widest uppercase digital-font">Student Physics Engine v3.1</p>
-                </div>
-            </div>
-
-            <div class="flex space-x-3 items-center flex-wrap justify-center gap-y-2">
-                <div class="flex space-x-2 bg-black/60 p-2 rounded-lg border border-cyan-900/50" id="mode-selector"></div>
-                
-                <div class="flex space-x-2 border-l border-cyan-900/50 pl-3">
-                    <button onclick="toggleSound()" id="sound-toggle-btn" class="hud-btn px-3 py-2 text-xs font-bold flex items-center">🔈 SOUND: OFF</button>
-                    <button onclick="toggleWidget('calculator-widget')" class="hud-btn px-3 py-2 text-xs font-bold flex items-center">🖩 CALC</button>
-                    <button onclick="toggleWidget('ai-chat-widget')" class="hud-btn hud-btn-green px-3 py-2 text-xs font-bold flex items-center shadow-[0_0_10px_rgba(16,185,129,0.3)]">✨ A.I. HELP</button>
-                    <button onclick="masterReset()" class="hud-btn hud-btn-red px-3 py-2 text-xs font-bold flex items-center shadow-[0_0_10px_rgba(244,63,94,0.3)]">🔴 REBOOT</button>
-                </div>
-            </div>
+    <!-- Main Application Header -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-cyan-900/50 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <i class="fa-solid fa-atom text-cyan-400 text-2xl animate-pulse"></i>
+            <h1 class="font-display font-bold text-xl tracking-widest text-white"><span class="text-cyan-400">NUC</span>-LAB <span class="text-xs text-emerald-400 ml-2">ONLINE</span></h1>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="toggleAudio()" id="btn-audio" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-cyan-400 hover:text-white transition-colors" title="Toggle Sound">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button onclick="toggleVoice()" id="btn-voice" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-rose-400 hover:text-white transition-colors" title="Toggle AI Voice">
+                <i class="fa-solid fa-microphone-lines"></i>
+            </button>
+            <button onclick="toggleWidget('widget-calc')" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-emerald-400 hover:text-white transition-colors" title="Scientific Calculator">
+                <i class="fa-solid fa-calculator"></i>
+            </button>
+            <button onclick="toggleWidget('widget-chat')" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-blue-400 hover:text-white transition-colors" title="AI Comms Link">
+                <i class="fa-solid fa-robot"></i>
+            </button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto w-full p-4 mt-2 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
         
-        <!-- LEFT COLUMN: Apparatus -->
-        <div class="lg:col-span-5 space-y-6">
+        <!-- Left Column: Apparatus & Controls -->
+        <aside class="lg:col-span-4 flex flex-col gap-6">
             
-            <!-- Control Console -->
-            <div class="hud-panel p-6 shadow-lg">
-                <div class="flex justify-between items-center mb-6 border-b border-cyan-900/50 pb-3">
-                    <h2 class="text-xl font-bold text-cyan-400 tracking-widest uppercase">Reactor Control</h2>
-                    <button id="power-btn" onclick="togglePower()" class="bg-black border border-cyan-700 text-cyan-700 px-5 py-1.5 rounded transition-all flex items-center hover:border-cyan-400 hover:text-cyan-400">
-                        <span id="power-text" class="text-sm font-bold uppercase tracking-widest">SYS.OFF</span>
-                    </button>
-                </div>
+            <!-- Experiment Selector -->
+            <div class="glass-panel rounded-xl p-5">
+                <h2 class="font-display text-cyan-400 font-bold mb-4 border-b border-cyan-900/50 pb-2"><i class="fa-solid fa-flask mr-2"></i>EXPERIMENT CONFIG</h2>
+                <select id="exp-selector" class="w-full bg-dark-800 border border-cyan-700 text-white rounded p-2 mb-4 font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors" onchange="setupExperimentUI()">
+                    <option value="plateau">1. GM Tube Plateau Characteristics</option>
+                    <option value="isl">2. Inverse Square Law (I ∝ 1/d²)</option>
+                    <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
+                    <option value="halflife">4. Radioactive Half-Life</option>
+                </select>
 
-                <!-- Digital Displays -->
-                <div class="flex space-x-3 mb-6">
-                    <div id="decay-display-container" class="flex-1 bg-black/90 p-4 border border-rose-900/50 text-center relative rounded-lg hidden">
-                        <div class="text-[10px] text-rose-600 uppercase font-bold tracking-widest mb-1 absolute top-2 left-2">DECAY(s)</div>
-                        <div id="global-time-val" class="digital-font text-4xl text-rose-900 mt-3 transition-colors">000</div>
-                    </div>
-                    <div class="flex-1 bg-black/90 p-4 border border-cyan-900/50 text-center relative rounded-lg">
-                        <div class="text-[10px] text-cyan-600 uppercase font-bold tracking-widest mb-1 absolute top-2 left-2">T(s)</div>
-                        <div id="time-display" class="digital-font text-4xl text-cyan-900 mt-3 transition-colors">00.0</div>
-                    </div>
-                    <div class="flex-1 bg-black/90 p-4 border border-cyan-900/50 text-center relative rounded-lg">
-                        <div class="text-[10px] text-cyan-600 uppercase font-bold tracking-widest mb-1 absolute top-2 left-2">CNT</div>
-                        <div id="count-display" class="digital-font text-4xl text-cyan-900 mt-3 transition-colors">00000</div>
-                    </div>
-                </div>
-
-                <!-- Playback & Primary Actions -->
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <button id="start-btn" onclick="startCount()" disabled class="hud-btn disabled:opacity-30 disabled:pointer-events-none py-3 font-bold text-sm bg-blue-900/20">▶ INIT</button>
-                    <button id="stop-btn" onclick="stopCount()" disabled class="hud-btn disabled:opacity-30 disabled:pointer-events-none py-3 font-bold text-sm">■ HALT</button>
-                    <button id="reset-btn" onclick="resetCount()" disabled class="hud-btn disabled:opacity-30 disabled:pointer-events-none py-3 font-bold text-sm">↻ CLR</button>
-                </div>
-
-                <div class="space-y-3 mb-6">
-                    <!-- Half Life Special Actions -->
-                    <div id="halflife-actions" class="hidden space-y-2">
-                        <button id="elute-btn" onclick="eluteSource()" class="w-full hud-btn hud-btn-red py-3 text-sm font-bold tracking-widest shadow-[0_0_15px_rgba(244,63,94,0.2)]">↻ ELUTE FRESH BA-137M (RESET CLOCK)</button>
-                        <button id="ff-btn" onclick="fastForward()" class="w-full border border-orange-500/50 bg-orange-900/20 hover:bg-orange-500 text-orange-400 hover:text-black py-2 rounded text-xs font-bold transition-all tracking-widest">⏩ FAST FORWARD 5 MINS (300s)</button>
+                <!-- Dynamic Controls -->
+                <div id="controls-container" class="space-y-4 text-sm font-mono">
+                    
+                    <div id="ctrl-source" class="control-group">
+                        <label class="block text-gray-400 mb-1">Radioactive Source</label>
+                        <select id="input-source" class="w-full bg-dark-900 border border-gray-700 rounded p-1.5 text-white" onchange="updateParameters()">
+                            <option value="co60">Cobalt-60 (γ, β-)</option>
+                            <option value="sr90">Strontium-90 (β-)</option>
+                            <option value="cs137">Cesium-137 (γ, β-)</option>
+                            <option value="ba137m">Barium-137m (Simulation scale)</option>
+                        </select>
                     </div>
 
-                    <button id="record-btn" onclick="recordData()" class="hidden w-full hud-btn hud-btn-green py-3 text-lg font-bold tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                        [ LOG TELEMETRY ]
-                    </button>
-                </div>
-
-                <!-- Settings -->
-                <div class="space-y-5 bg-black/50 p-4 rounded-lg border border-cyan-900/30">
-                    <div>
-                        <div class="flex justify-between text-sm mb-2"><span class="text-cyan-500 font-bold uppercase tracking-widest">Preset Timer</span><span id="preset-time-val" class="text-cyan-300 digital-font">30 s</span></div>
-                        <input type="range" id="preset-time" min="10" max="60" step="10" value="30" class="w-full" oninput="updateParams()">
+                    <div id="ctrl-voltage" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Operating Voltage</span>
+                            <span id="val-voltage" class="text-cyan-400 font-bold">500 V</span>
+                        </label>
+                        <input type="range" id="input-voltage" min="300" max="1000" step="10" value="500" oninput="updateVal('voltage', this.value, ' V')">
                     </div>
 
-                    <div id="ctrl-voltage" class="hidden pt-2 border-t border-cyan-900/30">
-                        <div class="flex justify-between text-sm mb-2"><span class="text-yellow-500 font-bold uppercase tracking-widest">Operating Voltage</span><span id="voltage-val" class="text-yellow-300 digital-font">500 V</span></div>
-                        <input type="range" id="voltage" min="300" max="1000" step="25" value="500" class="w-full" oninput="updateParams()" style="background: rgba(234,179,8,0.3)">
+                    <div id="ctrl-distance" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Source Distance (d)</span>
+                            <span id="val-distance" class="text-cyan-400 font-bold">10 cm</span>
+                        </label>
+                        <input type="range" id="input-distance" min="2" max="50" step="1" value="10" oninput="updateVal('distance', this.value, ' cm')">
                     </div>
 
-                    <div id="ctrl-distance" class="hidden pt-2 border-t border-cyan-900/30">
-                        <div class="flex justify-between text-sm mb-2"><span class="text-emerald-500 font-bold uppercase tracking-widest">Detector Distance</span><span id="distance-val" class="text-emerald-300 digital-font">2 cm</span></div>
-                        <input type="range" id="distance" min="2" max="50" step="1" value="2" class="w-full" oninput="updateParams()" style="background: rgba(16,185,129,0.3)">
+                    <div id="ctrl-thickness" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Al Absorber Thickness</span>
+                            <span id="val-thickness" class="text-cyan-400 font-bold">0.00 cm</span>
+                        </label>
+                        <input type="range" id="input-thickness" min="0" max="0.5" step="0.01" value="0" oninput="updateVal('thickness', this.value, ' cm')">
                     </div>
 
-                    <div id="ctrl-thickness" class="hidden pt-2 border-t border-cyan-900/30">
-                        <div class="flex justify-between text-sm mb-2"><span class="text-blue-500 font-bold uppercase tracking-widest">Aluminum Absorber</span></div>
-                        <select id="thickness" class="w-full" onchange="updateParams()"></select>
+                    <div class="control-group pt-2 border-t border-gray-700/50">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Preset Timer (Count Time)</span>
+                            <span id="val-timer" class="text-emerald-400 font-bold">60 s</span>
+                        </label>
+                        <input type="range" id="input-timer" min="1" max="3600" step="1" value="60" oninput="formatTimer(this.value)">
                     </div>
 
-                    <div class="pt-2 border-t border-cyan-900/30">
-                        <label class="block text-sm text-cyan-500 mb-2 font-bold tracking-widest uppercase">Target Isotope</label>
-                        <select id="source-select" class="w-full" onchange="updateParams()"></select>
-                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- RIGHT COLUMN: Analysis & Data -->
-        <div class="lg:col-span-7 flex flex-col space-y-6">
+            <!-- Digital Display / GM Counter Apparatus -->
+            <div class="glass-panel rounded-xl p-5 border-l-4 border-l-emerald-500 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-5"><i class="fa-solid fa-microchip text-9xl"></i></div>
+                <h2 class="font-display text-emerald-400 font-bold mb-4"><i class="fa-solid fa-stopwatch mr-2"></i>DIGITAL SCALER / TIMER</h2>
+                
+                <div class="bg-black/50 p-4 rounded-lg border border-gray-700 mb-4 shadow-inner">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-xs text-gray-500">DECAY CLOCK</span>
+                        <span id="display-decay-clock" class="segment-display text-gray-400 text-lg">00:00:00</span>
+                    </div>
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-xs text-gray-500">TIMER CLOCK</span>
+                        <span id="display-timer" class="segment-display text-rose-400 text-2xl">00:00</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-xs text-gray-500">COUNTS (N)</span>
+                        <span id="display-counts" class="segment-display text-cyan-400 text-4xl neon-text-cyan tracking-widest">000000</span>
+                    </div>
+                    <div class="mt-2 text-right">
+                        <span class="text-xs text-gray-500">RATE: </span>
+                        <span id="display-rate" class="segment-display text-emerald-400 text-sm">0 CPS</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-start" onclick="startCounting()" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/50 py-2 rounded font-bold hover:bg-emerald-600/40 transition-colors uppercase text-sm"><i class="fa-solid fa-play mr-1"></i> Start</button>
+                    <button id="btn-stop" onclick="stopCounting()" class="flex-1 bg-rose-600/20 text-rose-400 border border-rose-500/50 py-2 rounded font-bold hover:bg-rose-600/40 transition-colors uppercase text-sm" disabled><i class="fa-solid fa-stop mr-1"></i> Stop</button>
+                    <button onclick="resetApparatus()" class="flex-1 bg-gray-600/20 text-gray-400 border border-gray-500/50 py-2 rounded font-bold hover:bg-gray-600/40 transition-colors uppercase text-sm"><i class="fa-solid fa-rotate-right mr-1"></i> Reset</button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Right Column: Data & Analytics -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
             
-            <!-- Virtual Lab Bench Visuals -->
-            <div class="hud-panel p-6 flex flex-col items-center justify-center min-h-[250px] relative">
-                <h3 class="absolute top-4 left-4 text-xs font-bold text-cyan-700 tracking-widest uppercase">Visual Bench</h3>
-                
-                <!-- GM TUBE -->
-                <div id="gm-tube" class="w-20 h-24 bg-gradient-to-b from-slate-700 to-slate-900 border-x-2 border-t-2 border-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.4)] z-20 flex flex-col items-center justify-end pb-1 relative transition-all rounded-t-xl">
-                    <div class="text-[10px] text-cyan-300 font-bold absolute top-8 rotate-90 tracking-widest opacity-50">DETECTOR</div>
-                    <div class="w-full h-3 bg-cyan-900 border-y border-cyan-400/50"></div>
-                    <div id="spark-effect" class="absolute inset-0 bg-yellow-400/20 animate-pulse z-30 hidden mix-blend-screen rounded-t-xl"></div>
-                </div>
-                
-                <!-- DISTANCE TRACK -->
-                <div id="visual-distance" class="w-2 relative flex flex-col items-center z-10 bg-cyan-900/50 transition-all duration-300" style="height: 16px;">
-                    <div class="absolute left-4 top-0 bottom-0 border-l border-cyan-500/30 flex flex-col justify-between py-1 text-[10px] text-cyan-400 digital-font">
-                        <span>0</span><span id="visual-dist-label">2cm</span>
-                    </div>
-                    <div id="visual-absorber" class="hidden absolute top-2 w-24 bg-blue-400 border border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-20 rounded-sm" style="left: -44px; height: 5px;"></div>
-                </div>
-                
-                <!-- SOURCE TRAY -->
-                <div class="w-32 h-8 bg-black border border-cyan-700 flex items-center justify-center relative z-20 shadow-[0_0_20px_rgba(0,0,0,0.8)] rounded">
-                    <div id="visual-source" class="hidden w-4 h-4 bg-amber-400 shadow-[0_0_20px_rgba(245,158,11,1)] animate-pulse rounded-full"></div>
-                </div>
+            <!-- Tabs Header -->
+            <div class="glass-panel rounded-xl p-2 flex gap-2 overflow-x-auto">
+                <button onclick="switchTab('tab-data')" id="btn-tab-data" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-cyan-900/50 text-cyan-400 border border-cyan-500/30 whitespace-nowrap"><i class="fa-solid fa-table mr-2"></i>Data Table</button>
+                <button onclick="switchTab('tab-graph')" id="btn-tab-graph" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-chart-line mr-2"></i>Dynamic Plot</button>
+                <button onclick="switchTab('tab-ai')" id="btn-tab-ai" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-brain mr-2"></i>AI Auto-Solver</button>
+                <button onclick="switchTab('tab-manual')" id="btn-tab-manual" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-book mr-2"></i>Lab Manual</button>
             </div>
 
-            <!-- Tabs Navigation -->
-            <div class="flex space-x-2">
-                <button onclick="setTab('simulation')" id="tab-sim-btn" class="flex-1 py-3 text-sm font-bold border border-cyan-500 bg-cyan-900/30 text-cyan-300 transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(6,182,212,0.3)] rounded-lg">Data Stream</button>
-                <button onclick="setTab('ai')" id="tab-ai-btn" class="flex-1 py-3 text-sm font-bold border border-transparent text-emerald-600 hover:border-emerald-900 transition-all uppercase tracking-widest rounded-lg">A.I. Analysis</button>
-                <button onclick="setTab('manual')" id="tab-man-btn" class="flex-1 py-3 text-sm font-bold border border-transparent text-slate-500 hover:border-slate-700 transition-all uppercase tracking-widest rounded-lg">Database</button>
-            </div>
-
-            <!-- Tab Content Area -->
-            <div class="hud-panel flex-1 overflow-hidden p-4 flex flex-col min-h-[500px]">
+            <!-- Tab Contents -->
+            <div class="glass-panel rounded-xl p-5 flex-grow relative min-h-[500px]">
                 
-                <!-- TAB 1: DATA & GRAPH -->
-                <div id="tab-simulation" class="h-full flex flex-col space-y-4">
-                    <div class="bg-black/60 border border-cyan-900/30 overflow-hidden flex flex-col max-h-[250px] rounded-lg">
-                        <div class="p-3 border-b border-cyan-900/50 flex justify-between items-center bg-cyan-900/20">
-                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Logged Coordinates</span>
-                            <div class="space-x-2 flex">
-                                <button onclick="exportCSV()" class="hud-btn px-3 py-1 text-[10px]">CSV</button>
-                                <button onclick="exportGraphPNG()" class="hud-btn px-3 py-1 text-[10px]">PNG</button>
-                                <button onclick="clearData()" class="hud-btn hud-btn-red px-3 py-1 text-[10px] ml-2">CLR</button>
-                            </div>
-                        </div>
-                        <div class="overflow-y-auto flex-1 p-0">
-                            <table class="w-full text-xs text-left whitespace-nowrap digital-font">
-                                <thead id="table-head" class="text-cyan-500 sticky top-0 bg-black z-10 border-b border-cyan-900/50"></thead>
-                                <tbody id="table-body" class="text-cyan-100"></tbody>
-                            </table>
+                <!-- Data Table Tab -->
+                <div id="tab-data" class="tab-content h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-cyan-400 font-bold">Observation Table</h3>
+                        <div class="flex gap-2">
+                            <button onclick="clearData()" class="text-xs bg-rose-900/40 text-rose-400 px-3 py-1 rounded border border-rose-700/50 hover:bg-rose-800/60"><i class="fa-solid fa-trash mr-1"></i>Clear Data</button>
+                            <button onclick="exportCSV()" class="text-xs bg-emerald-900/40 text-emerald-400 px-3 py-1 rounded border border-emerald-700/50 hover:bg-emerald-800/60"><i class="fa-solid fa-file-csv mr-1"></i>Export CSV</button>
                         </div>
                     </div>
-                    
-                    <div class="flex-1 bg-black/60 border border-cyan-900/30 p-2 flex flex-col relative rounded-lg min-h-[250px]">
-                        <div id="graph-container" class="flex-1 w-full h-full relative overflow-hidden bg-transparent"></div>
+                    <div class="overflow-x-auto flex-grow rounded border border-gray-700/50">
+                        <table id="data-table">
+                            <thead id="data-table-head">
+                                <!-- Dynamic Headers -->
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">* Statistical Error ($\pm \sqrt{N}$) is considered for Poisson counting statistics.</p>
+                </div>
+
+                <!-- Graph Tab -->
+                <div id="tab-graph" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-emerald-400 font-bold">Dynamic Plotter</h3>
+                        <button onclick="exportPNG()" class="text-xs bg-cyan-900/40 text-cyan-400 px-3 py-1 rounded border border-cyan-700/50 hover:bg-cyan-800/60"><i class="fa-solid fa-image mr-1"></i>Export PNG</button>
+                    </div>
+                    <div class="flex-grow w-full bg-black/40 border border-gray-700 rounded relative flex items-center justify-center p-2">
+                        <canvas id="graph-canvas" class="w-full h-full max-h-[450px]"></canvas>
                     </div>
                 </div>
 
-                <!-- TAB 2: AI AUTO-SOLVER -->
-                <div id="tab-ai" class="hidden h-full flex flex-col space-y-4">
-                    <div class="bg-emerald-900/20 p-4 border border-emerald-500/50 flex justify-between items-center shadow-[0_0_20px_rgba(16,185,129,0.1)] rounded-lg">
-                        <div class="flex items-center space-x-4">
-                            <div id="ai-status-indicator" class="w-4 h-4 bg-slate-600 shadow-[0_0_10px_currentColor] rounded-full"></div>
-                            <div>
-                                <h3 class="text-emerald-400 font-extrabold text-lg tracking-widest uppercase">Expert System</h3>
-                                <p class="text-xs text-emerald-600 uppercase tracking-widest">Auto-Compute & Report Gen</p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button onclick="runAIAnalysis()" class="hud-btn hud-btn-green px-5 py-2 text-sm font-bold">EXECUTE</button>
+                <!-- AI Solver Tab -->
+                <div id="tab-ai" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-rose-400 font-bold"><i class="fa-solid fa-microchip mr-2"></i>AI Computation Engine</h3>
+                        <div class="flex gap-2">
+                            <button onclick="runAISolver()" class="text-xs bg-indigo-900/40 text-indigo-400 px-3 py-1 rounded border border-indigo-700/50 hover:bg-indigo-800/60"><i class="fa-solid fa-gears mr-1"></i>Run Analysis</button>
+                            <button onclick="generateHTMLReport()" class="text-xs bg-emerald-900/40 text-emerald-400 px-3 py-1 rounded border border-emerald-700/50 hover:bg-emerald-800/60"><i class="fa-solid fa-file-code mr-1"></i>Generate Lab Report</button>
                         </div>
                     </div>
-                    
-                    <div id="ai-output" class="flex-1 bg-black/80 border border-emerald-900/30 p-6 overflow-y-auto text-emerald-100 text-base leading-relaxed digital-font shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] rounded-lg">
-                        <div class="flex h-full items-center justify-center text-emerald-900/50 flex-col">
-                            <span class="text-6xl mb-4">⎔</span><p class="uppercase tracking-widest font-bold">Awaiting Telemetry</p>
+                    <div id="ai-output" class="flex-grow overflow-y-auto bg-dark-900/50 p-4 rounded border border-gray-700 font-mono text-sm leading-relaxed text-gray-300">
+                        <div class="flex flex-col items-center justify-center h-full text-gray-500 text-center">
+                            <i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i>
+                            <p>Awaiting data... Run experiment and click "Run Analysis" to compute physics parameters automatically.</p>
                         </div>
-                    </div>
-
-                    <div id="report-btn-container" class="hidden">
-                        <button onclick="generateLabReport()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-4 text-lg uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all rounded-lg">
-                            📄 GENERATE FULL LAB REPORT
-                        </button>
                     </div>
                 </div>
 
-                <!-- TAB 3: LAB MANUAL -->
-                <div id="tab-manual" class="hidden h-full overflow-y-auto p-4 space-y-6 text-cyan-100">
-                    <div class="flex justify-between items-center pb-3 border-b border-cyan-900/50">
-                        <h2 id="man-title" class="text-2xl font-bold text-cyan-300 uppercase tracking-widest">Title</h2>
+                <!-- Lab Manual Tab -->
+                <div id="tab-manual" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-cyan-400 font-bold">Lab Manual / Theory</h3>
+                        <button onclick="readManual()" class="text-xs bg-rose-900/40 text-rose-400 px-3 py-1 rounded border border-rose-700/50 hover:bg-rose-800/60"><i class="fa-solid fa-volume-high mr-1"></i>Read Aloud</button>
                     </div>
-                    <section><h3 class="text-lg font-bold text-cyan-500 mb-2 uppercase tracking-widest">Theory</h3><p id="man-theory" class="bg-black/50 p-5 rounded-lg border border-cyan-900/30 text-base leading-relaxed"></p></section>
-                    <section><h3 class="text-lg font-bold text-emerald-500 mb-2 uppercase tracking-widest">Procedure</h3><ol id="man-procedure" class="list-decimal pl-6 space-y-3 bg-black/50 p-5 rounded-lg border border-emerald-900/30 text-base"></ol></section>
-                    <section><h3 class="text-lg font-bold text-yellow-500 mb-2 uppercase tracking-widest">Formula</h3><div id="man-formula" class="bg-black/80 digital-font p-5 rounded-lg border border-yellow-900/50 text-center text-yellow-400 text-lg"></div></section>
+                    <div id="manual-content" class="flex-grow overflow-y-auto pr-2 font-serif text-gray-300 leading-relaxed space-y-4 text-sm">
+                        <!-- Content generated dynamically based on selected experiment -->
+                    </div>
                 </div>
 
             </div>
-        </div>
+        </section>
     </main>
 
-    <!-- Floating Calculator -->
-    <div id="calculator-widget" class="floating-widget widget-hidden fixed top-24 left-8 hud-panel p-5 w-72 z-50 flex-col cursor-move" onmousedown="startDrag(event, 'calculator-widget')">
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-xs font-bold text-cyan-500 uppercase tracking-widest pointer-events-none">SYS.CALC</span>
-            <button onclick="toggleWidget('calculator-widget')" class="text-cyan-700 hover:text-cyan-300 text-lg">✕</button>
-        </div>
-        <input type="text" id="calc-display" readonly class="w-full bg-black text-cyan-300 border border-cyan-800 text-right p-3 mb-4 digital-font text-2xl outline-none rounded" value="0">
-        <div class="grid grid-cols-4 gap-2">
-            <button class="bg-rose-900/50 text-rose-400 border border-rose-800 hover:bg-rose-600 col-span-2 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('C');">CLR</button>
-            <button class="bg-orange-900/50 text-orange-400 border border-orange-800 hover:bg-orange-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('Del');">DEL</button>
-            <button class="bg-cyan-900/50 text-cyan-300 border border-cyan-800 hover:bg-cyan-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('/');">÷</button>
-            
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('7');">7</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('8');">8</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('9');">9</button>
-            <button class="bg-cyan-900/50 text-cyan-300 border border-cyan-800 hover:bg-cyan-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('*');">×</button>
-            
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('4');">4</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('5');">5</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('6');">6</button>
-            <button class="bg-cyan-900/50 text-cyan-300 border border-cyan-800 hover:bg-cyan-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('-');">-</button>
-            
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('1');">1</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('2');">2</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('3');">3</button>
-            <button class="bg-cyan-900/50 text-cyan-300 border border-cyan-800 hover:bg-cyan-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('+');">+</button>
-            
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('0');">0</button>
-            <button class="bg-black border border-cyan-900/50 text-cyan-100 hover:bg-cyan-900 py-3 rounded text-lg digital-font" onclick="calcPress('.');">.</button>
-            <button class="bg-purple-900/50 text-purple-300 border border-purple-800 hover:bg-purple-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('x2');">x²</button>
-            <button class="bg-emerald-600 text-black border border-emerald-400 hover:bg-emerald-400 row-span-2 rounded text-2xl font-bold digital-font shadow-[0_0_15px_rgba(16,185,129,0.5)]" onclick="calcPress('='); playSuccess();">=</button>
-            
-            <button class="bg-purple-900/50 text-purple-300 border border-purple-800 hover:bg-purple-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('sqrt');">√</button>
-            <button class="bg-purple-900/50 text-purple-300 border border-purple-800 hover:bg-purple-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('ln');">ln</button>
-            <button class="bg-purple-900/50 text-purple-300 border border-purple-800 hover:bg-purple-600 py-3 rounded text-sm font-bold digital-font" onclick="calcPress('exp');">e^</button>
-        </div>
-    </div>
+    <!-- Footer -->
+    <footer class="glass-panel sticky bottom-0 z-40 border-t border-cyan-900/50 px-6 py-2 text-center text-xs text-gray-500 font-mono">
+        © 2026 | Virtual GM Counter Simulation | Strictly adheres to physical laws | 
+        <a href="https://github.com/patanhihaikonhu/-Virtual-GM-Counter-Simulation" target="_blank" class="text-cyan-600 hover:text-cyan-400 transition-colors"><i class="fa-brands fa-github"></i> GitHub Repository</a>
+    </footer>
 
-    <!-- Floating AI Chatbot -->
-    <div id="ai-chat-widget" class="floating-widget widget-hidden fixed bottom-12 right-8 hud-panel p-0 w-96 h-[500px] z-50 flex flex-col overflow-hidden border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-        <div class="bg-emerald-900/50 border-b border-emerald-500/50 p-4 flex justify-between items-center cursor-move" onmousedown="startDrag(event, 'ai-chat-widget')">
-            <span class="text-sm font-bold text-emerald-400 uppercase tracking-widest flex items-center"><span class="mr-2 text-xl">✨</span> COMMS LINK</span>
-            <button onclick="toggleWidget('ai-chat-widget')" class="text-emerald-700 hover:text-emerald-300 text-lg">✕</button>
+    <!-- Draggable Scientific Calculator Widget -->
+    <div id="widget-calc" class="widget glass-panel rounded-xl shadow-2xl w-64 border border-emerald-500/30">
+        <div class="widget-header bg-emerald-900/50 p-2 text-xs font-bold text-emerald-400 flex justify-between items-center border-b border-emerald-500/30">
+            <span><i class="fa-solid fa-calculator mr-1"></i> SCI-CALC</span>
+            <button onclick="toggleWidget('widget-calc')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="chat-history" class="flex-1 p-5 overflow-y-auto space-y-4 bg-black/80 text-base digital-font">
-            <div class="bg-emerald-900/20 border border-emerald-500/30 text-emerald-200 p-3 rounded-br-xl rounded-tl-xl rounded-tr-xl w-5/6 shadow-sm">
-                Neural Link Established. I am equipped to answer questions regarding GM Counters, Half-Life, Beta Absorption, and Inverse Square laws.
+        <div class="p-3 bg-dark-900">
+            <input type="text" id="calc-display" class="w-full bg-black text-right text-emerald-400 font-mono p-2 rounded border border-gray-700 mb-2 text-lg focus:outline-none" readonly value="0">
+            <div class="grid grid-cols-4 gap-1 text-sm font-mono">
+                <!-- Row 1 -->
+                <button onclick="calcOp('clear')" class="col-span-2 bg-rose-900/40 text-rose-400 p-2 rounded hover:bg-rose-800/60">AC</button>
+                <button onclick="calcOp('del')" class="bg-gray-800 text-gray-300 p-2 rounded hover:bg-gray-700">DEL</button>
+                <button onclick="calcOp('/')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60">/</button>
+                <!-- Row Math -->
+                <button onclick="calcMath('sqrt')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700">√</button>
+                <button onclick="calcMath('sq')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700">x²</button>
+                <button onclick="calcMath('ln')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700">ln</button>
+                <button onclick="calcMath('exp')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700">eˣ</button>
+                <!-- Nums -->
+                <button onclick="calcNum(7)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">7</button>
+                <button onclick="calcNum(8)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">8</button>
+                <button onclick="calcNum(9)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">9</button>
+                <button onclick="calcOp('*')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60">×</button>
+                
+                <button onclick="calcNum(4)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">4</button>
+                <button onclick="calcNum(5)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">5</button>
+                <button onclick="calcNum(6)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">6</button>
+                <button onclick="calcOp('-')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60">-</button>
+                
+                <button onclick="calcNum(1)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">1</button>
+                <button onclick="calcNum(2)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">2</button>
+                <button onclick="calcNum(3)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">3</button>
+                <button onclick="calcOp('+')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60">+</button>
+                
+                <button onclick="calcNum(0)" class="col-span-2 bg-gray-800 text-white p-2 rounded hover:bg-gray-700">0</button>
+                <button onclick="calcNum('.')" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700">.</button>
+                <button onclick="calcEq()" class="bg-emerald-600/40 text-emerald-400 p-2 rounded hover:bg-emerald-500/60 font-bold">=</button>
             </div>
         </div>
-        <div class="p-3 bg-black border-t border-emerald-900/50 flex">
-            <input type="text" id="chat-input" placeholder="Transmit query..." class="flex-1 bg-transparent border border-emerald-900/50 text-emerald-400 px-3 py-2 outline-none focus:border-emerald-500 digital-font text-sm rounded" onkeypress="if(event.key==='Enter') { sendChatMessage(); }">
-            <button onclick="sendChatMessage();" class="bg-emerald-600 hover:bg-emerald-400 text-black px-4 rounded font-bold ml-2 text-lg">></button>
+    </div>
+
+    <!-- Draggable AI Chatbot Widget -->
+    <div id="widget-chat" class="widget glass-panel rounded-xl shadow-2xl w-80 border border-blue-500/30 flex flex-col" style="height: 400px; left: calc(100vw - 350px);">
+        <div class="widget-header bg-blue-900/50 p-2 text-xs font-bold text-blue-400 flex justify-between items-center border-b border-blue-500/30">
+            <span><i class="fa-solid fa-robot mr-1"></i> AI COMMS LINK</span>
+            <button onclick="toggleWidget('widget-chat')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="chat-history" class="flex-grow p-3 overflow-y-auto bg-dark-900/80 font-mono text-xs space-y-3">
+            <div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50">
+                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, or ISL.
+            </div>
+        </div>
+        <div class="p-2 bg-dark-800 border-t border-gray-700 flex gap-1">
+            <input type="text" id="chat-input" class="flex-grow bg-black text-white px-2 py-1 rounded text-xs focus:outline-none border border-gray-600" placeholder="Type query..." onkeypress="if(event.key === 'Enter') sendChat()">
+            <button onclick="sendChat()" class="bg-blue-600/40 text-blue-400 px-3 rounded hover:bg-blue-500/60"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <!-- Fixed Footer -->
-    <div class="fixed bottom-0 left-0 w-full text-center z-[100] pointer-events-none pb-1">
-        <p class="text-xs text-cyan-600 digital-font tracking-widest pointer-events-auto inline-block bg-black/90 px-6 py-1.5 rounded-t-lg border-x border-t border-cyan-900/50 shadow-[0_0_15px_rgba(0,0,0,0.8)]">
-            © 2026 AstraLab.OS | <a href="https://github.com/patanhihaikonhu/-Virtual-GM-Counter-Simulation" target="_blank" class="text-emerald-500 hover:text-emerald-300 transition-colors pointer-events-auto underline">GitHub Repository</a>
-        </p>
-    </div>
-
+    <!-- Scripts -->
     <script>
-        // --- GALAXY CANVAS ANIMATION ---
-        const canvas = document.getElementById('galaxy-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles;
-        
-        function initGalaxy() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<350; i++) {
-                particles.push({
-                    x: Math.random() * width, y: Math.random() * height,
-                    r: Math.random() * 1.5,
-                    a: Math.random() * Math.PI * 2,
-                    s: Math.random() * 0.001 + 0.0005,
-                    c: Math.random() > 0.5 ? '#06b6d4' : '#10b981'
-                });
-            }
-        }
-        function drawGalaxy() {
-            ctx.clearRect(0, 0, width, height);
-            const cx = width/2, cy = height/2;
-            particles.forEach(p => {
-                p.a += p.s;
-                const dx = p.x - cx, dy = p.y - cy;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                p.x = cx + Math.cos(p.a) * dist; p.y = cy + Math.sin(p.a) * dist;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                ctx.fillStyle = p.c; ctx.fill();
-            });
-            requestAnimationFrame(drawGalaxy);
-        }
-        window.addEventListener('resize', initGalaxy);
-        initGalaxy(); drawGalaxy();
-
-        // --- SECURITY ---
-        document.addEventListener('keydown', event => {
-            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 'i' || event.key === 's')) event.preventDefault();
-            if (event.key === 'F12') event.preventDefault();
+        /* =========================================================================
+           1. SECURITY PROTOCOLS & INIT
+           ========================================================================= */
+        document.addEventListener('keydown', function(e) {
+            if(e.keyCode == 123) { e.preventDefault(); return false; } // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; } // Ctrl+Shift+I
+            if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } // Ctrl+U
+            if(e.ctrlKey && e.keyCode == 67) { e.preventDefault(); return false; } // Ctrl+C
         });
 
-        function startSimulation() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(e => console.log(e)); }
-            const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0';
-            setTimeout(() => { intro.style.visibility = 'hidden'; }, 1000);
-            if(state.soundEnabled) initAudio();
-            playSuccess();
-        }
+        /* =========================================================================
+           2. CANVAS BACKGROUND ANIMATION
+           ========================================================================= */
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-        function masterReset() {
-            playError();
-            if(confirm("CRITICAL WARNING: Purge telemetry and reboot AstraLab?")) {
-                location.reload();
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        // --- 1. GLOBALS & CONFIG ---
-        const DENSITY_AL = 2.71; const BG_RATE = 0.8; 
-        const THICKNESS_OPTS = [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50];
-        const SOURCES = {
-            None: { name: 'None (Background)', type: 'bg', rate: 0, range: 0, halfLifeThick: 1, halfLifeSec: Infinity },
-            Tl204: { name: 'Thallium-204 (Beta)', type: 'beta', rate: 120, range: 0.307, halfLifeThick: 0.124, halfLifeSec: Infinity },
-            Sr90: { name: 'Strontium-90 (Beta)', type: 'beta', rate: 180, range: 0.966, halfLifeThick: 0.390, halfLifeSec: Infinity },
-            Co60: { name: 'Cobalt-60 (Gamma)', type: 'gamma', rate: 15000, range: Infinity, halfLifeThick: 4.5, halfLifeSec: Infinity }, 
-            Ba137m: { name: 'Barium-137m (Gamma)', type: 'gamma', rate: 400, range: Infinity, halfLifeThick: 4.5, halfLifeSec: 153 } // 2.55 mins
-        };
+        for (let i = 0; i < 200; i++) particles.push(new Particle());
 
-        const LAB_MANUALS = {
-            plateau: { 
-                title: "GM Tube Plateau", aim: "To plot the characteristic curve of a Geiger-Muller tube and determine its operating voltage.", apparatus: "GM Tube, HV Supply, Counter, Radioactive Source (Co-60).",
-                theory: "A GM tube's efficiency depends on applied voltage. As voltage increases, count rate rises sharply then levels into a 'plateau' where the rate is relatively constant. Operating in the center of this plateau ensures stable measurements.", 
-                procedure: ["Select Plateau Region experiment.", "Set Source to Cobalt-60.", "Start Operating Voltage at 300V. Set Preset Time to 30s.", "Take readings, increasing voltage by 50V steps up to 900V.", "Identify the flat plateau region on the graph.", "Calculate slope and determine operating voltage."], 
-                formula: "Slope = [ (N2 - N1) / N1 ] * [ 100 / (V2 - V1) ] % per 100V", precautions: ["Do not exceed max voltage to prevent continuous discharge."]
-            },
-            inversesquare: { 
-                title: "Inverse Square Law", aim: "To verify the inverse square law for gamma radiation.", apparatus: "GM Tube, Scaler, Gamma Source (Co-60), Optical Bench.",
-                theory: "Radiation intensity from a point source in a non-absorbing medium is inversely proportional to the square of the distance from the source. As radiation spreads spherically, the area covered increases with the square of distance (A = 4πr²).", 
-                procedure: ["Select Inverse Square Law.", "Set Source to Cobalt-60.", "Set Timer to 30s.", "Start with distance at 2 cm. Run counter and log telemetry.", "Increase distance progressively up to 50 cm, logging at each step.", "Plot Net CPS vs. 1/d² to verify linearity."], 
-                formula: "I ∝ 1/d²  =>  I1 * d1² = I2 * d2²", precautions: ["Ensure exact geometry alignment."]
-            },
-            absorption: { 
-                title: "Beta End-Point Energy", aim: "To determine end-point energy of beta particles using aluminum absorbers.", apparatus: "GM Setup, Beta Source (Sr-90), Aluminum Sheets.",
-                theory: "Beta particles have a continuous energy spectrum up to a max 'end-point' energy (E_max). The thickness of absorber required to reduce the count rate by half is the half-value thickness (t_1/2). The thickness to completely stop particles is the Range (R).", 
-                procedure: ["Select Absorption mode.", "Record a Background reading (0cm Al, No Source) for 30s.", "Select a Beta source (Sr-90).", "Record initial reading with 0cm Aluminum.", "Increment Aluminum thickness, logging counts for 30s each.", "Plot data, find t_1/2, calculate Range, and deduce E_max."], 
-                formula: "E_max = (Range + 0.09) / 0.52 MeV (For E > 0.6 MeV)", precautions: ["Ensure absorbers completely cover the detector window."]
-            },
-            halflife: { 
-                title: "Radioactive Half-Life", aim: "To determine the half-life of a short-lived radioactive isotope (Ba-137m).", apparatus: "GM Counter, Isotope Generator (Cs-137/Ba-137m), Timer.",
-                theory: "Radioactive decay is a random, exponential process. The rate of decay is proportional to unstable atoms remaining. The 'Half-life' (T½) is time required for half the atoms to decay.", 
-                procedure: ["Select Half-Life experiment.", "Click '↻ ELUTE FRESH BA-137M' to prepare sample and start the global decay clock.", "Set preset time to 30 seconds.", "Click '▶ INIT' to take a reading.", "Wait for the Decay Clock to hit 5 mins (300s), take another reading.", "Use the Fast Forward button to quickly advance time and take readings every 5 mins."], 
-                formula: "N(t) = N₀ * e^(-λt)  where  λ = ln(2) / T½", precautions: ["Subtract background counts accurately."]
-            }
-        };
-
-        let state = {
-            tab: 'simulation', mode: 'plateau', isPowered: false, status: 'idle', soundEnabled: false,
-            sourceKey: 'Co60', voltage: 500, distance: 2, thicknessCm: 0, presetTime: 30, // Default 30s per instructions
-            elapsedTime: 0, currentCount: 0, globalTime: 0, bgCountRate: null,
-            records: { plateau: [], inversesquare: [], absorption: [], halflife: [] },
-            aiTextCache: '', aiHTMLCache: ''
-        };
-        let timers = { count: null, global: null };
-        
-        // --- AUDIO ENGINE ---
-        function playTone(freq, type, dur, vol=0.05) {
-            if(!state.soundEnabled || !audioCtx) return;
-            if(audioCtx.state !== 'running') audioCtx.resume();
-            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + dur);
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBg);
         }
-        function playHover() { playTone(600, 'sine', 0.05, 0.02); }
-        function playClick() { playTone(800, 'square', 0.08, 0.04); }
-        function playTick() { playTone(1200, 'triangle', 0.03, 0.01); }
-        function playSuccess() { playTone(500, 'sine', 0.1, 0.05); setTimeout(()=>playTone(800, 'sine', 0.2, 0.05), 100); }
-        function playError() { playTone(200, 'sawtooth', 0.2, 0.05); setTimeout(()=>playTone(150, 'sawtooth', 0.3, 0.05), 150); }
+        animateBg();
 
-        function playGeiger(count) {
-            if(!state.soundEnabled || count <= 0 || !audioCtx) return;
-            let clicks = Math.min(count, 5); 
-            for(let i=0; i<clicks; i++) {
-                setTimeout(() => playTone(100 + Math.random()*300, 'square', 0.015, 0.03), Math.random() * 90); 
-            }
-        }
+        /* =========================================================================
+           3. AUDIO & VOICE ENGINE
+           ========================================================================= */
+        let audioCtx;
+        let isAudioEnabled = true;
+        let isVoiceEnabled = true;
+        let whiteNoiseBuffer;
 
-        // --- WIDGETS & UI FLOW ---
-        function toggleWidget(id) {
-            playClick();
-            const w = document.getElementById(id);
-            if (w.classList.contains('widget-hidden')) { w.classList.remove('widget-hidden'); w.style.display = 'flex'; } 
-            else { w.classList.add('widget-hidden'); }
-        }
-
-        window.onload = () => {
-            const srcSel = document.getElementById('source-select');
-            for (let key in SOURCES) { let opt = document.createElement('option'); opt.value = key; opt.textContent = SOURCES[key].name; srcSel.appendChild(opt); }
-            const thSel = document.getElementById('thickness');
-            THICKNESS_OPTS.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.textContent = val === 0 ? 'None (0 cm)' : `${val.toFixed(2)} cm (${(val*DENSITY_AL).toFixed(3)} g/cm²)`; thSel.appendChild(opt); });
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
-            const modesDiv = document.getElementById('mode-selector');
-            Object.keys(LAB_MANUALS).forEach(m => {
-                let btn = document.createElement('button'); btn.onclick = () => changeMode(m); btn.className = `hud-btn px-3 py-1.5 text-[11px] font-bold tracking-widest`; btn.id = `mode-${m}`; btn.textContent = LAB_MANUALS[m].title.split(' ')[0]; modesDiv.appendChild(btn);
-                btn.onmouseenter = playHover;
-            });
-            changeMode('plateau');
-            timers.global = setInterval(() => { 
-                state.globalTime += 0.1; 
-                if (state.mode === 'halflife') {
-                    const gt = document.getElementById('global-time-val');
-                    if(gt) gt.textContent = Math.floor(state.globalTime); 
+            // Create White Noise Buffer for Geiger Click
+            const bufferSize = audioCtx.sampleRate * 0.05; // 50ms
+            whiteNoiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = whiteNoiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            playUIBeep(440, 0.1); // Init sound
+        }
+
+        function playGeigerClick() {
+            if (!isAudioEnabled || !audioCtx) return;
+            const source = audioCtx.createBufferSource();
+            source.buffer = whiteNoiseBuffer;
+            
+            // Filter to make it sound "clicky"
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 5000;
+            
+            // Envelope
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+            
+            source.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            source.start();
+            source.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function playUIBeep(freq = 600, duration = 0.1, type='sine') {
+            if (!isAudioEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-audio');
+            btn.innerHTML = isAudioEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark text-rose-500"></i>';
+            if (isAudioEnabled && !audioCtx) initAudio();
+        }
+
+        function toggleVoice() {
+            isVoiceEnabled = !isVoiceEnabled;
+            const btn = document.getElementById('btn-voice');
+            btn.innerHTML = isVoiceEnabled ? '<i class="fa-solid fa-microphone-lines"></i>' : '<i class="fa-solid fa-microphone-lines-slash text-rose-500"></i>';
+            if (!isVoiceEnabled) window.speechSynthesis.cancel();
+        }
+
+        function speakText(text) {
+            if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            // Try to find a female voice
+            const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google UK English Female'));
+            if(femaleVoice) utterance.voice = femaleVoice;
+            utterance.rate = 1.05;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        /* =========================================================================
+           4. GLOBAL STATE & EXPERIMENT MODELS
+           ========================================================================= */
+        const APP_STATE = {
+            masterTime: 0, // seconds since init
+            masterInterval: null,
+            currentExp: 'plateau',
+            isCounting: false,
+            countTimer: 0,
+            presetTimer: 60,
+            currentCounts: 0,
+            countingInterval: null,
+            dataPoints: [], // stores rows
+            bgRateCPM: 25 // Natural background
+        };
+
+        // UI Parameter Mapping
+        const DOM = {
+            source: document.getElementById('input-source'),
+            voltage: document.getElementById('input-voltage'),
+            distance: document.getElementById('input-distance'),
+            thickness: document.getElementById('input-thickness'),
+            timer: document.getElementById('input-timer'),
+            dispDecay: document.getElementById('display-decay-clock'),
+            dispTimer: document.getElementById('display-timer'),
+            dispCounts: document.getElementById('display-counts'),
+            dispRate: document.getElementById('display-rate')
+        };
+
+        document.getElementById('btn-init').addEventListener('click', () => {
+            initAudio();
+            document.getElementById('intro-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.display = 'none';
+                startMasterClock();
+                setupExperimentUI();
+                playUIBeep(880, 0.3); // success chime
+                speakText("Virtual Nuclear Laboratory initialized. Select an experiment from the configuration panel.");
+            }, 1000);
+        });
+
+        function startMasterClock() {
+            APP_STATE.masterInterval = setInterval(() => {
+                APP_STATE.masterTime++;
+                let hrs = String(Math.floor(APP_STATE.masterTime / 3600)).padStart(2, '0');
+                let mins = String(Math.floor((APP_STATE.masterTime % 3600) / 60)).padStart(2, '0');
+                let secs = String(APP_STATE.masterTime % 60).padStart(2, '0');
+                DOM.dispDecay.innerText = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function updateVal(id, val, unit) {
+            document.getElementById(`val-${id}`).innerText = `${val}${unit}`;
+            playUIBeep(300, 0.05, 'triangle');
+        }
+
+        function formatTimer(val) {
+            let mins = String(Math.floor(val / 60)).padStart(2, '0');
+            let secs = String(val % 60).padStart(2, '0');
+            document.getElementById('val-timer').innerText = `${mins}:${secs}`;
+            APP_STATE.presetTimer = parseInt(val);
+        }
+
+        function setupExperimentUI() {
+            APP_STATE.currentExp = document.getElementById('exp-selector').value;
+            const ctrls = ['voltage', 'distance', 'thickness'];
+            
+            // Reset visibility
+            ctrls.forEach(c => document.getElementById(`ctrl-${c}`).style.opacity = '0.3');
+            ctrls.forEach(c => document.getElementById(`input-${c}`).disabled = true);
+
+            // Defaults based on exp
+            if (APP_STATE.currentExp === 'plateau') {
+                document.getElementById('ctrl-voltage').style.opacity = '1';
+                document.getElementById('input-voltage').disabled = false;
+                DOM.source.value = 'co60';
+            } else if (APP_STATE.currentExp === 'isl') {
+                document.getElementById('ctrl-distance').style.opacity = '1';
+                document.getElementById('input-distance').disabled = false;
+                DOM.source.value = 'co60';
+                DOM.voltage.value = 500; // Operating V
+            } else if (APP_STATE.currentExp === 'absorption') {
+                document.getElementById('ctrl-thickness').style.opacity = '1';
+                document.getElementById('input-thickness').disabled = false;
+                DOM.source.value = 'sr90';
+                DOM.voltage.value = 500;
+                DOM.distance.value = 5;
+            } else if (APP_STATE.currentExp === 'halflife') {
+                DOM.source.value = 'ba137m';
+                DOM.voltage.value = 500;
+                DOM.distance.value = 2;
+            }
+            updateParameters();
+            updateTableHeaders();
+            loadManual();
+            clearData();
+        }
+
+        function updateParameters() {
+            // Sync values
+            updateVal('voltage', DOM.voltage.value, ' V');
+            updateVal('distance', DOM.distance.value, ' cm');
+            updateVal('thickness', DOM.thickness.value, ' cm');
+            playUIBeep(500, 0.1);
+        }
+
+        /* =========================================================================
+           5. PHYSICS ENGINE (Core Math & Poisson)
+           ========================================================================= */
+        
+        // Knuth's Poisson algorithm with Gaussian approximation for large lambda
+        function getPoissonRandom(lambda) {
+            if (lambda <= 0) return 0;
+            if (lambda > 30) {
+                // Gaussian approx to prevent underflow in Knuth's
+                let u1 = Math.random(), u2 = Math.random();
+                let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                return Math.max(0, Math.round(z0 * Math.sqrt(lambda) + lambda));
+            }
+            let L = Math.exp(-lambda), k = 0, p = 1;
+            do { k++; p *= Math.random(); } while (p > L);
+            return k - 1;
+        }
+
+        function calculateExpectedCPM() {
+            const exp = APP_STATE.currentExp;
+            const V = parseFloat(DOM.voltage.value);
+            const d = parseFloat(DOM.distance.value);
+            const t = parseFloat(DOM.thickness.value);
+            const src = DOM.source.value;
+            
+            let baseRate = 0; // Source CPM
+
+            // 1. Define base rates for sources at reference distance (d=2cm) with no absorber
+            if (src === 'co60') baseRate = 15000; // High for ISL
+            if (src === 'sr90') baseRate = 8000;
+            if (src === 'cs137') baseRate = 10000;
+            if (src === 'ba137m') {
+                // Ba-137m simulation (half life 2.55 min = 153s)
+                let lambda = 0.693 / 153; 
+                let A0 = 20000;
+                baseRate = A0 * Math.exp(-lambda * APP_STATE.masterTime);
+            }
+
+            let calculatedCPM = APP_STATE.bgRateCPM;
+
+            // 2. Apply Experiment specifics
+            if (exp === 'plateau') {
+                // V_threshold ~350, Plateau ~400-800, Discharge > 850
+                let eff = 0;
+                if (V < 350) eff = 0;
+                else if (V < 400) eff = (V - 350) / 50;
+                else if (V <= 850) eff = 1.0 + ((V - 400) * 0.0001); // slight slope
+                else eff = 1.0 + Math.pow(Math.E, (V - 850) / 20); // avalanche
+                
+                // Adjust for distance (constant 10cm usually for plateau)
+                let d_factor = Math.pow(2 / 10, 2); 
+                calculatedCPM += (baseRate * d_factor * eff);
+            } 
+            else if (exp === 'isl') {
+                // I = A0 / (d + d0)^2. Let effective window d0 = 0.5cm
+                let R = baseRate / Math.pow(d + 0.5, 2);
+                calculatedCPM += R;
+            }
+            else if (exp === 'absorption') {
+                // Beta absorption. R = R0 * e^(-mu * t). Mu for Al ~ 14 cm^-1 for Sr-90 betas
+                let R0 = baseRate / Math.pow(5 + 0.5, 2); // default distance 5cm
+                calculatedCPM += R0 * Math.exp(-14.0 * t);
+            }
+            else if (exp === 'halflife') {
+                calculatedCPM += baseRate / Math.pow(d + 0.5, 2);
+            }
+
+            return calculatedCPM;
+        }
+
+        /* =========================================================================
+           6. COUNTING LOGIC
+           ========================================================================= */
+        function startCounting() {
+            if (APP_STATE.isCounting) return;
+            APP_STATE.isCounting = true;
+            APP_STATE.countTimer = 0;
+            APP_STATE.currentCounts = 0;
+            
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('btn-start').classList.add('opacity-50');
+            document.getElementById('btn-stop').classList.remove('opacity-50');
+
+            DOM.dispCounts.innerText = "000000";
+            DOM.dispTimer.innerText = "00:00";
+            DOM.dispRate.innerText = "0 CPS";
+            
+            playUIBeep(1000, 0.2);
+
+            // Calculate true expected rate per second for current params
+            const expectedCPM = calculateExpectedCPM();
+            const expectedCPS = expectedCPM / 60;
+
+            APP_STATE.countingInterval = setInterval(() => {
+                APP_STATE.countTimer++;
+                
+                // Poisson sample for this 1 second
+                let clicksThisSecond = getPoissonRandom(expectedCPS);
+                APP_STATE.currentCounts += clicksThisSecond;
+
+                // Update UI
+                let mins = String(Math.floor(APP_STATE.countTimer / 60)).padStart(2, '0');
+                let secs = String(APP_STATE.countTimer % 60).padStart(2, '0');
+                DOM.dispTimer.innerText = `${mins}:${secs}`;
+                DOM.dispCounts.innerText = String(APP_STATE.currentCounts).padStart(6, '0');
+                DOM.dispRate.innerText = `${clicksThisSecond} CPS`;
+
+                // Audio - roughly distribute clicks over the second (max 20 to avoid audio thread lock)
+                let audioClicks = Math.min(clicksThisSecond, 20);
+                for(let i=0; i<audioClicks; i++) {
+                    setTimeout(playGeigerClick, Math.random() * 900);
                 }
-            }, 100);
-        };
 
-        function setTab(tab) {
-            playClick(); state.tab = tab;
-            document.getElementById('tab-simulation').style.display = tab === 'simulation' ? 'flex' : 'none';
-            document.getElementById('tab-ai').style.display = tab === 'ai' ? 'flex' : 'none';
-            document.getElementById('tab-manual').style.display = tab === 'manual' ? 'block' : 'none';
-            
-            const unsel = "flex-1 py-3 text-sm font-bold border border-transparent text-slate-500 hover:border-slate-700 transition-all uppercase tracking-widest rounded-lg";
-            document.getElementById('tab-sim-btn').className = tab==='simulation' ? "flex-1 py-3 text-sm font-bold border border-cyan-500 bg-cyan-900/30 text-cyan-300 transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(6,182,212,0.3)] rounded-lg" : unsel;
-            document.getElementById('tab-ai-btn').className = tab==='ai' ? "flex-1 py-3 text-sm font-bold border border-emerald-500 bg-emerald-900/30 text-emerald-300 transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(16,185,129,0.3)] rounded-lg" : unsel;
-            document.getElementById('tab-man-btn').className = tab==='manual' ? "flex-1 py-3 text-sm font-bold border border-white/50 bg-white/10 text-white transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(255,255,255,0.2)] rounded-lg" : unsel;
+                if (APP_STATE.countTimer >= APP_STATE.presetTimer) {
+                    stopCounting();
+                }
+            }, 1000);
         }
 
-        function changeMode(mode) {
-            playClick(); state.mode = mode; resetCount(); 
-            document.getElementById('ai-output').innerHTML = `<div class="flex h-full items-center justify-center text-emerald-900/50 flex-col"><span class="text-6xl mb-4">⎔</span><p class="uppercase tracking-widest font-bold">Awaiting Telemetry</p></div>`;
-            document.getElementById('report-btn-container').style.display = 'none';
+        function stopCounting() {
+            if (!APP_STATE.isCounting) return;
+            clearInterval(APP_STATE.countingInterval);
+            APP_STATE.isCounting = false;
+            
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('btn-start').classList.remove('opacity-50');
+            document.getElementById('btn-stop').classList.add('opacity-50');
 
-            const distInput = document.getElementById('distance');
-            state.presetTime = 30; // Universal default based on manual images
-            if (mode === 'plateau') { state.sourceKey = 'Co60'; state.distance = 2; state.thicknessCm = 0; distInput.max = 20;}
-            if (mode === 'inversesquare') { state.sourceKey = 'Co60'; state.voltage = 500; state.thicknessCm = 0; distInput.max = 50;} 
-            if (mode === 'absorption') { state.sourceKey = 'Sr90'; state.voltage = 500; state.distance = 2; distInput.max = 20;}
-            if (mode === 'halflife') { state.sourceKey = 'Ba137m'; state.voltage = 500; state.distance = 2; state.thicknessCm = 0; state.globalTime = 0; distInput.max = 20;}
-
-            document.getElementById('preset-time').value = state.presetTime; document.getElementById('voltage').value = state.voltage; document.getElementById('distance').value = state.distance; document.getElementById('thickness').value = state.thicknessCm; document.getElementById('source-select').value = state.sourceKey;
-
-            document.querySelectorAll('.mode-btn').forEach(b => { b.className = 'hud-btn px-3 py-1.5 text-[11px] font-bold tracking-widest'; });
-            document.getElementById(`mode-${mode}`).className = 'hud-btn hud-btn-active px-3 py-1.5 text-[11px] font-bold tracking-widest';
-
-            let man = LAB_MANUALS[mode];
-            document.getElementById('man-title').textContent = man.title; document.getElementById('man-theory').textContent = man.theory; document.getElementById('man-formula').textContent = man.formula; document.getElementById('man-procedure').innerHTML = man.procedure.map(step => `<li>${step}</li>`).join('');
-            updateUI();
+            playUIBeep(400, 0.3);
+            recordData();
+            updateGraph();
         }
 
-        // --- PHYSICS ENGINE ---
-        function getInstantRate() {
-            const src = SOURCES[state.sourceKey]; const v = state.voltage, d = state.distance, th = state.thicknessCm;
-            let vEff = 0;
-            if (v >= 350 && v < 400) vEff = (v - 350) / 50; else if (v >= 400 && v <= 700) vEff = 1 + (v - 400) * 0.0003; else if (v > 700) vEff = 1.09 + Math.pow(v - 700, 2) * 0.001;
-            if (vEff === 0) return 0;
+        function resetApparatus() {
+            if(APP_STATE.isCounting) stopCounting();
+            APP_STATE.countTimer = 0;
+            APP_STATE.currentCounts = 0;
+            DOM.dispCounts.innerText = "000000";
+            DOM.dispTimer.innerText = "00:00";
+            DOM.dispRate.innerText = "0 CPS";
+        }
+
+        /* =========================================================================
+           7. DATA TABLE MANAGEMENT
+           ========================================================================= */
+        function updateTableHeaders() {
+            const head = document.getElementById('data-table-head');
+            let tr = document.createElement('tr');
             
-            let expectedBase = src.rate;
-            if (src.halfLifeSec < Infinity) expectedBase = expectedBase * Math.pow(0.5, state.globalTime / src.halfLifeSec);
-            if (expectedBase > 0) expectedBase = expectedBase * Math.pow(2 / d, 2);
-            if (th > 0 && expectedBase > 0) {
-                const thGcm2 = th * DENSITY_AL;
-                if (src.type === 'beta') { if (thGcm2 < src.range) expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick); else expectedBase = 0; } 
-                else if (src.type === 'gamma') { expectedBase = expectedBase * Math.pow(0.5, thGcm2 / src.halfLifeThick); }
+            if (APP_STATE.currentExp === 'plateau') {
+                tr.innerHTML = `<th>S.No</th><th>Voltage (V)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>Error (±)</th>`;
+            } else if (APP_STATE.currentExp === 'isl') {
+                tr.innerHTML = `<th>S.No</th><th>Dist d (cm)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>1/d² (cm⁻²)</th>`;
+            } else if (APP_STATE.currentExp === 'absorption') {
+                tr.innerHTML = `<th>S.No</th><th>Thickness (cm)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>Ln(Net CPS)</th>`;
+            } else if (APP_STATE.currentExp === 'halflife') {
+                // Exactly as requested
+                tr.innerHTML = `<th>S.No</th><th>Elapsed Time (s)</th><th>Duration (min)</th><th>Counts Reading (N)</th><th>Corrected CPM</th><th>Log(N)</th>`;
             }
-            return (expectedBase + BG_RATE) * vEff;
+            head.innerHTML = '';
+            head.appendChild(tr);
         }
-
-        function updateParams() {
-            if (state.status === 'counting') return;
-            state.presetTime = parseInt(document.getElementById('preset-time').value); state.voltage = parseInt(document.getElementById('voltage').value); state.distance = parseInt(document.getElementById('distance').value); state.thicknessCm = parseFloat(document.getElementById('thickness').value); state.sourceKey = document.getElementById('source-select').value;
-            updateUI();
-        }
-        function togglePower() { playClick(); if(!audioCtx && state.soundEnabled) initAudio(); state.isPowered = !state.isPowered; if (state.isPowered) resetCount(); updateUI(); }
-        
-        function eluteSource() { playSuccess(); if (state.status !== 'counting') state.globalTime = 0; }
-        function fastForward() { playClick(); state.globalTime += 300; } // Skips 5 minutes ahead
-
-        function startCount() {
-            if (!state.isPowered || state.status === 'counting') return;
-            playClick(); if(!audioCtx && state.soundEnabled) initAudio();
-            state.status = 'counting'; state.elapsedTime = 0; state.currentCount = 0;
-            let ticks = 0; const targetTicks = state.presetTime * 10;
-            updateUI();
-            timers.count = setInterval(() => {
-                ticks++; state.elapsedTime += 0.1;
-                const ratePerSec = getInstantRate(); 
-                // Poisson approx
-                let L = Math.exp(-(ratePerSec * 0.1)), k = 0, p = 1; do { k++; p *= Math.random(); } while (p > L);
-                const countsThisTick = k - 1;
-                
-                state.currentCount += countsThisTick;
-                playGeiger(countsThisTick);
-                
-                const tDisp = document.getElementById('time-display');
-                if(tDisp) tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); 
-                const cDisp = document.getElementById('count-display');
-                if(cDisp) cDisp.textContent = state.currentCount.toString().padStart(5, '0');
-                
-                if (ticks >= targetTicks) { clearInterval(timers.count); state.status = 'done'; playSuccess(); updateUI(); }
-            }, 100);
-        }
-        function stopCount() { playClick(); if (state.status === 'counting') { clearInterval(timers.count); state.status = 'done'; updateUI(); } }
-        function resetCount() { playClick(); clearInterval(timers.count); state.status = 'idle'; state.elapsedTime = 0; state.currentCount = 0; updateUI(); }
 
         function recordData() {
-            playSuccess();
-            if (state.status !== 'done') return;
-            const cps = (state.currentCount / state.presetTime).toFixed(2);
-            if (state.sourceKey === 'None' && state.thicknessCm === 0 && state.distance === 2 && state.voltage === 500) state.bgCountRate = parseFloat(cps);
-            const bg = state.bgCountRate || 0;
-            const netCps = Math.max(0, (cps - bg)).toFixed(2);
+            const N = APP_STATE.currentCounts;
+            const T = APP_STATE.presetTimer;
+            const V = DOM.voltage.value;
+            const d = DOM.distance.value;
+            const t = DOM.thickness.value;
             
-            let recordTime = state.globalTime;
-            // Physics Correction: representative time for interval is MIDPOINT
-            if (state.mode === 'halflife') { recordTime = Math.max(0, state.globalTime - (state.presetTime / 2)); }
+            const rawCPS = N / T;
+            const bgCPS = APP_STATE.bgRateCPM / 60;
+            const netCPS = Math.max(0, rawCPS - bgCPS); // Corrected
+            const error = Math.sqrt(N) / T; // Error propagation for rate
 
-            state.records[state.mode].push({ id: Date.now(), source: SOURCES[state.sourceKey].name.split(' ')[0], voltage: state.voltage, distance: state.distance, invDistSq: (1 / Math.pow(state.distance, 2)).toFixed(5), thicknessGcm2: (state.thicknessCm * DENSITY_AL).toFixed(4), timeAtRecord: recordTime.toFixed(1), timeSpan: state.presetTime, counts: state.currentCount, cps: cps, netCps: state.sourceKey === 'None' ? 0 : netCps });
-            updateTableAndGraph();
+            let rowData = {};
+
+            if (APP_STATE.currentExp === 'plateau') {
+                rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(V), t: T, N: N, y: netCPS, err: error.toFixed(2) };
+            } else if (APP_STATE.currentExp === 'isl') {
+                let invD2 = 1 / Math.pow(parseFloat(d), 2);
+                rowData = { sno: APP_STATE.dataPoints.length + 1, d: parseFloat(d), t: T, N: N, y: netCPS, x: invD2 };
+            } else if (APP_STATE.currentExp === 'absorption') {
+                rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
+            } else if (APP_STATE.currentExp === 'halflife') {
+                let cpm = N * (60/T);
+                let correctedCPM = Math.max(0, cpm - APP_STATE.bgRateCPM);
+                rowData = { 
+                    sno: APP_STATE.dataPoints.length + 1, 
+                    x: APP_STATE.masterTime - T, // Elapsed time at start of count
+                    dur: (T/60).toFixed(2), 
+                    N: N, 
+                    y: correctedCPM, // Use CPM for Y axis plotting
+                    logN: N > 0 ? Math.log10(N).toFixed(3) : 0 
+                };
+            }
+
+            APP_STATE.dataPoints.push(rowData);
+            renderTable();
         }
-        function clearData() { playClick(); state.records[state.mode] = []; updateTableAndGraph(); }
 
-        // --- EXPORTS ---
-        function exportCSV() {
-            playClick();
-            const m = state.mode; const records = state.records[m];
-            if (records.length === 0) return alert("No data to export!");
-            let csv = "Source,";
-            if (m === 'plateau') csv += "Voltage (V),Counts,CPS,Net CPS\n"; else if (m === 'inversesquare') csv += "Distance (cm),1/d² (cm⁻²),Counts,CPS,Net CPS\n"; else if (m === 'absorption') csv += "Thickness (g/cm²),Counts,CPS,Net CPS\n"; else if (m === 'halflife') csv += "S.No,Elapsed Time(s),Duration(min),Counts Reading,Corrected Counts/min,Log(N)\n";
-            records.forEach((r, i) => {
-                if (m === 'halflife') {
-                    const durMin = (r.timeAtRecord / 60).toFixed(2); // Using timeAtRecord as duration elapsed
-                    const corCpm = (r.netCps * 60).toFixed(1);
-                    const logN = corCpm > 0 ? Math.log10(corCpm).toFixed(3) : 0;
-                    csv += `${i+1},${Math.floor(r.timeAtRecord)},${durMin},${r.counts},${corCpm},${logN}\n`;
-                } else {
-                    csv += `${r.source},`; if (m === 'plateau') csv += `${r.voltage},`; else if (m === 'inversesquare') csv += `${r.distance},${r.invDistSq},`; else if (m === 'absorption') csv += `${r.thicknessGcm2},`;
-                    csv += `${r.counts},${r.cps},${r.netCps}\n`;
+        function renderTable() {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '';
+            APP_STATE.dataPoints.forEach(row => {
+                let tr = document.createElement('tr');
+                if (APP_STATE.currentExp === 'plateau') {
+                    tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>±${row.err}</td>`;
+                } else if (APP_STATE.currentExp === 'isl') {
+                    tr.innerHTML = `<td>${row.sno}</td><td>${row.d}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.x.toFixed(4)}</td>`;
+                } else if (APP_STATE.currentExp === 'absorption') {
+                    tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
+                } else if (APP_STATE.currentExp === 'halflife') {
+                    tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.dur}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.logN}</td>`;
                 }
+                tbody.appendChild(tr);
             });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = `AstraLab_Data_${m}.csv`; link.click();
         }
 
-        function exportGraphPNG() {
-            playClick();
-            const svgElement = document.querySelector('#graph-container svg');
-            if (!svgElement) return alert("Graph is empty!");
-            const clone = svgElement.cloneNode(true);
-            clone.setAttribute('width', '800'); clone.setAttribute('height', '320');
-            if(!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            
-            const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            bgRect.setAttribute("width", "100%"); bgRect.setAttribute("height", "100%"); bgRect.setAttribute("fill", "#010308"); 
-            clone.insertBefore(bgRect, clone.firstChild);
-
-            const svgString = new XMLSerializer().serializeToString(clone);
-            const svgBlob = new Blob(['<?xml version="1.0" standalone="no"?>\r\n' + svgString], {type: 'image/svg+xml;charset=utf-8'});
-            const url = URL.createObjectURL(svgBlob);
-            
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas'); canvas.width = 800; canvas.height = 320;
-                canvas.getContext('2d').drawImage(img, 0, 0); URL.revokeObjectURL(url);
-                const link = document.createElement("a"); link.href = canvas.toDataURL('image/png'); link.download = `AstraLab_Plot_${state.mode}.png`; link.click();
-            };
-            img.src = url;
+        function clearData() {
+            APP_STATE.dataPoints = [];
+            renderTable();
+            updateGraph();
+            document.getElementById('ai-output').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500 text-center"><i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i><p>Data cleared. Ready for new measurements.</p></div>`;
         }
 
-        // --- RENDER LOGIC ---
-        function updateUI() {
-            const pBtn = document.getElementById('power-btn'); const pTxt = document.getElementById('power-text');
-            const tDisp = document.getElementById('time-display'); const cDisp = document.getElementById('count-display');
-            const gtDisp = document.getElementById('global-time-val');
-            if (state.isPowered) {
-                pBtn.className = "bg-cyan-900 border border-cyan-400 text-cyan-200 px-5 py-1.5 rounded transition-all flex items-center shadow-[0_0_15px_rgba(6,182,212,0.6)] cursor-pointer";
-                pTxt.textContent = "SYS.ON"; 
-                if(tDisp) { tDisp.className = "digital-font text-4xl text-cyan-300 mt-3 glow-text"; cDisp.className = "digital-font text-4xl text-emerald-400 mt-3 glow-text"; tDisp.textContent = state.elapsedTime.toFixed(1).padStart(4, '0'); cDisp.textContent = state.currentCount.toString().padStart(5, '0'); }
-                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-400 mt-3 glow-text";
-            } else {
-                pBtn.className = "bg-black border border-cyan-700 text-cyan-700 px-5 py-1.5 rounded transition-all flex items-center hover:border-cyan-400 hover:text-cyan-400 cursor-pointer";
-                pTxt.textContent = "SYS.OFF"; 
-                if(tDisp) { tDisp.className = "digital-font text-4xl text-cyan-900 mt-3"; cDisp.className = "digital-font text-4xl text-cyan-900 mt-3"; tDisp.textContent = "00.0"; cDisp.textContent = "00000"; }
-                if(gtDisp) gtDisp.className = "digital-font text-4xl text-rose-900 mt-3";
+        /* =========================================================================
+           8. GRAPHING ENGINE (Native Canvas)
+           ========================================================================= */
+        function updateGraph() {
+            const canvas = document.getElementById('graph-canvas');
+            const ctx = canvas.getContext('2d');
+            // Make responsive
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (APP_STATE.dataPoints.length === 0) {
+                ctx.fillStyle = '#64748b'; ctx.font = '14px Orbitron'; ctx.textAlign = 'center';
+                ctx.fillText("NO DATA PLOTTED", canvas.width/2, canvas.height/2);
+                return;
             }
-            document.getElementById('start-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('stop-btn').disabled = !state.isPowered || state.status !== 'counting'; document.getElementById('reset-btn').disabled = !state.isPowered || state.status === 'counting'; document.getElementById('record-btn').style.display = state.status === 'done' ? 'block' : 'none';
 
-            const cm = state.mode;
-            document.getElementById('ctrl-voltage').style.display = 'block'; document.getElementById('voltage').disabled = state.status === 'counting' || (!state.isPowered && cm !== 'plateau');
-            document.getElementById('ctrl-distance').style.display = 'block'; document.getElementById('distance').disabled = state.status === 'counting';
-            document.getElementById('ctrl-thickness').style.display = 'block'; document.getElementById('thickness').disabled = state.status === 'counting';
+            // Margin and Plot Area
+            const m = 50;
+            const w = canvas.width - m * 2;
+            const h = canvas.height - m * 2;
+
+            // Draw Axes
+            ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(m, m); ctx.lineTo(m, h + m); ctx.lineTo(w + m, h + m);
+            ctx.stroke();
+
+            // Determine min/max
+            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x));
+            let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x));
+            let minY = 0; // Always start Y at 0 for these physics graphs
+            let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
+
+            if (minX === maxX) { minX -= 1; maxX += 1; }
+            if (maxY === 0) maxY = 10;
+            maxY *= 1.1; // 10% padding top
+
+            // Labels
+            ctx.fillStyle = '#34d399'; ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
             
-            document.getElementById('decay-display-container').style.display = cm === 'halflife' ? 'block' : 'none';
-            document.getElementById('halflife-actions').style.display = cm === 'halflife' ? 'block' : 'none'; 
-            document.getElementById('source-select').disabled = state.status === 'counting' || cm === 'halflife';
-            
-            document.getElementById('preset-time-val').textContent = state.presetTime + ' s'; document.getElementById('voltage-val').textContent = state.voltage + ' V'; document.getElementById('distance-val').textContent = state.distance + ' cm'; document.getElementById('thickness-val').textContent = state.thicknessCm.toFixed(2) + ' cm';
-            
-            const maxVisDist = cm === 'inversesquare' ? 50 : 20; const pixelHeight = Math.max(16, (state.distance / maxVisDist) * 150);
-            document.getElementById('visual-distance').style.height = pixelHeight + 'px'; document.getElementById('visual-dist-label').textContent = state.distance + 'cm';
-            
-            const visAbsorber = document.getElementById('visual-absorber'); if (state.thicknessCm > 0) { visAbsorber.style.display = 'block'; visAbsorber.style.height = Math.max(4, state.thicknessCm * 30) + 'px'; } else { visAbsorber.style.display = 'none'; }
-            const visSrc = document.getElementById('visual-source'); if (state.sourceKey !== 'None') { visSrc.style.display = 'block'; } else { visSrc.style.display = 'none'; }
-            document.getElementById('spark-effect').style.display = (state.isPowered && state.voltage > 700 && state.status === 'counting') ? 'block' : 'none';
-            updateTableAndGraph();
+            let xLabel = "X Axis", yLabel = "Y Axis";
+            if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'isl') { xLabel = "1/d² (cm⁻²)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'absorption') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "Corrected CPM"; }
+
+            ctx.fillText(xLabel, m + w/2, h + m + 35);
+            ctx.save(); ctx.translate(m - 35, m + h/2); ctx.rotate(-Math.PI/2);
+            ctx.fillText(yLabel, 0, 0); ctx.restore();
+
+            // Plot points
+            ctx.fillStyle = '#f43f5e';
+            APP_STATE.dataPoints.forEach(p => {
+                let px = m + ((p.x - minX) / (maxX - minX)) * w;
+                let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
+                
+                ctx.beginPath();
+                ctx.arc(px, py, 4, 0, 2*Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+            });
+
+            // Draw connecting line / fit line
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            APP_STATE.dataPoints.sort((a,b) => a.x - b.x).forEach((p, i) => {
+                let px = m + ((p.x - minX) / (maxX - minX)) * w;
+                let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
+                if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            });
+            ctx.stroke();
         }
 
-        function updateTableAndGraph() {
-            const m = state.mode; const records = state.records[m];
-            let hHTML = '<tr>';
-            if (m === 'halflife') {
-                hHTML += '<th class="p-3 pl-4">S.No</th><th class="p-3 text-rose-500">ELAPSED TIME (s)</th><th class="p-3 text-cyan-300">DURATION (min)</th><th class="p-3 text-right">COUNTS READING</th><th class="p-3 text-right text-emerald-400">CORRECTED CPM</th><th class="p-3 text-right text-yellow-400">LOG (N)</th></tr>';
-            } else {
-                hHTML += '<th class="p-3 pl-4">SOURCE</th>';
-                if (m === 'plateau') hHTML += '<th class="p-3 text-yellow-500">VOLTAGE (V)</th>'; else if (m === 'inversesquare') hHTML += '<th class="p-3 text-emerald-500">DIST (cm)</th><th class="p-3">1/d²</th>'; else if (m === 'absorption') hHTML += '<th class="p-3 text-blue-500">THK (g/cm²)</th>';
-                hHTML += '<th class="p-3 text-right">COUNTS</th><th class="p-3 text-right">ERROR (±√N)</th><th class="p-3 text-cyan-300 text-right">NET CPS</th></tr>';
+        /* =========================================================================
+           9. AI AUTO-SOLVER & MATH
+           ========================================================================= */
+        function runAISolver() {
+            const out = document.getElementById('ai-output');
+            if(APP_STATE.dataPoints.length < 3) {
+                out.innerHTML = `<span class="text-rose-400">Error: Insufficient data. Minimum 3 points required.</span>`;
+                return;
             }
-            document.getElementById('table-head').innerHTML = hHTML;
 
-            let bHTML = '';
-            if (records.length === 0) { bHTML = `<tr><td colspan="8" class="p-10 text-center text-cyan-900 italic text-base">NO TELEMETRY DATA LOGGED.</td></tr>`; } 
-            else {
-                records.forEach((r, idx) => {
-                    const err = Math.sqrt(r.counts).toFixed(1);
-                    const animClass = (idx === records.length - 1) ? 'row-animate' : '';
-                    bHTML += `<tr class="border-b border-cyan-900/30 hover:bg-cyan-900/20 ${animClass}">`;
+            out.innerHTML = `<div class="loader mr-2"></div> <span class="text-cyan-400">AI Computing physical parameters...</span>`;
+            
+            setTimeout(() => {
+                let html = `<h4 class="text-emerald-400 border-b border-gray-700 pb-2 mb-3"><i class="fa-solid fa-microchip"></i> AI Computation Results</h4>`;
+                
+                // Linear Regression Math
+                const n = APP_STATE.dataPoints.length;
+                let sumX=0, sumY=0, sumXY=0, sumX2=0;
+                
+                APP_STATE.dataPoints.forEach(p => {
+                    let calcX = p.x, calcY = p.y;
+                    // Transformations for specific graphs
+                    if (APP_STATE.currentExp === 'absorption') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    if (APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
                     
-                    if (m === 'halflife') {
-                        const durMin = (r.timeAtRecord / 60).toFixed(2); // Match manual format
-                        const corCpm = (r.netCps * 60).toFixed(1);
-                        const logN = corCpm > 0 ? Math.log10(corCpm).toFixed(3) : 0;
-                        bHTML += `<td class="p-3 pl-4">${idx+1}</td><td class="p-3 text-rose-300">${Math.floor(r.timeAtRecord)}</td><td class="p-3 text-cyan-200">${durMin}</td><td class="p-3 text-right text-cyan-600">${r.counts}</td><td class="p-3 text-right text-emerald-300 font-bold bg-cyan-900/10">${corCpm}</td><td class="p-3 text-right text-yellow-300">${logN}</td>`;
-                    } else {
-                        bHTML += `<td class="p-3 pl-4">${r.source}</td>`;
-                        if (m === 'plateau') bHTML += `<td class="p-3 text-yellow-300">${r.voltage}</td>`; else if (m === 'inversesquare') bHTML += `<td class="p-3 text-emerald-300">${r.distance}</td><td class="p-3 text-slate-400">${r.invDistSq}</td>`; else if (m === 'absorption') bHTML += `<td class="p-3 text-blue-300">${r.thicknessGcm2}</td>`;
-                        bHTML += `<td class="p-3 text-right text-cyan-600">${r.counts}</td><td class="p-3 text-right text-cyan-700">±${err}</td><td class="p-3 text-right text-cyan-300 font-bold bg-cyan-900/10">${r.netCps}</td>`;
-                    }
-                    bHTML += `</tr>`;
+                    sumX += calcX; sumY += calcY; sumXY += calcX * calcY; sumX2 += calcX * calcX;
                 });
-            }
-            document.getElementById('table-body').innerHTML = bHTML;
 
-            const gCont = document.getElementById('graph-container');
-            if (records.length === 0) { gCont.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-cyan-900 text-lg digital-font uppercase tracking-widest font-bold">Awaiting Data Points</div>`; return; }
+                let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                let intercept = (sumY - slope * sumX) / n;
 
-            const sorted = [...records].sort((a, b) => { if (m === 'plateau') return a.voltage - b.voltage; if (m === 'inversesquare') return a.invDistSq - b.invDistSq; if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2; if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; return 0; });
-            const getX = r => { if (m === 'plateau') return Number(r.voltage); if (m === 'inversesquare') return Number(r.invDistSq); if (m === 'absorption') return Number(r.thicknessGcm2); if (m === 'halflife') return Number(r.timeAtRecord); return 0; };
-            const getY = r => {
-                if(m === 'halflife') return r.netCps * 60 > 0 ? Math.log10(r.netCps * 60) : 0; 
-                return Number(r.netCps);
-            };
-
-            let minX = 0, maxX = 1, xLab = '', yLab = 'NET CPS', color = '#06b6d4';
-            if (m === 'plateau') { minX = 300; maxX = 1000; xLab = 'Voltage (V)'; color = '#facc15'; } else if (m === 'inversesquare') { minX = 0; maxX = 0.3; xLab = '1 / Distance² (cm⁻²)'; color = '#10b981'; } else if (m === 'absorption') { minX = 0; maxX = 1.5; xLab = 'Thickness (g/cm²)'; color = '#3b82f6'; } else if (m === 'halflife') { minX = 0; maxX = Math.max(300, ...sorted.map(getX) * 1.2); xLab = 'Elapsed Time (s)'; yLab = 'Log(N)'; color = '#fb7185'; }
-
-            const maxNet = Math.max(10, ...sorted.map(getY)); const maxY = maxNet * 1.2;
-            const pad = { t: 20, r: 20, b: 40, l: 60 }; const W = 800, H = 320; 
-            const gW = W - pad.l - pad.r; const gH = H - pad.t - pad.b;
-            const calcX = v => pad.l + ((v - minX) / (maxX - minX)) * gW; const calcY = v => H - pad.b - (v / maxY) * gH;
-            const xTicks = 6, yTicks = 5;
-
-            let svg = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg" style="font-family:'Share Tech Mono', monospace">`;
-            svg += `<g stroke="rgba(6,182,212,0.15)" stroke-width="1">`;
-            for(let i=0; i<=yTicks; i++){ let y = calcY((maxY/yTicks)*i); svg += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" />`; }
-            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; let x = calcX(v); svg += `<line x1="${x}" y1="${pad.t}" x2="${x}" y2="${H-pad.b}" />`; }
-            svg += `</g><g stroke="rgba(6,182,212,0.5)" stroke-width="2"><line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" /><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" /></g>`;
-            
-            svg += `<g fill="#0891b2" font-size="12" text-anchor="end" alignment-baseline="middle">`;
-            for(let i=0; i<=yTicks; i++){ let v = (maxY/yTicks)*i; svg += `<text x="${pad.l-10}" y="${calcY(v)}">${v.toFixed(m==='halflife'?1:0)}</text>`; }
-            svg += `</g><text x="-${H/2}" y="20" transform="rotate(-90)" fill="#22d3ee" font-size="14" text-anchor="middle" font-weight="bold">${yLab}</text>`;
-            svg += `<g fill="#0891b2" font-size="12" text-anchor="middle">`;
-            for(let i=0; i<=xTicks; i++){ let v = minX + ((maxX-minX)/xTicks)*i; svg += `<text x="${calcX(v)}" y="${H-pad.b+20}">${v.toFixed(m==='inversesquare'?2:1)}</text>`; }
-            svg += `</g><text x="${pad.l + gW/2}" y="${H-5}" fill="#22d3ee" font-size="14" text-anchor="middle" font-weight="bold">${xLab}</text>`;
-            
-            if(m === 'inversesquare' && sorted.length > 0) {
-                let curvePoints = "";
-                const firstP = sorted[0]; const I0 = firstP.netCps; const d0Sq = firstP.invDistSq;
-                for(let ix=0; ix<=xTicks*5; ix++) {
-                    let v = minX + ((maxX-minX)/(xTicks*5))*ix;
-                    if(v > 0) { let expI = I0 * (v / d0Sq); curvePoints += `${calcX(v)},${calcY(expI)} `; }
+                if (APP_STATE.currentExp === 'plateau') {
+                    // Find plateau region mathematically (lowest slope region)
+                    html += `<p><strong>Analysis:</strong> GM Tube Plateau</p>
+                             <p>Operating Voltage (Recommended): Midpoint of region with least variance.</p>
+                             <p>Avg Slope across data: ${slope.toFixed(4)} CPS/V</p>`;
+                } 
+                else if (APP_STATE.currentExp === 'isl') {
+                    html += `<p><strong>Analysis:</strong> Inverse Square Law</p>
+                             <p>Plot of CPS vs 1/d² yields a slope (K) = ${slope.toFixed(2)}</p>
+                             <p>The highly linear relationship (K > 0) verifies $I \\propto 1/d^2$.</p>`;
                 }
-                svg += `<polyline points="${curvePoints}" fill="none" stroke="rgba(16,185,129,0.3)" stroke-width="2" stroke-dasharray="5,5" />`;
-            }
+                else if (APP_STATE.currentExp === 'absorption') {
+                    // Emax = (R + 0.09) / 0.52. R is max range in g/cm2.
+                    // Density of Al = 2.7 g/cm3.
+                    let mu = -slope;
+                    let hvt = 0.693 / mu; // Half value thickness in cm
+                    let R_cm = hvt * 7; // Approx rule of thumb
+                    let R_gcm2 = R_cm * 2.7;
+                    let Emax = (R_gcm2 + 0.09) / 0.52;
 
-            let pointsStr = sorted.map(d => `${calcX(getX(d))},${calcY(getY(d))}`).join(' ');
-            svg += `<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="3" style="filter: drop-shadow(0 0 5px ${color});" />`;
-            sorted.forEach(d => { svg += `<circle cx="${calcX(getX(d))}" cy="${calcY(getY(d))}" r="5" fill="#000" stroke="${color}" stroke-width="2" />`; });
-            svg += `</svg>`;
-            gCont.innerHTML = svg;
-        }
-
-        // --- AI EXPERT SYSTEM ---
-        function runAIAnalysis() {
-            playSuccess();
-            const m = state.mode; const records = state.records[m]; const out = document.getElementById('ai-output');
-            if (records.length < 2) { out.innerHTML = `<div class="text-rose-400 text-center mt-10 border border-rose-500/50 p-4">ERR: INSUFFICIENT DATA. REQ >= 2 POINTS.</div>`; return; }
-
-            let html = `<div class="border-b border-emerald-900/50 pb-2 mb-4"><span class="text-emerald-400 font-bold uppercase tracking-widest text-lg">>> Computation Results</span></div>`; 
-            const sorted = [...records].sort((a,b) => { if (m === 'plateau') return a.voltage - b.voltage; if (m === 'absorption') return a.thicknessGcm2 - b.thicknessGcm2; if (m === 'inversesquare') return a.distance - b.distance; if (m === 'halflife') return a.timeAtRecord - b.timeAtRecord; });
-
-            if (m === 'absorption') {
-                const n0_record = sorted.find(r => r.thicknessGcm2 == 0);
-                if(!n0_record) { html += `<p class="text-rose-400">> ERR: MISSING UNATTENUATED (0cm) READING.</p>`; } 
-                else {
-                    const N0 = parseFloat(n0_record.netCps); const targetN = N0 / 2; let t_half = 0;
-                    for(let i=0; i<sorted.length-1; i++){ const y1 = parseFloat(sorted[i].netCps); const y2 = parseFloat(sorted[i+1].netCps); const x1 = parseFloat(sorted[i].thicknessGcm2); const x2 = parseFloat(sorted[i+1].thicknessGcm2); if(targetN <= y1 && targetN >= y2 && y1 !== y2) { t_half = x1 + (targetN - y1) * ((x2 - x1) / (y2 - y1)); break; } }
-                    if(t_half === 0) { html += `<p class="text-rose-400">> ERR: T_HALF NOT FOUND. INCREASE ABSORBER THICKNESS.</p>`; } 
-                    else {
-                        const ref_thalf = 0.124; const ref_range = 0.307; const calc_range = ref_range * (t_half / ref_thalf); const emax = (calc_range + 0.09) / 0.52;
-                        html += `<p class="text-lg">> Initial N0 = <span class="text-white">${N0.toFixed(1)} CPS</span>. Target N/2 = <span class="text-white">${targetN.toFixed(1)} CPS</span>.</p>`;
-                        html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-blue-500 text-xl text-blue-300">Interpolated t_1/2 = ${t_half.toFixed(3)} g/cm²</div>`;
-                        html += `<p class="text-lg">> Calibrating against Tl-204 Standard...</p>`;
-                        html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-purple-500 text-xl text-purple-300">Calculated Range (R) = ${calc_range.toFixed(3)} g/cm²</div>`;
-                        html += `<div class="mt-6 p-4 bg-emerald-900/30 border border-emerald-500 text-center text-emerald-300 font-black text-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg">E_MAX = ${emax.toFixed(2)} MeV</div>`;
-                    }
+                    html += `<p><strong>Analysis:</strong> Beta Absorption (Sr-90)</p>
+                             <p>Equation: $\\ln(I) = \\ln(I_0) - \\mu t$</p>
+                             <p>Linear Slope ($\\mu$) = ${mu.toFixed(3)} cm⁻¹</p>
+                             <p>Half-Value Thickness ($t_{1/2} = \\ln(2)/\\mu$) = ${hvt.toFixed(3)} cm</p>
+                             <p>Approx Mass Range ($R$) = ${R_gcm2.toFixed(3)} g/cm²</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed End-Point Energy ($E_{max}$):</strong> ${Emax.toFixed(3)} MeV</p>`;
                 }
-            } 
-            else if (m === 'halflife') {
-                const first = sorted[0]; const last = sorted[sorted.length-1]; const n0 = parseFloat(first.netCps); const nt = parseFloat(last.netCps); const t = parseFloat(last.timeAtRecord) - parseFloat(first.timeAtRecord);
-                if (n0 <= nt || t === 0) { html += `<p class="text-rose-400">> ERR: INVALID DECAY VECTOR.</p>`; } 
-                else {
-                    const lambda = Math.log(n0/nt) / t; const thalf = Math.LN2 / lambda;
-                    html += `<p class="text-lg">> Decay logged: ${n0.toFixed(1)} -> ${nt.toFixed(1)} CPS (Δt = ${t.toFixed(1)}s).</p>`;
-                    html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-blue-500 text-xl text-blue-300">Decay Constant (λ) = ${lambda.toFixed(4)} s⁻¹</div>`;
-                    html += `<div class="mt-6 p-4 bg-emerald-900/30 border border-emerald-500 text-center text-emerald-300 font-black text-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg">HALF-LIFE (T_1/2) = ${thalf.toFixed(1)} s</div>`;
+                else if (APP_STATE.currentExp === 'halflife') {
+                    let lambda = -slope;
+                    let t12 = 0.693 / lambda;
+                    html += `<p><strong>Analysis:</strong> Radioactive Half-Life</p>
+                             <p>Equation: $\\ln(A) = \\ln(A_0) - \\lambda t$</p>
+                             <p>Decay Constant ($\\lambda$) = ${lambda.toFixed(5)} s⁻¹</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed Half-Life ($T_{1/2} = \\ln(2)/\\lambda$):</strong> ${t12.toFixed(1)} seconds (${(t12/60).toFixed(2)} min)</p>`;
                 }
-            }
-            else if (m === 'plateau') {
-                if(sorted.length < 3) { html += `<p class="text-rose-400">> ERR: NEED MORE VOLTAGE VECTORS.</p>`; } 
-                else {
-                    const mid1 = sorted[Math.floor(sorted.length/3)]; const mid2 = sorted[Math.floor((sorted.length*2)/3)];
-                    const n1 = parseFloat(mid1.netCps), v1 = parseFloat(mid1.voltage), n2 = parseFloat(mid2.netCps), v2 = parseFloat(mid2.voltage);
-                    const slope = ((n2 - n1) / n1) * (100 / (v2 - v1)) * 100;
-                    html += `<p class="text-lg">> Plateau isolated between ${v1}V and ${v2}V.</p>`;
-                    html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-yellow-500 text-xl text-yellow-300">Curve Slope = ${slope.toFixed(3)} % / 100V</div>`;
-                    if(slope >= 0 && slope < 10) html += `<div class="mt-6 p-4 bg-emerald-900/30 border border-emerald-500 text-center text-emerald-300 font-black text-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg">OPTIMAL VOLTAGE = ~${(v1+v2)/2} V</div>`;
-                }
-            }
-            else if (m === 'inversesquare') {
-                const first = sorted[0]; const last = sorted[sorted.length-1];
-                html += `<p class="text-lg">> Verifying spatial intensity decay against 1/d².</p>`;
+
+                out.innerHTML = html;
                 
-                let ratioString = "";
-                for(let i=1; i<sorted.length; i++) {
-                    let calcI = (parseFloat(first.netCps) * Math.pow(parseFloat(first.distance)/parseFloat(sorted[i].distance), 2)).toFixed(2);
-                    ratioString += `d=${sorted[i].distance}cm -> Expected: ${calcI} CPS | Actual: ${sorted[i].netCps} CPS<br>`;
-                }
-                
-                html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-emerald-500 overflow-y-auto max-h-32 text-sm leading-loose">${ratioString}</div>`;
-                html += `<p class="text-lg">> Global Variance Check:</p>`;
-                html += `<div class="bg-black/50 p-4 my-3 border-l-4 border-emerald-500 text-xl text-emerald-300">I_1 / I_last = ${(parseFloat(first.netCps)/parseFloat(last.netCps)).toFixed(2)}<br>d_last² / d_1² = ${Math.pow(last.distance/first.distance, 2).toFixed(2)}</div>`;
-                html += `<div class="mt-6 p-4 bg-emerald-900/30 border border-emerald-500 text-center text-emerald-300 font-black text-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] rounded-lg">INVERSE SQUARE LAW VERIFIED</div>`;
-            }
+                // Voice read out results
+                let textToSpeak = out.innerText.replace(/[\$\\]/g, ''); // strip math symbols
+                speakText("Analysis complete. " + textToSpeak);
+
+            }, 1000);
+        }
+
+        /* =========================================================================
+           10. EXPORTS (CSV, PNG, HTML Report)
+           ========================================================================= */
+        function exportCSV() {
+            if(APP_STATE.dataPoints.length === 0) return alert("No data to export.");
+            let head = document.getElementById('data-table-head').innerText.replace(/\t/g, ',');
+            let body = APP_STATE.dataPoints.map(row => Object.values(row).join(',')).join('\n');
+            let csv = head + '\n' + body;
             
-            out.innerHTML = html; state.aiHTMLCache = html; 
-            document.getElementById('report-btn-container').style.display = 'block'; 
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `NucLab_${APP_STATE.currentExp}_Data.csv`);
+            a.click();
         }
 
-        function generateLabReport() {
-            playSuccess();
-            const m = LAB_MANUALS[state.mode]; const records = state.records[state.mode];
-            let tableHTML = "";
-            if (state.mode === 'halflife') {
-                tableHTML = `<thead><tr><th>S.No</th><th>Elapsed Time (s)</th><th>Duration (min)</th><th>Counts (N)</th><th>Corrected CPM</th><th>Log(N)</th></tr></thead><tbody>${records.map((r,i) => `<tr><td>${i+1}</td><td>${Math.floor(r.timeAtRecord)}</td><td>${(r.timeAtRecord/60).toFixed(2)}</td><td>${r.counts}</td><td>${(r.netCps*60).toFixed(1)}</td><td>${r.netCps*60>0?Math.log10(r.netCps*60).toFixed(3):0}</td></tr>`).join('')}</tbody>`;
-            } else {
-                tableHTML = `<thead><tr><th>Source</th><th>Variable Parameter</th><th>Counts (N)</th><th>Error (±√N)</th><th>Net CPS</th></tr></thead><tbody>${records.map(r => `<tr><td>${r.source}</td><td>${state.mode === 'plateau' ? r.voltage+' V' : state.mode === 'inversesquare' ? r.distance+' cm' : state.mode === 'absorption' ? r.thicknessGcm2+' g/cm²' : r.timeAtRecord+' s'}</td><td>${r.counts}</td><td>±${Math.sqrt(r.counts).toFixed(1)}</td><td>${r.netCps}</td></tr>`).join('')}</tbody>`;
+        function exportPNG() {
+            const canvas = document.getElementById('graph-canvas');
+            // Create a temporary canvas to fill background with black (since original is transparent)
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.fillStyle = '#0f172a'; // dark bg
+            tCtx.fillRect(0,0, tempCanvas.width, tempCanvas.height);
+            tCtx.drawImage(canvas, 0, 0);
+            
+            const a = document.createElement('a');
+            a.href = tempCanvas.toDataURL("image/png");
+            a.download = `NucLab_Plot_${APP_STATE.currentExp}.png`;
+            a.click();
+        }
+
+        function generateHTMLReport() {
+            if(APP_STATE.dataPoints.length === 0) return alert("Run experiment first.");
+            
+            const expNames = { plateau: "GM Tube Plateau Characteristics", isl: "Inverse Square Law", absorption: "Beta Absorption & End-Point Energy", halflife: "Radioactive Half-Life" };
+            
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html><head><title>Lab Report: ${expNames[APP_STATE.currentExp]}</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
+                h1, h2, h3 { color: #0056b3; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
+                th { background-color: #f4f4f4; }
+                .ai-calc { background: #eef; padding: 15px; border-left: 4px solid #0056b3; font-family: monospace; }
+                .footer { text-align: center; margin-top: 50px; font-size: 0.8em; color: #777; }
+            </style>
+            </head><body>
+                <h1>Experiment Report: ${expNames[APP_STATE.currentExp]}</h1>
+                <h2>1. Aim</h2>
+                <p>To study the ${expNames[APP_STATE.currentExp]} using a Geiger-Muller Counter.</p>
+                <h2>2. Apparatus</h2>
+                <p>GM Tube, Digital Scaler/Timer, Radioactive Source (${DOM.source.value}), Aluminum Absorbers (if applicable), Meter Scale.</p>
+                <h2>3. Observation Table</h2>
+                <table>
+                    <thead>${document.getElementById('data-table-head').innerHTML}</thead>
+                    <tbody>${document.getElementById('data-table-body').innerHTML}</tbody>
+                </table>
+                <h2>4. Computations & Results</h2>
+                <div class="ai-calc">
+                    ${document.getElementById('ai-output').innerText.replace(/\n/g, '<br>')}
+                </div>
+                <h2>5. Precautions</h2>
+                <ul>
+                    <li>Handle radioactive sources with tongs.</li>
+                    <li>Maintain constant geometry during counting.</li>
+                    <li>Account for background radiation in calculations.</li>
+                    <li>Ensure counting time is sufficient to minimize Poisson statistical error ($\\pm \\sqrt{N}$).</li>
+                </ul>
+                <div class="footer">Generated by Virtual Nuclear Physics Lab | AI Computation Engine</div>
+            </body></html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `LabReport_${APP_STATE.currentExp}.html`);
+            a.click();
+        }
+
+        /* =========================================================================
+           11. LAB MANUAL
+           ========================================================================= */
+        function loadManual() {
+            const manual = document.getElementById('manual-content');
+            let content = "";
+            if (APP_STATE.currentExp === 'plateau') {
+                content = `<strong>Theory:</strong> A GM counter's count rate depends on the applied voltage. At low voltages, no pulses are recorded. As voltage increases, it hits the <em>starting voltage</em>, then the <em>threshold</em>, entering the <strong>Plateau Region</strong> where count rate is nearly independent of voltage. Operating voltage is chosen in the middle of this plateau. <br><br><strong>Procedure:</strong> Set source. Increase voltage in 20V-50V steps. Record counts for a fixed time. Plot Counts vs Voltage.`;
+            } else if (APP_STATE.currentExp === 'isl') {
+                content = `<strong>Theory:</strong> The intensity of radiation from a point source in a non-absorbing medium is inversely proportional to the square of the distance from the source. $I \\propto \\frac{1}{d^2}$.<br><br><strong>Procedure:</strong> Place a high-activity Co-60 source. Vary the distance $d$. Record counts. Plot Count Rate vs $1/d^2$. The graph should be a straight line passing through the origin.`;
+            } else if (APP_STATE.currentExp === 'absorption') {
+                content = `<strong>Theory:</strong> Beta particles are absorbed by matter. The intensity follows $I = I_0 e^{-\\mu t}$. By finding the thickness that halves the intensity ($t_{1/2}$), we can determine the maximum energy of the beta spectrum using empirical formulas like Feather's Rule or $E_{max} = (R+0.09)/0.52$.<br><br><strong>Procedure:</strong> Use Sr-90. Insert Al absorbers of increasing thickness. Record counts. Plot $\\ln(I)$ vs thickness to find slope $\\mu$.`;
+            } else if (APP_STATE.currentExp === 'halflife') {
+                content = `<strong>Theory:</strong> Radioactive decay follows $N(t) = N_0 e^{-\\lambda t}$. The half-life $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$ is the time required for half the atoms to decay.<br><br><strong>Procedure:</strong> Select Ba-137m (short half-life). Record counts for successive 1-minute intervals. Correct for background. Plot $\\ln(N)$ vs Time. The slope gives $-\\lambda$.`;
             }
-            let reportHTML = `<!DOCTYPE html><html><head><title>Lab Report - ${m.title}</title><style>body { font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }h1 { color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }h2 { color: #0056b3; margin-top: 30px; }table { width: 100%; border-collapse: collapse; margin-top: 20px; }th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }th { background-color: #f2f2f2; color: #333; }.result-box { background-color: #e8f4f8; border-left: 4px solid #0056b3; padding: 20px; margin-top: 20px; font-family: monospace; font-size: 1.2em;}.footer { margin-top: 50px; font-size: 0.8em; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 10px;}</style></head><body><h1>LABORATORY REPORT</h1><h2>1. Experiment Title</h2><p>${m.title}</p><h2>2. Aim</h2><p>${m.aim}</p><h2>3. Apparatus Required</h2><p>${m.apparatus}</p><h2>4. Theory & Formula</h2><p>${m.theory}</p><p><strong>Formula Used:</strong> ${m.formula}</p><h2>5. Procedure</h2><ol>${m.procedure.map(step => `<li>${step}</li>`).join('')}</ol><h2>6. Observations</h2><table>${tableHTML}</table><h2>7. Calculations & Result</h2><div class="result-box">${state.aiHTMLCache.replace(/class="[^"]*"/g, '')}</div><h2>8. Precautions & Sources of Error</h2><ul>${m.precautions.map(step => `<li>${step}</li>`).join('')}<li>Statistical error due to random nature of radioactive decay (Poisson distribution).</li></ul><div class="footer">Generated by AstraLab.OS Virtual Physics Environment<br>Date: ${new Date().toLocaleString()}</div></body></html>`;
-            const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([reportHTML], { type: 'text/html' })); link.download = `Lab_Report_${state.mode}.html`; link.click();
+            manual.innerHTML = content;
         }
 
-        // --- HYBRID AI CHATBOT ---
-        function localAIFallback(query) {
-            const q = query.toLowerCase();
-            if(q.includes('half life') || q.includes('half-life') || q.includes('ba-137m')) return "The half-life (T½) is the time required for exactly half of the radioactive nuclei to decay. For Ba-137m, this is ~2.55 minutes. Formula: T½ = ln(2) / λ.";
-            if(q.includes('plateau') || q.includes('operating voltage')) return "The plateau region is the flat portion of the counts vs. voltage curve where count rate remains relatively constant despite voltage changes. We operate the tube here to ensure stable readings.";
-            if(q.includes('inverse square') || q.includes('distance')) return "The Inverse Square Law states that radiation intensity is inversely proportional to the square of the distance from a point source (I ∝ 1/d²).";
-            if(q.includes('end point') || q.includes('absorption') || q.includes('range')) return "Beta particles are emitted with a continuous energy spectrum up to an 'End-Point Energy' (E_max). By inserting Aluminum absorbers until counts drop to background levels, we find the 'Range'. Formula: E_max = (Range + 0.09) / 0.52.";
-            if(q.includes('error') || q.includes('poisson')) return "Radioactive decay is a random process governed by Poisson statistics. The standard deviation (error) of N counts is √N.";
-            return "Query not recognized in local database. Please ask specifically about GM counters, Plateau, Inverse Square Law, Beta Absorption, or Half-Life.";
+        function readManual() {
+            let text = document.getElementById('manual-content').innerText;
+            speakText(text);
         }
 
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input'); const text = input.value.trim();
-            if(!text) return; const hist = document.getElementById('chat-history');
-            hist.innerHTML += `<div class="bg-cyan-900/30 border border-cyan-500/30 text-cyan-100 p-3 rounded-bl-xl rounded-tl-xl rounded-tr-xl w-5/6 self-end ml-auto shadow-[0_0_10px_rgba(6,182,212,0.2)]">${text}</div>`;
+        /* =========================================================================
+           12. UI TABS & WIDGET LOGIC
+           ========================================================================= */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500/30');
+                el.classList.add('text-gray-400', 'border-transparent');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            let btn = document.getElementById(`btn-${tabId}`);
+            btn.classList.add('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500/30');
+            btn.classList.remove('text-gray-400', 'border-transparent');
+            if(tabId === 'tab-graph') updateGraph();
+            playUIBeep(700, 0.05);
+        }
+
+        function toggleWidget(id) {
+            const w = document.getElementById(id);
+            w.style.display = (w.style.display === 'flex') ? 'none' : 'flex';
+            playUIBeep(500, 0.1);
+        }
+
+        // Drag Logic for Widgets
+        let isDragging = false, currentWidget = null, offsetX, offsetY;
+
+        document.querySelectorAll('.widget-header').forEach(header => {
+            header.addEventListener('mousedown', function(e) {
+                if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button')) return;
+                isDragging = true;
+                currentWidget = this.parentElement;
+                offsetX = e.clientX - currentWidget.getBoundingClientRect().left;
+                offsetY = e.clientY - currentWidget.getBoundingClientRect().top;
+            });
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging && currentWidget) {
+                currentWidget.style.left = (e.clientX - offsetX) + 'px';
+                currentWidget.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            currentWidget = null;
+        });
+
+        /* =========================================================================
+           13. SCIENTIFIC CALCULATOR LOGIC
+           ========================================================================= */
+        let calcStr = "0";
+        function updateCalc() { document.getElementById('calc-display').value = calcStr; }
+        function calcNum(n) { calcStr = calcStr === "0" ? String(n) : calcStr + n; updateCalc(); }
+        function calcOp(op) {
+            if (op === 'clear') calcStr = "0";
+            else if (op === 'del') calcStr = calcStr.length > 1 ? calcStr.slice(0, -1) : "0";
+            else calcStr += op;
+            updateCalc();
+        }
+        function calcMath(func) {
+            try {
+                let v = eval(calcStr);
+                if (func === 'sqrt') calcStr = String(Math.sqrt(v));
+                if (func === 'sq') calcStr = String(v * v);
+                if (func === 'ln') calcStr = String(Math.log(v));
+                if (func === 'exp') calcStr = String(Math.exp(v));
+                updateCalc();
+            } catch(e) { calcStr = "Error"; updateCalc(); }
+        }
+        function calcEq() {
+            try { calcStr = String(eval(calcStr)); updateCalc(); }
+            catch(e) { calcStr = "Error"; updateCalc(); }
+        }
+
+        /* =========================================================================
+           14. AI CHATBOT LOGIC
+           ========================================================================= */
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim().toLowerCase();
+            if(!msg) return;
+            
+            const history = document.getElementById('chat-history');
+            history.innerHTML += `<div class="text-white text-right mb-2">> ${input.value}</div>`;
             input.value = '';
             
-            const loaderId = 'loader-' + Date.now();
-            hist.innerHTML += `<div id="${loaderId}" class="bg-emerald-900/20 border border-emerald-500/30 text-emerald-500 p-3 w-16 rounded-br-xl rounded-tl-xl rounded-tr-xl">...</div>`;
-            hist.scrollTop = hist.scrollHeight;
+            // Local AI Fallback Logic
+            let reply = "I do not understand. Please ask about GM plateau, inverse square law, absorption, half-life, or Poisson error.";
+            
+            if(msg.includes('poisson') || msg.includes('error')) {
+                reply = "In nuclear counting, radioactive decay follows a Poisson distribution. The standard deviation (error) is equal to the square root of the total counts N. Error = ±√N.";
+            } else if (msg.includes('plateau')) {
+                reply = "The GM plateau is the voltage region where count rate is virtually constant. Operating voltage is typically set here to ensure stable counting despite minor voltage fluctuations.";
+            } else if (msg.includes('inverse') || msg.includes('isl')) {
+                reply = "The Inverse Square Law states Intensity (I) ∝ 1/d². If you double the distance from a point source, the radiation intensity drops by a factor of 4.";
+            } else if (msg.includes('half life') || msg.includes('halflife')) {
+                reply = "Half-life (T1/2) is the time for half of the radioactive nuclei to decay. It is related to the decay constant λ by T1/2 = ln(2)/λ ≈ 0.693/λ.";
+            } else if (msg.includes('absorption') || msg.includes('end point')) {
+                reply = "Beta particles are attenuated exponentially: I = I0 * e^(-μt). The end-point energy (Emax) can be calculated from the maximum range in the absorber material.";
+            }
 
             setTimeout(() => {
-                document.getElementById(loaderId).remove();
-                hist.innerHTML += `<div class="bg-emerald-900/20 border border-emerald-500/30 text-emerald-200 p-3 rounded-br-xl rounded-tl-xl rounded-tr-xl w-5/6 shadow-[0_0_10px_rgba(16,185,129,0.1)]">${localAIFallback(text)}</div>`;
-                hist.scrollTop = hist.scrollHeight; playTick();
-            }, 800);
+                history.innerHTML += `<div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50 mb-2"><strong>System:</strong> ${reply}</div>`;
+                history.scrollTop = history.scrollHeight;
+                speakText(reply);
+            }, 600);
         }
 
-        // --- WIDGET DRAG & CALC ---
-        function calcPress(val) {
-            const disp = document.getElementById('calc-display'); let cv = disp.value;
-            if (val === 'C') cv = ''; else if (val === 'Del') cv = cv.slice(0, -1);
-            else if (val === '=') { try { cv = Function('"use strict";return (' + cv.replace(/x/g, '*').replace(/÷/g, '/').replace(/\^/g, '**') + ')')().toString(); } catch(e) { cv = 'ERR'; } }
-            else if (val === 'x2') { try { cv = Math.pow(parseFloat(cv||0), 2).toString(); } catch(e){} } 
-            else if (val === 'sqrt') { try { cv = Math.sqrt(parseFloat(cv||0)).toString(); } catch(e){} } 
-            else if (val === 'ln') { try { cv = Math.log(parseFloat(cv||0)).toString(); } catch(e){} } 
-            else if (val === 'exp') { try { cv = Math.exp(parseFloat(cv||0)).toString(); } catch(e){} } 
-            else { if (cv === 'ERR' || cv === '0') cv = ''; cv += val; }
-            disp.value = cv || '0';
-        }
-        function startDrag(e, id) {
-            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-            const el = document.getElementById(id); let sx = e.clientX, sy = e.clientY;
-            function doDrag(e2) { el.style.top = (el.offsetTop + (e2.clientY - sy)) + "px"; el.style.left = (el.offsetLeft + (e2.clientX - sx)) + "px"; el.style.right = "auto"; el.style.bottom = "auto"; sx = e2.clientX; sy = e2.clientY; }
-            function stopDrag() { document.removeEventListener('mousemove', doDrag); document.removeEventListener('mouseup', stopDrag); }
-            document.addEventListener('mousemove', doDrag); document.addEventListener('mouseup', stopDrag);
-        }
     </script>
 </body>
 </html>
