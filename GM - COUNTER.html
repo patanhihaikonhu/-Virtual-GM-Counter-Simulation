@@ -11,6 +11,19 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     
+    <!-- Conditional MathJax for LaTeX Rendering to avoid multiple loading errors -->
+    <script>
+        if (!window.MathJax) {
+            window.MathJax = {
+                tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+            };
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -150,6 +163,9 @@
             0% { box-shadow: 0 0 20px #06b6d4, inset 0 0 10px #06b6d4; border-color: #06b6d4; }
             100% { box-shadow: none; border-color: rgba(6, 182, 212, 0.5); }
         }
+        
+        /* MathJax adjustments for dark theme */
+        .MathJax { color: #e2e8f0 !important; }
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col relative" oncontextmenu="return false;">
@@ -166,7 +182,7 @@
             <div class="orbit"><div class="electron"></div></div>
         </div>
         <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-4 neon-text-cyan tracking-wider text-center">VIRTUAL NUCLEAR LAB</h1>
-        <p class="text-emerald-400 font-mono mb-10 text-lg neon-text-emerald">Advanced GM Counter Simulation System v4.0</p>
+        <p class="text-emerald-400 font-mono mb-10 text-lg neon-text-emerald">Advanced GM Counter Simulation System v5.0 (LaTeX Enabled)</p>
         <button id="btn-init" class="glass-panel text-cyan-400 border border-cyan-400 px-8 py-4 rounded-full font-display font-bold text-xl hover:bg-cyan-900/50 hover:neon-border-cyan transition-all duration-300 transform hover:scale-105">
             <i class="fa-solid fa-power-off mr-2"></i> INITIALIZE LAB
         </button>
@@ -180,6 +196,7 @@
             <h1 class="font-display font-bold text-xl tracking-widest text-white"><span class="text-cyan-400">NUC</span>-LAB <span class="text-xs text-emerald-400 ml-2">ONLINE</span></h1>
         </div>
         <div class="flex gap-4">
+            <span id="save-status" class="text-xs text-emerald-400 font-mono flex items-center mr-4 opacity-0 transition-opacity duration-500"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Autosaved</span>
             <button onclick="toggleAudio()" id="btn-audio" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-cyan-400 hover:text-white transition-colors" title="Toggle Sound">
                 <i class="fa-solid fa-volume-high"></i>
             </button>
@@ -247,6 +264,10 @@
                         <div class="absolute -bottom-5 text-[10px] font-mono text-cyan-400" id="visual-dist-label">50cm</div>
                     </div>
                 </div>
+                
+                <button onclick="injectCosmicBurst()" class="absolute top-2 right-2 text-[10px] bg-purple-900/50 text-purple-400 px-2 py-1 rounded border border-purple-500/50 hover:bg-purple-800/80 transition-colors z-30" title="Simulate Random Cosmic Ray Shower">
+                    <i class="fa-solid fa-meteor"></i> Burst
+                </button>
             </div>
 
             <!-- Experiment Selector & Controls -->
@@ -254,7 +275,7 @@
                 <h2 class="font-display text-cyan-400 font-bold mb-4 border-b border-cyan-900/50 pb-2"><i class="fa-solid fa-sliders mr-2"></i>EXPERIMENT CONFIG</h2>
                 <select id="exp-selector" class="w-full bg-dark-800 border border-cyan-700 text-white rounded p-2 mb-4 font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[0_0_10px_rgba(6,182,212,0.1)]" onchange="setupExperimentUI()">
                     <option value="plateau">1. GM Tube Plateau Characteristics</option>
-                    <option value="isl">2. Inverse Square Law (I ∝ 1/d²)</option>
+                    <option value="isl">2. Inverse Square Law ($I \propto 1/d^2$)</option>
                     <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
                     <option value="halflife">4. Radioactive Half-Life</option>
                 </select>
@@ -265,9 +286,9 @@
                     <div id="ctrl-source" class="control-group">
                         <label class="block text-gray-400 mb-1">Radioactive Source</label>
                         <select id="input-source" class="w-full bg-dark-900 border border-gray-700 rounded p-1.5 text-white focus:outline-none focus:border-cyan-400" onchange="updateParameters()">
-                            <option value="co60">Cobalt-60 (γ, β-)</option>
-                            <option value="sr90">Strontium-90 (β-)</option>
-                            <option value="cs137">Cesium-137 (γ, β-)</option>
+                            <option value="co60">Cobalt-60 ($\gamma, \beta^-$)</option>
+                            <option value="sr90">Strontium-90 ($\beta^-$)</option>
+                            <option value="cs137">Cesium-137 ($\gamma, \beta^-$)</option>
                             <option value="ba137m">Barium-137m (Simulation scale)</option>
                         </select>
                     </div>
@@ -282,7 +303,7 @@
 
                     <div id="ctrl-distance" class="control-group">
                         <label class="flex justify-between text-gray-400 mb-1">
-                            <span>Source Distance (d)</span>
+                            <span>Source Distance ($d$)</span>
                             <span id="val-distance" class="text-cyan-400 font-bold">10 cm</span>
                         </label>
                         <input type="range" id="input-distance" min="2" max="50" step="1" value="10" oninput="updateVal('distance', this.value, ' cm')">
@@ -290,7 +311,7 @@
 
                     <div id="ctrl-thickness" class="control-group">
                         <label class="flex justify-between text-gray-400 mb-1">
-                            <span>Al Absorber Thickness</span>
+                            <span>Al Absorber Thickness ($t$)</span>
                             <span id="val-thickness" class="text-cyan-400 font-bold">0.00 cm</span>
                         </label>
                         <input type="range" id="input-thickness" min="0" max="0.5" step="0.01" value="0" oninput="updateVal('thickness', this.value, ' cm')">
@@ -322,7 +343,7 @@
                         <span id="display-timer" class="segment-display text-rose-400 text-2xl">00:00</span>
                     </div>
                     <div class="flex justify-between items-end">
-                        <span class="text-xs text-gray-500">COUNTS (N)</span>
+                        <span class="text-xs text-gray-500">COUNTS ($N$)</span>
                         <span id="display-counts" class="segment-display text-cyan-400 text-4xl neon-text-cyan tracking-widest">000000</span>
                     </div>
                     <div class="mt-2 text-right flex justify-between">
@@ -376,7 +397,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">* Statistical Error ($\pm \sqrt{N}$) is considered for Poisson counting statistics.</p>
+                    <p class="text-xs text-gray-500 mt-2" id="table-footer-note">* Statistical Error ($\pm \sqrt{N}$) is considered for Poisson counting statistics.</p>
                 </div>
 
                 <!-- Graph Tab -->
@@ -385,9 +406,10 @@
                         <h3 class="font-display text-emerald-400 font-bold">Dynamic Plotter</h3>
                         <button onclick="exportPNG()" class="text-xs bg-cyan-900/40 text-cyan-400 px-3 py-1 rounded border border-cyan-700/50 hover:bg-cyan-800/60 transition-colors"><i class="fa-solid fa-image mr-1"></i>Export PNG</button>
                     </div>
-                    <div class="flex-grow w-full bg-[#050505] border border-gray-700 rounded relative flex items-center justify-center p-2 shadow-inner">
+                    <div class="flex-grow w-full bg-[#050505] border border-gray-700 rounded relative flex items-center justify-center p-2 shadow-inner overflow-hidden">
                         <canvas id="graph-canvas" class="w-full h-full max-h-[450px]"></canvas>
                     </div>
+                    <p class="text-xs text-gray-500 mt-2 text-center">Graph includes automatic Linear Regression (Best Fit Line) computation.</p>
                 </div>
 
                 <!-- AI Solver Tab -->
@@ -402,7 +424,7 @@
                     <div id="ai-output" class="flex-grow overflow-y-auto bg-dark-900/50 p-4 rounded border border-gray-700 font-mono text-sm leading-relaxed text-gray-300 shadow-inner">
                         <div class="flex flex-col items-center justify-center h-full text-gray-500 text-center">
                             <i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i>
-                            <p>Awaiting data... Run experiment and click "Run Analysis" to compute physics parameters automatically.</p>
+                            <p>Awaiting data... Run experiment and click "Run Analysis" to compute physics parameters automatically with full LaTeX mathematical notation.</p>
                         </div>
                     </div>
                 </div>
@@ -477,7 +499,7 @@
         </div>
         <div id="chat-history" class="flex-grow p-3 overflow-y-auto bg-dark-900/80 font-mono text-xs space-y-3">
             <div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50">
-                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, or ISL.
+                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, or ISL. (Math will render automatically via MathJax).
             </div>
         </div>
         <div class="p-2 bg-dark-800 border-t border-gray-700 flex gap-1">
@@ -497,6 +519,13 @@
             if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } // Ctrl+U
             if(e.ctrlKey && e.keyCode == 67) { e.preventDefault(); return false; } // Ctrl+C
         });
+
+        // Helper function to render LaTeX dynamically using MathJax
+        function renderMath() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err.message));
+            }
+        }
 
         /* =========================================================================
            2. CANVAS BACKGROUND ANIMATION
@@ -606,7 +635,16 @@
         function speakText(text) {
             if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Clean out LaTeX formatting for voice synthesis
+            let cleanText = text.replace(/[\$\\]/g, '')
+                                .replace(/_\{.*?\}/g, '')
+                                .replace(/\^\{.*?\}/g, '')
+                                .replace(/frac\{(.*?)\}\{(.*?)\}/g, "$1 over $2")
+                                .replace(/pm/g, "plus or minus")
+                                .replace(/propto/g, "proportional to");
+                                
+            const utterance = new SpeechSynthesisUtterance(cleanText);
             const voices = window.speechSynthesis.getVoices();
             const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google UK English Female'));
             if(femaleVoice) utterance.voice = femaleVoice;
@@ -628,6 +666,7 @@
             countingInterval: null,
             dataPoints: [],
             bgRateCPM: 25,
+            cosmicBurstActive: false,
             
             // Visual Engine Variables
             sourceColors: { 'co60': '#3b82f6', 'sr90': '#10b981', 'cs137': '#a855f7', 'ba137m': '#eab308' },
@@ -652,10 +691,12 @@
             setTimeout(() => {
                 document.getElementById('intro-screen').style.display = 'none';
                 startMasterClock();
+                loadDataFromStorage(); // Load saved data
                 setupExperimentUI();
-                initApparatusVisuals(); // Start custom visualization
+                initApparatusVisuals(); 
                 playUIBeep(880, 0.3);
                 speakText("Virtual Nuclear Laboratory initialized. Select an experiment from the configuration panel.");
+                renderMath(); // Initial render
             }, 1000);
         });
 
@@ -671,7 +712,7 @@
 
         function updateVal(id, val, unit) {
             document.getElementById(`val-${id}`).innerText = `${val}${unit}`;
-            updateParameters(); // trigger visual update directly on slider move
+            updateParameters(); 
         }
 
         function formatTimer(val) {
@@ -712,7 +753,19 @@
             updateParameters();
             updateTableHeaders();
             loadManual();
-            clearData();
+            
+            // Re-render table if data exists for this experiment
+            renderTable();
+            updateGraph();
+            renderMath();
+        }
+
+        // Feature: Cosmic Burst
+        function injectCosmicBurst() {
+            if (APP_STATE.cosmicBurstActive) return;
+            APP_STATE.cosmicBurstActive = true;
+            playUIBeep(200, 0.5, 'square');
+            setTimeout(() => { APP_STATE.cosmicBurstActive = false; }, 3000); // 3 seconds of high bg
         }
 
         /* =========================================================================
@@ -722,7 +775,6 @@
         let vCanvas, vCtx;
         let radiationRays = [];
         
-        // Setup internal canvas dimensions
         function resizeVisualCanvas() {
             vCanvas = document.getElementById('apparatus-canvas');
             if(!vCanvas) return;
@@ -735,24 +787,19 @@
         function initApparatusVisuals() {
             resizeVisualCanvas();
             window.addEventListener('resize', resizeVisualCanvas);
-            
-            // Start visual particle loop
             requestAnimationFrame(renderVisualApparatus);
         }
 
         function updateParameters() {
-            // Sync text values
             document.getElementById('val-voltage').innerText = `${DOM.voltage.value} V`;
             document.getElementById('val-distance').innerText = `${DOM.distance.value} cm`;
             document.getElementById('val-thickness').innerText = `${DOM.thickness.value} cm`;
 
-            // --- UPDATE VISUAL APPARATUS ---
             const dist = parseFloat(DOM.distance.value);
             const thick = parseFloat(DOM.thickness.value);
             const src = DOM.source.value;
             const vol = parseFloat(DOM.voltage.value);
 
-            // 1. Source Color Update
             const pColor = APP_STATE.sourceColors[src] || '#ffffff';
             APP_STATE.currentParticleColor = pColor;
             
@@ -761,8 +808,6 @@
             pellet.style.boxShadow = `0 0 15px ${pColor}`;
             document.getElementById('visual-source-mount').style.borderColor = pColor;
 
-            // 2. Distance Translation Update
-            // Map: 2cm -> 20% left, 50cm -> 90% left (Container space)
             const minPos = 20; const maxPos = 90;
             const percentPos = minPos + ((dist - 2) / 48) * (maxPos - minPos);
             const mount = document.getElementById('visual-source-mount');
@@ -770,46 +815,38 @@
             document.getElementById('visual-dist-label').innerText = `${dist}cm`;
             document.getElementById('visual-dist-label').style.color = pColor;
 
-            // 3. Absorber Update
             const absorberContainer = document.getElementById('visual-absorber-container');
             const absorber = document.getElementById('visual-absorber');
             if (APP_STATE.currentExp === 'absorption' && thick > 0) {
                 absorberContainer.style.opacity = '1';
-                // Scale thickness visually (0 to 0.50cm mapped to 2px to 20px)
                 const widthPx = 2 + (thick / 0.5) * 18;
                 absorber.style.width = `${widthPx}px`;
             } else {
                 absorberContainer.style.opacity = '0';
             }
 
-            // 4. Hardware Status
             const hwStatus = document.getElementById('hw-status');
             if(vol < 350) { hwStatus.innerText = "HV: TOO LOW"; hwStatus.style.color = "#f43f5e"; }
             else if(vol > 850) { hwStatus.innerText = "HV: DISCHARGE"; hwStatus.style.color = "#f43f5e"; }
             else { hwStatus.innerText = "HV: STABLE"; hwStatus.style.color = "#10b981"; }
             
-            // Only beep if not counting
             if(!APP_STATE.isCounting) playUIBeep(500, 0.05);
         }
 
-        // Custom Ray Class for Visuals
         class RadiationRay {
             constructor(startX, startY, endX, color, getsAbsorbed) {
                 this.x = startX;
-                this.y = startY + (Math.random() * 10 - 5); // Slight vertical spread
-                this.endX = endX; // Destination (either GM tube or Absorber)
+                this.y = startY + (Math.random() * 10 - 5); 
+                this.endX = endX; 
                 this.speed = 3 + Math.random() * 4;
                 this.color = color;
-                this.getsAbsorbed = getsAbsorbed; // Boolean: Does it die at absorber?
+                this.getsAbsorbed = getsAbsorbed; 
                 this.active = true;
                 this.length = 5 + Math.random() * 10;
             }
             update() {
                 this.x -= this.speed;
-                // If it reaches its specific destination
-                if (this.x <= this.endX) {
-                    this.active = false; // Kill particle
-                }
+                if (this.x <= this.endX) { this.active = false; }
             }
             draw(ctx) {
                 if(!this.active) return;
@@ -825,24 +862,18 @@
         }
 
         function renderVisualApparatus() {
-            if(!vCtx || !vCanvas) {
-                requestAnimationFrame(renderVisualApparatus);
-                return;
-            }
+            if(!vCtx || !vCanvas) { requestAnimationFrame(renderVisualApparatus); return; }
             
             vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
 
-            // Get current positions dynamically via DOM rects to be exact
             const mountRect = document.getElementById('visual-source-pellet').getBoundingClientRect();
             const canvasRect = vCanvas.getBoundingClientRect();
             const gmWindowRect = document.getElementById('gm-window').getBoundingClientRect();
             
             const startX = mountRect.left - canvasRect.left;
             const startY = (mountRect.top + mountRect.height/2) - canvasRect.top;
-            
             const gmTargetX = gmWindowRect.right - canvasRect.left;
 
-            // Absorber calculations
             let absorberTargetX = gmTargetX;
             let hasAbsorber = false;
             let absorptionProb = 0;
@@ -853,41 +884,33 @@
                     hasAbsorber = true;
                     const absRect = document.getElementById('visual-absorber').getBoundingClientRect();
                     absorberTargetX = absRect.right - canvasRect.left;
-                    // Probability of stopping at absorber visually = 1 - e^(-mu*t)
                     absorptionProb = 1 - Math.exp(-14.0 * thick); 
                 }
             }
 
-            // Spawn particles
-            // If counting, spawn proportional to rate. If idle, spawn slowly.
             let spawnChance = APP_STATE.isCounting ? 0.4 : 0.05; 
-            
-            // If high voltage is too low, don't show counts visually hitting (simulate failure)
             const V = parseFloat(DOM.voltage.value);
             if (V < 350) spawnChance = 0.01; 
+            if (APP_STATE.cosmicBurstActive) spawnChance = 0.9;
 
             if (Math.random() < spawnChance) {
-                // Determine if this specific particle gets absorbed physically
                 let getsAbsorbed = false;
                 let targetX = gmTargetX;
 
                 if (hasAbsorber) {
                     if (Math.random() < absorptionProb) {
                         getsAbsorbed = true;
-                        targetX = absorberTargetX + (Math.random()*4); // Hit slightly inside absorber
+                        targetX = absorberTargetX + (Math.random()*4); 
                     }
                 }
-
                 radiationRays.push(new RadiationRay(startX, startY, targetX, APP_STATE.currentParticleColor, getsAbsorbed));
             }
 
-            // Update and draw
             for(let i = radiationRays.length - 1; i >= 0; i--) {
                 const r = radiationRays[i];
                 r.update();
                 r.draw(vCtx);
                 if(!r.active) {
-                    // Small explosion effect at impact
                     vCtx.beginPath();
                     vCtx.arc(r.x, r.y, 2, 0, Math.PI*2);
                     vCtx.fillStyle = r.color;
@@ -895,7 +918,6 @@
                     radiationRays.splice(i, 1);
                 }
             }
-
             requestAnimationFrame(renderVisualApparatus);
         }
 
@@ -932,6 +954,7 @@
             }
 
             let calculatedCPM = APP_STATE.bgRateCPM;
+            if (APP_STATE.cosmicBurstActive) calculatedCPM += 5000; // Cosmic Burst modifier
 
             if (exp === 'plateau') {
                 let eff = 0;
@@ -971,7 +994,6 @@
             document.getElementById('btn-start').classList.add('opacity-50');
             document.getElementById('btn-stop').classList.remove('opacity-50');
 
-            // Visual Status
             const vStatus = document.getElementById('visual-status');
             vStatus.innerText = "COUNTING...";
             vStatus.classList.replace('bg-rose-900/50', 'bg-emerald-900/50');
@@ -984,12 +1006,11 @@
             
             playUIBeep(1000, 0.2);
 
-            const expectedCPM = calculateExpectedCPM();
-            const expectedCPS = expectedCPM / 60;
-
             APP_STATE.countingInterval = setInterval(() => {
-                APP_STATE.countTimer++;
+                const expectedCPM = calculateExpectedCPM();
+                const expectedCPS = expectedCPM / 60;
                 
+                APP_STATE.countTimer++;
                 let clicksThisSecond = getPoissonRandom(expectedCPS);
                 APP_STATE.currentCounts += clicksThisSecond;
 
@@ -999,7 +1020,6 @@
                 DOM.dispCounts.innerText = String(APP_STATE.currentCounts).padStart(6, '0');
                 DOM.dispRate.innerText = `${clicksThisSecond} CPS`;
 
-                // Distribute audio clicks
                 let audioClicks = Math.min(clicksThisSecond, 20);
                 for(let i=0; i<audioClicks; i++) {
                     setTimeout(playGeigerClick, Math.random() * 900);
@@ -1021,7 +1041,6 @@
             document.getElementById('btn-start').classList.remove('opacity-50');
             document.getElementById('btn-stop').classList.add('opacity-50');
 
-            // Visual Status
             const vStatus = document.getElementById('visual-status');
             vStatus.innerText = "OFFLINE";
             vStatus.classList.replace('bg-emerald-900/50', 'bg-rose-900/50');
@@ -1043,16 +1062,46 @@
         }
 
         /* =========================================================================
-           8. DATA TABLE & GRAPH ENGINE
+           8. DATA TABLE, GRAPH ENGINE, & LOCAL STORAGE
            ========================================================================= */
+        function saveDataToStorage() {
+            const payload = {
+                currentExp: APP_STATE.currentExp,
+                dataPoints: APP_STATE.dataPoints
+            };
+            localStorage.setItem('nucLabData', JSON.stringify(payload));
+            
+            // Show saved indicator
+            const status = document.getElementById('save-status');
+            status.style.opacity = '1';
+            setTimeout(() => { status.style.opacity = '0'; }, 2000);
+        }
+
+        function loadDataFromStorage() {
+            const dataStr = localStorage.getItem('nucLabData');
+            if (dataStr) {
+                try {
+                    const parsed = JSON.parse(dataStr);
+                    // Only load if it matches the current starting experiment (plateau by default)
+                    // or let's actually just load the experiment they were on!
+                    if (parsed.currentExp) {
+                        document.getElementById('exp-selector').value = parsed.currentExp;
+                        APP_STATE.currentExp = parsed.currentExp;
+                        APP_STATE.dataPoints = parsed.dataPoints || [];
+                    }
+                } catch(e) { console.error("Could not load save data"); }
+            }
+        }
+
         function updateTableHeaders() {
             const head = document.getElementById('data-table-head');
             let tr = document.createElement('tr');
-            if (APP_STATE.currentExp === 'plateau') { tr.innerHTML = `<th>S.No</th><th>Voltage (V)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>Error (±)</th>`; }
-            else if (APP_STATE.currentExp === 'isl') { tr.innerHTML = `<th>S.No</th><th>Dist d (cm)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>1/d² (cm⁻²)</th>`; }
-            else if (APP_STATE.currentExp === 'absorption') { tr.innerHTML = `<th>S.No</th><th>Thickness (cm)</th><th>Time (s)</th><th>Counts (N)</th><th>Net CPS</th><th>Ln(Net CPS)</th>`; }
-            else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elapsed Time (s)</th><th>Duration (min)</th><th>Counts Reading (N)</th><th>Corrected CPM</th><th>Log(N)</th>`; }
+            if (APP_STATE.currentExp === 'plateau') { tr.innerHTML = `<th>S.No</th><th>Voltage ($V$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>Error ($\\pm$)</th>`; }
+            else if (APP_STATE.currentExp === 'isl') { tr.innerHTML = `<th>S.No</th><th>Dist $d$ ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$1/d^2$ ($cm^{-2}$)</th>`; }
+            else if (APP_STATE.currentExp === 'absorption') { tr.innerHTML = `<th>S.No</th><th>Thickness ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$\\ln(CPS)$</th>`; }
+            else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elapsed Time ($s$)</th><th>Duration ($min$)</th><th>Counts Reading ($N$)</th><th>Corrected CPM</th><th>$\\log(N)$</th>`; }
             head.innerHTML = ''; head.appendChild(tr);
+            renderMath();
         }
 
         function recordData() {
@@ -1067,26 +1116,31 @@
             else if (APP_STATE.currentExp === 'absorption') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
             else if (APP_STATE.currentExp === 'halflife') rowData = { sno: APP_STATE.dataPoints.length + 1, x: APP_STATE.masterTime - T, dur: (T/60).toFixed(2), N: N, y: Math.max(0, (N * (60/T)) - APP_STATE.bgRateCPM), logN: N > 0 ? Math.log10(N).toFixed(3) : 0 };
 
-            APP_STATE.dataPoints.push(rowData); renderTable();
+            APP_STATE.dataPoints.push(rowData); 
+            renderTable();
+            saveDataToStorage();
         }
 
         function renderTable() {
             const tbody = document.getElementById('data-table-body'); tbody.innerHTML = '';
             APP_STATE.dataPoints.forEach(row => {
                 let tr = document.createElement('tr');
-                if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>±${row.err}</td>`;
+                if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>$\\pm ${row.err}$</td>`;
                 else if (APP_STATE.currentExp === 'isl') tr.innerHTML = `<td>${row.sno}</td><td>${row.d}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.x.toFixed(4)}</td>`;
                 else if (APP_STATE.currentExp === 'absorption') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
                 else if (APP_STATE.currentExp === 'halflife') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.dur}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.logN}</td>`;
                 tbody.appendChild(tr);
             });
+            renderMath();
         }
 
         function clearData() {
             APP_STATE.dataPoints = []; renderTable(); updateGraph();
+            saveDataToStorage();
             document.getElementById('ai-output').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500 text-center"><i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i><p>Data cleared. Ready for new measurements.</p></div>`;
         }
 
+        // Advanced Graph Engine with Best Fit Overlay and Grid
         function updateGraph() {
             const canvas = document.getElementById('graph-canvas'); const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
@@ -1098,14 +1152,28 @@
             }
 
             const m = 50; const w = canvas.width - m * 2; const h = canvas.height - m * 2;
+            
+            // Draw Grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for(let i=1; i<10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(m, m + (h/10)*i); ctx.lineTo(w + m, m + (h/10)*i); // Horiz
+                ctx.moveTo(m + (w/10)*i, m); ctx.lineTo(m + (w/10)*i, m + h); // Vert
+                ctx.stroke();
+            }
+
+            // Axes
             ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2; ctx.beginPath();
             ctx.moveTo(m, m); ctx.lineTo(m, h + m); ctx.lineTo(w + m, h + m); ctx.stroke();
 
+            // Limits
             let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x)); let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x));
             let minY = 0; let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
             if (minX === maxX) { minX -= 1; maxX += 1; }
             if (maxY === 0) maxY = 10; maxY *= 1.1;
 
+            // Labels
             ctx.fillStyle = '#34d399'; ctx.font = '12px monospace'; ctx.textAlign = 'center';
             let xLabel = "X Axis", yLabel = "Y Axis";
             if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; }
@@ -1116,23 +1184,54 @@
             ctx.fillText(xLabel, m + w/2, h + m + 35);
             ctx.save(); ctx.translate(m - 35, m + h/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel, 0, 0); ctx.restore();
 
-            ctx.fillStyle = '#f43f5e';
-            APP_STATE.dataPoints.forEach(p => {
-                let px = m + ((p.x - minX) / (maxX - minX)) * w; let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
-                ctx.beginPath(); ctx.arc(px, py, 4, 0, 2*Math.PI); ctx.fill();
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
-            });
+            // Plot Linear Regression Line (Best Fit)
+            if (APP_STATE.dataPoints.length >= 2 && APP_STATE.currentExp !== 'plateau') { // Plateau isn't fully linear
+                const n = APP_STATE.dataPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
+                APP_STATE.dataPoints.forEach(p => {
+                    let calcY = p.y;
+                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    sumX += p.x; sumY += calcY; sumXY += p.x * calcY; sumX2 += p.x * p.x;
+                });
+                let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                let intercept = (sumY - slope * sumX) / n;
 
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.4)'; // Rose 400 with opacity
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // Dashed line
+                ctx.beginPath();
+                
+                // For log plots, y axis mapped differently vs linear fits. For visual simplicity, 
+                // we'll draw the fit if it's a linear ISL, otherwise we just draw the connecting line.
+                if (APP_STATE.currentExp === 'isl') {
+                    let startYFit = slope * minX + intercept;
+                    let endYFit = slope * maxX + intercept;
+                    let py1 = m + h - ((startYFit - minY) / (maxY - minY)) * h;
+                    let py2 = m + h - ((endYFit - minY) / (maxY - minY)) * h;
+                    ctx.moveTo(m, py1); ctx.lineTo(m+w, py2);
+                    ctx.stroke();
+                }
+                ctx.setLineDash([]); // Reset
+            }
+
+            // Plot connecting line
             ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)'; ctx.lineWidth = 2; ctx.beginPath();
             APP_STATE.dataPoints.sort((a,b) => a.x - b.x).forEach((p, i) => {
                 let px = m + ((p.x - minX) / (maxX - minX)) * w; let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
                 if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
             });
             ctx.stroke();
+
+            // Plot points
+            ctx.fillStyle = '#f43f5e';
+            APP_STATE.dataPoints.forEach(p => {
+                let px = m + ((p.x - minX) / (maxX - minX)) * w; let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
+                ctx.beginPath(); ctx.arc(px, py, 4, 0, 2*Math.PI); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+            });
         }
 
         /* =========================================================================
-           9. AI AUTO-SOLVER & LOGIC
+           9. AI AUTO-SOLVER & LOGIC (With LaTeX formatting)
            ========================================================================= */
         function runAISolver() {
             const out = document.getElementById('ai-output');
@@ -1152,22 +1251,38 @@
 
                 let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
                 
-                if (APP_STATE.currentExp === 'plateau') { html += `<p><strong>Analysis:</strong> GM Tube Plateau</p><p>Avg Slope across data: ${slope.toFixed(4)} CPS/V</p>`; } 
-                else if (APP_STATE.currentExp === 'isl') { html += `<p><strong>Analysis:</strong> Inverse Square Law</p><p>Linear relationship (K = ${slope.toFixed(2)}) verifies $I \\propto 1/d^2$.</p>`; }
+                if (APP_STATE.currentExp === 'plateau') { 
+                    html += `<p><strong>Analysis:</strong> GM Tube Plateau</p>
+                             <p>Avg Slope across data: $${slope.toFixed(4)} \\text{ CPS/V}$</p>`; 
+                } 
+                else if (APP_STATE.currentExp === 'isl') { 
+                    html += `<p><strong>Analysis:</strong> Inverse Square Law</p>
+                             <p>Linear relationship with slope $K = ${slope.toFixed(2)}$ verifies $I \\propto \\frac{1}{d^2}$.</p>`; 
+                }
                 else if (APP_STATE.currentExp === 'absorption') {
                     let mu = -slope; let hvt = 0.693 / mu; let R_gcm2 = (hvt * 7) * 2.7; let Emax = (R_gcm2 + 0.09) / 0.52;
-                    html += `<p><strong>Analysis:</strong> Beta Absorption</p><p>Linear Slope ($\\mu$) = ${mu.toFixed(3)} cm⁻¹</p><p>Half-Value Thickness ($t_{1/2}$) = ${hvt.toFixed(3)} cm</p><p class="text-rose-400 mt-2"><strong>End-Point Energy ($E_{max}$):</strong> ${Emax.toFixed(3)} MeV</p>`;
+                    html += `<p><strong>Analysis:</strong> Beta Absorption</p>
+                             <p>Equation applied: $\\ln(I) = \\ln(I_0) - \\mu t$</p>
+                             <p>Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p>
+                             <p>Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed End-Point Energy ($E_{\\max}$):</strong> $${Emax.toFixed(3)} \\text{ MeV}$</p>`;
                 }
                 else if (APP_STATE.currentExp === 'halflife') {
                     let lambda = -slope; let t12 = 0.693 / lambda;
-                    html += `<p><strong>Analysis:</strong> Radioactive Half-Life</p><p>Decay Constant ($\\lambda$) = ${lambda.toFixed(5)} s⁻¹</p><p class="text-rose-400 mt-2"><strong>Half-Life ($T_{1/2}$):</strong> ${t12.toFixed(1)} s</p>`;
+                    html += `<p><strong>Analysis:</strong> Radioactive Half-Life</p>
+                             <p>Equation applied: $\\ln(A) = \\ln(A_0) - \\lambda t$</p>
+                             <p>Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed Half-Life ($T_{1/2}$):</strong> $${t12.toFixed(1)} \\text{ s}$</p>`;
                 }
                 out.innerHTML = html;
-                speakText("Analysis complete. " + out.innerText.replace(/[\$\\]/g, ''));
+                renderMath(); // Re-render LaTeX natively
+                speakText("Analysis complete. Check the computation results panel for detailed parameters.");
             }, 1000);
         }
 
-        /* (Exports, Widgets, Calc, and other utility functions remain unchanged) */
+        /* =========================================================================
+           10. EXPORTS & WIDGET UTILS
+           ========================================================================= */
         function exportCSV() {
             if(APP_STATE.dataPoints.length === 0) return alert("No data.");
             let head = document.getElementById('data-table-head').innerText.replace(/\t/g, ',');
@@ -1185,17 +1300,64 @@
 
         function generateHTMLReport() {
             if(APP_STATE.dataPoints.length === 0) return alert("Run experiment first.");
-            let htmlContent = `<!DOCTYPE html><html><head><title>Lab Report</title><style>body { font-family: sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #aaa; padding: 8px; text-align: center; } .calc { background: #eef; padding: 15px; }</style></head><body><h1>Experiment Report</h1><h2>Observation Table</h2><table><thead>${document.getElementById('data-table-head').innerHTML}</thead><tbody>${document.getElementById('data-table-body').innerHTML}</tbody></table><h2>Computations</h2><div class="calc">${document.getElementById('ai-output').innerText.replace(/\n/g, '<br>')}</div></body></html>`;
+            
+            // Get graph image data
+            const canvas = document.getElementById('graph-canvas');
+            const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d'); tCtx.fillStyle = '#ffffff'; tCtx.fillRect(0,0, tempCanvas.width, tempCanvas.height); tCtx.drawImage(canvas, 0, 0);
+            const imgData = tempCanvas.toDataURL("image/png");
+
+            // Strip out raw LaTeX for pure HTML fallback (or inject MathJax into exported HTML)
+            let rawTable = document.getElementById('data-table-body').innerHTML.replace(/<td.*?>/g, "<td>");
+            let rawHead = document.getElementById('data-table-head').innerHTML.replace(/<th.*?>/g, "<th>");
+            
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html><head><title>Lab Report</title>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; max-width: 900px; margin: auto; color: #333; } 
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } 
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: center; } 
+                th { background-color: #f8f9fa; }
+                .calc { background: #eef2f5; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9; }
+                .graph-container { text-align: center; margin: 30px 0; padding: 20px; background: #000; border-radius: 8px;}
+                img { max-width: 100%; height: auto; }
+            </style>
+            <!-- Embed MathJax in Report -->
+            <script>
+                window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\\\(', '\\\\)']] } };
+            <\/script>
+            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"><\/script>
+            </head><body>
+            <h1>Comprehensive Experiment Report</h1>
+            <p><strong>Experiment:</strong> ${document.getElementById('exp-selector').options[document.getElementById('exp-selector').selectedIndex].text}</p>
+            <p><strong>Date Generated:</strong> ${new Date().toLocaleString()}</p>
+            
+            <h2>1. Observation Table</h2>
+            <table><thead>${rawHead}</thead><tbody>${rawTable}</tbody></table>
+            
+            <h2>2. Graphical Plot</h2>
+            <div class="graph-container">
+                <img src="${imgData}" alt="Experiment Graph">
+            </div>
+
+            <h2>3. Mathematical Analysis & Computations</h2>
+            <div class="calc">${document.getElementById('ai-output').innerHTML}</div>
+            
+            <p style="text-align:center; color:#888; margin-top:50px; font-size: 0.9em;">Generated automatically by Virtual Nuclear Physics Lab Engine.</p>
+            </body></html>`;
+            
             const blob = new Blob([htmlContent], { type: 'text/html' });
-            const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob); a.download = `Report_${APP_STATE.currentExp}.html`; a.click();
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob); a.download = `LabReport_${APP_STATE.currentExp}.html`; a.click();
         }
 
         function loadManual() {
             const manual = document.getElementById('manual-content');
-            if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<strong>Theory:</strong> GM plateau is the voltage region where count rate is virtually constant.`;
-            else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<strong>Theory:</strong> Radiation intensity follows $I \\propto 1/d^2$.`;
-            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<strong>Theory:</strong> Beta particles attenuate via $I = I_0 e^{-\\mu t}$.`;
-            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<strong>Theory:</strong> Radioactive decay follows $N(t) = N_0 e^{-\\lambda t}$.`;
+            if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<strong>Theory:</strong> GM plateau is the voltage region where count rate is virtually constant. Operational voltage is generally $V_{op} \approx V_{threshold} + 100\\text{V}$.`;
+            else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<strong>Theory:</strong> Radiation intensity follows the inverse square law: $I \\propto \\frac{1}{d^2}$. A plot of Rate vs $1/d^2$ yields a straight line.`;
+            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<strong>Theory:</strong> Beta particles attenuate exponentially via $I = I_0 e^{-\\mu t}$. Half value thickness is $t_{1/2} = \\frac{\\ln(2)}{\\mu}$.`;
+            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<strong>Theory:</strong> Radioactive decay follows $N(t) = N_0 e^{-\\lambda t}$. Half life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.`;
+            renderMath();
         }
         function readManual() { speakText(document.getElementById('manual-content').innerText); }
         function switchTab(tabId) {
@@ -1223,11 +1385,18 @@
             const input = document.getElementById('chat-input'); const msg = input.value.trim().toLowerCase(); if(!msg) return;
             const history = document.getElementById('chat-history'); history.innerHTML += `<div class="text-white text-right mb-2">> ${input.value}</div>`; input.value = '';
             let reply = "Ask about GM plateau, inverse square law, absorption, half-life, or Poisson error.";
-            if(msg.includes('poisson') || msg.includes('error')) reply = "Error = ±√N based on Poisson statistics.";
-            else if (msg.includes('plateau')) reply = "The GM plateau provides a stable voltage region for reliable counting.";
-            else if (msg.includes('inverse') || msg.includes('isl')) reply = "Intensity drops rapidly as the square of the distance (1/d²).";
-            else if (msg.includes('absorption')) reply = "Beta particles are absorbed exponentially by matter like Aluminum.";
-            setTimeout(() => { history.innerHTML += `<div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50 mb-2"><strong>System:</strong> ${reply}</div>`; history.scrollTop = history.scrollHeight; speakText(reply); }, 600);
+            if(msg.includes('poisson') || msg.includes('error')) reply = "The statistical error in nuclear counting is strictly related to Poisson statistics. Therefore, Error $= \\pm \\sqrt{N}$.";
+            else if (msg.includes('plateau')) reply = "The GM plateau provides a stable voltage region for reliable counting, avoiding proportional or continuous discharge zones.";
+            else if (msg.includes('inverse') || msg.includes('isl')) reply = "Intensity drops rapidly as the square of the distance: $I \\propto \\frac{1}{d^2}$.";
+            else if (msg.includes('absorption')) reply = "Beta particles are absorbed exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$";
+            else if (msg.includes('half')) reply = "Half life relates to the decay constant: $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$";
+            
+            setTimeout(() => { 
+                history.innerHTML += `<div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50 mb-2"><strong>System:</strong> ${reply}</div>`; 
+                history.scrollTop = history.scrollHeight; 
+                renderMath(); // Render any LaTeX injected in chat
+                speakText(reply); 
+            }, 600);
         }
     </script>
 </body>
