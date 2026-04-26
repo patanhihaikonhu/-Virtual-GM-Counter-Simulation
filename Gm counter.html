@@ -218,7 +218,7 @@
         <!-- Left Column: Apparatus & Controls -->
         <aside class="lg:col-span-5 flex flex-col gap-6">
             
-            <!-- VIRTUAL APPARATUS VISUALIZER (NEW) -->
+            <!-- VIRTUAL APPARATUS VISUALIZER -->
             <div class="glass-panel rounded-xl p-4 relative overflow-hidden group border-b-4 border-b-cyan-500/50">
                 <h2 class="font-display text-cyan-400 font-bold mb-2 flex justify-between items-center">
                     <span><i class="fa-solid fa-microscope mr-2"></i>LIVE APPARATUS</span>
@@ -278,6 +278,8 @@
                     <option value="isl">2. Inverse Square Law ($I \propto 1/d^2$)</option>
                     <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
                     <option value="halflife">4. Radioactive Half-Life</option>
+                    <!-- NEW EXPERIMENT OPTION ADDED HERE -->
+                    <option value="abs_factor">5. Absorption Factor ($\mu$, $\mu_m$) of Al</option>
                 </select>
 
                 <!-- Dynamic Controls -->
@@ -499,7 +501,7 @@
         </div>
         <div id="chat-history" class="flex-grow p-3 overflow-y-auto bg-dark-900/80 font-mono text-xs space-y-3">
             <div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50">
-                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, or ISL. (Math will render automatically via MathJax).
+                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, ISL, or Mass Absorption. (Math will render automatically via MathJax).
             </div>
         </div>
         <div class="p-2 bg-dark-800 border-t border-gray-700 flex gap-1">
@@ -749,6 +751,13 @@
                 DOM.source.value = 'ba137m';
                 DOM.voltage.value = 500;
                 DOM.distance.value = 2;
+            } else if (APP_STATE.currentExp === 'abs_factor') {
+                // NEW EXPERIMENT INITIALIZATION
+                document.getElementById('ctrl-thickness').style.opacity = '1';
+                document.getElementById('input-thickness').disabled = false;
+                DOM.source.value = 'cs137'; // Cs-137 works well for standard absorption
+                DOM.voltage.value = 500;
+                DOM.distance.value = 5;
             }
             updateParameters();
             updateTableHeaders();
@@ -769,7 +778,7 @@
         }
 
         /* =========================================================================
-           5. APPARATUS VISUALIZATION ENGINE (NEW)
+           5. APPARATUS VISUALIZATION ENGINE
            ========================================================================= */
         let visualApparatusInterval;
         let vCanvas, vCtx;
@@ -817,7 +826,9 @@
 
             const absorberContainer = document.getElementById('visual-absorber-container');
             const absorber = document.getElementById('visual-absorber');
-            if (APP_STATE.currentExp === 'absorption' && thick > 0) {
+            
+            // Show Absorber for both Absorption experiments
+            if ((APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') && thick > 0) {
                 absorberContainer.style.opacity = '1';
                 const widthPx = 2 + (thick / 0.5) * 18;
                 absorber.style.width = `${widthPx}px`;
@@ -878,7 +889,8 @@
             let hasAbsorber = false;
             let absorptionProb = 0;
 
-            if (APP_STATE.currentExp === 'absorption') {
+            // Apply to both Absorption experiments
+            if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') {
                 const thick = parseFloat(DOM.thickness.value);
                 if (thick > 0) {
                     hasAbsorber = true;
@@ -969,7 +981,8 @@
                 let R = baseRate / Math.pow(d + 0.5, 2);
                 calculatedCPM += R;
             }
-            else if (exp === 'absorption') {
+            // Same physical attenuation equation applied for both Absorption experiments
+            else if (exp === 'absorption' || exp === 'abs_factor') {
                 let R0 = baseRate / Math.pow(5 + 0.5, 2); 
                 calculatedCPM += R0 * Math.exp(-14.0 * t);
             }
@@ -1082,8 +1095,6 @@
             if (dataStr) {
                 try {
                     const parsed = JSON.parse(dataStr);
-                    // Only load if it matches the current starting experiment (plateau by default)
-                    // or let's actually just load the experiment they were on!
                     if (parsed.currentExp) {
                         document.getElementById('exp-selector').value = parsed.currentExp;
                         APP_STATE.currentExp = parsed.currentExp;
@@ -1098,7 +1109,8 @@
             let tr = document.createElement('tr');
             if (APP_STATE.currentExp === 'plateau') { tr.innerHTML = `<th>S.No</th><th>Voltage ($V$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>Error ($\\pm$)</th>`; }
             else if (APP_STATE.currentExp === 'isl') { tr.innerHTML = `<th>S.No</th><th>Dist $d$ ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$1/d^2$ ($cm^{-2}$)</th>`; }
-            else if (APP_STATE.currentExp === 'absorption') { tr.innerHTML = `<th>S.No</th><th>Thickness ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$\\ln(CPS)$</th>`; }
+            // Both absorption experiments share the same table structure
+            else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { tr.innerHTML = `<th>S.No</th><th>Thickness ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$\\ln(CPS)$</th>`; }
             else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elapsed Time ($s$)</th><th>Duration ($min$)</th><th>Counts Reading ($N$)</th><th>Corrected CPM</th><th>$\\log(N)$</th>`; }
             head.innerHTML = ''; head.appendChild(tr);
             renderMath();
@@ -1113,7 +1125,8 @@
             let rowData = {};
             if (APP_STATE.currentExp === 'plateau') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(V), t: T, N: N, y: netCPS, err: error.toFixed(2) };
             else if (APP_STATE.currentExp === 'isl') rowData = { sno: APP_STATE.dataPoints.length + 1, d: parseFloat(d), t: T, N: N, y: netCPS, x: 1 / Math.pow(parseFloat(d), 2) };
-            else if (APP_STATE.currentExp === 'absorption') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
+            // Record identically for both absorption experiments
+            else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
             else if (APP_STATE.currentExp === 'halflife') rowData = { sno: APP_STATE.dataPoints.length + 1, x: APP_STATE.masterTime - T, dur: (T/60).toFixed(2), N: N, y: Math.max(0, (N * (60/T)) - APP_STATE.bgRateCPM), logN: N > 0 ? Math.log10(N).toFixed(3) : 0 };
 
             APP_STATE.dataPoints.push(rowData); 
@@ -1127,7 +1140,7 @@
                 let tr = document.createElement('tr');
                 if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>$\\pm ${row.err}$</td>`;
                 else if (APP_STATE.currentExp === 'isl') tr.innerHTML = `<td>${row.sno}</td><td>${row.d}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.x.toFixed(4)}</td>`;
-                else if (APP_STATE.currentExp === 'absorption') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
+                else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
                 else if (APP_STATE.currentExp === 'halflife') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.dur}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.logN}</td>`;
                 tbody.appendChild(tr);
             });
@@ -1178,7 +1191,8 @@
             let xLabel = "X Axis", yLabel = "Y Axis";
             if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; }
             if(APP_STATE.currentExp === 'isl') { xLabel = "1/d² (cm⁻²)"; yLabel = "Net CPS"; }
-            if(APP_STATE.currentExp === 'absorption') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; }
+            // Labels applied to both absorption experiments
+            if(APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; }
             if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "Corrected CPM"; }
 
             ctx.fillText(xLabel, m + w/2, h + m + 35);
@@ -1189,7 +1203,8 @@
                 const n = APP_STATE.dataPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
                 APP_STATE.dataPoints.forEach(p => {
                     let calcY = p.y;
-                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    // Apply Log mapping for absorption, abs_factor, and halflife
+                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
                     sumX += p.x; sumY += calcY; sumXY += p.x * calcY; sumX2 += p.x * p.x;
                 });
                 let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
@@ -1200,8 +1215,7 @@
                 ctx.setLineDash([5, 5]); // Dashed line
                 ctx.beginPath();
                 
-                // For log plots, y axis mapped differently vs linear fits. For visual simplicity, 
-                // we'll draw the fit if it's a linear ISL, otherwise we just draw the connecting line.
+                // For visual simplicity in linear plotting
                 if (APP_STATE.currentExp === 'isl') {
                     let startYFit = slope * minX + intercept;
                     let endYFit = slope * maxX + intercept;
@@ -1245,7 +1259,8 @@
                 
                 APP_STATE.dataPoints.forEach(p => {
                     let calcX = p.x, calcY = p.y;
-                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    // Apply Math.log mapping for both absorption experiments and halflife
+                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
                     sumX += calcX; sumY += calcY; sumXY += calcX * calcY; sumX2 += calcX * calcX;
                 });
 
@@ -1261,11 +1276,22 @@
                 }
                 else if (APP_STATE.currentExp === 'absorption') {
                     let mu = -slope; let hvt = 0.693 / mu; let R_gcm2 = (hvt * 7) * 2.7; let Emax = (R_gcm2 + 0.09) / 0.52;
-                    html += `<p><strong>Analysis:</strong> Beta Absorption</p>
+                    html += `<p><strong>Analysis:</strong> Beta Absorption (End-Point Energy)</p>
                              <p>Equation applied: $\\ln(I) = \\ln(I_0) - \\mu t$</p>
                              <p>Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p>
                              <p>Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p>
                              <p class="text-rose-400 mt-2"><strong>Computed End-Point Energy ($E_{\\max}$):</strong> $${Emax.toFixed(3)} \\text{ MeV}$</p>`;
+                }
+                // NEW: Logic specifically for the Absorption Factor Experiment
+                else if (APP_STATE.currentExp === 'abs_factor') {
+                    let mu = -slope; 
+                    let hvt = 0.693 / mu; 
+                    let mu_m = mu / 2.70; // Density of Aluminum = 2.70 g/cm^3
+                    html += `<p><strong>Analysis:</strong> Absorption Factor of Aluminum</p>
+                             <p>Equation applied: $\\ln(I) = \\ln(I_0) - \\mu t$</p>
+                             <p>Linear Absorption Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p>
+                             <p>Half-Value Thickness ($HVT$) = $${hvt.toFixed(3)} \\text{ cm}$</p>
+                             <p class="text-rose-400 mt-2"><strong>Mass Absorption Coefficient ($\\mu_m$):</strong> $${mu_m.toFixed(3)} \\text{ cm}^2\\text{/g}$</p>`;
                 }
                 else if (APP_STATE.currentExp === 'halflife') {
                     let lambda = -slope; let t12 = 0.693 / lambda;
@@ -1355,7 +1381,9 @@
             const manual = document.getElementById('manual-content');
             if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<strong>Theory:</strong> GM plateau is the voltage region where count rate is virtually constant. Operational voltage is generally $V_{op} \approx V_{threshold} + 100\\text{V}$.`;
             else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<strong>Theory:</strong> Radiation intensity follows the inverse square law: $I \\propto \\frac{1}{d^2}$. A plot of Rate vs $1/d^2$ yields a straight line.`;
-            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<strong>Theory:</strong> Beta particles attenuate exponentially via $I = I_0 e^{-\\mu t}$. Half value thickness is $t_{1/2} = \\frac{\\ln(2)}{\\mu}$.`;
+            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<strong>Theory:</strong> Beta particles attenuate exponentially via $I = I_0 e^{-\\mu t}$. Half value thickness is $t_{1/2} = \\frac{\\ln(2)}{\\mu}$. End-Point energy is derived from empirical range.`;
+            // NEW MANUAL TEXT
+            else if (APP_STATE.currentExp === 'abs_factor') manual.innerHTML = `<strong>Theory:</strong> Radiation intensity decreases exponentially as it passes through an absorber according to the law $I = I_0 e^{-\\mu t}$. The linear absorption coefficient ($\\mu$) depends on the material. The mass absorption coefficient is $\\mu_m = \\frac{\\mu}{\\rho}$, where $\\rho$ is the density of the absorber (Aluminum $\\approx 2.70 \\text{ g/cm}^3$).`;
             else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<strong>Theory:</strong> Radioactive decay follows $N(t) = N_0 e^{-\\lambda t}$. Half life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.`;
             renderMath();
         }
@@ -1388,6 +1416,7 @@
             if(msg.includes('poisson') || msg.includes('error')) reply = "The statistical error in nuclear counting is strictly related to Poisson statistics. Therefore, Error $= \\pm \\sqrt{N}$.";
             else if (msg.includes('plateau')) reply = "The GM plateau provides a stable voltage region for reliable counting, avoiding proportional or continuous discharge zones.";
             else if (msg.includes('inverse') || msg.includes('isl')) reply = "Intensity drops rapidly as the square of the distance: $I \\propto \\frac{1}{d^2}$.";
+            else if (msg.includes('mass') || msg.includes('factor')) reply = "The Mass Absorption coefficient removes the dependence on the density of the absorber. $\\mu_m = \\frac{\\mu}{\\rho}$.";
             else if (msg.includes('absorption')) reply = "Beta particles are absorbed exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$";
             else if (msg.includes('half')) reply = "Half life relates to the decay constant: $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$";
             
