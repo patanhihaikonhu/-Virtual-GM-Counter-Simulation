@@ -1,3 +1,7 @@
+
+Click here to open
+https://patanhihaikonhu.github.io/-Virtual-GM-Counter-Simulation/Gm%20counter.html
+
 Virtual Nuclear Physics Lab ☢️
 
 A comprehensive, browser-based interactive simulation for conducting classic nuclear physics experiments. This project features a virtual Geiger-Müller (GM) counter apparatus, realistic real-time particle decay physics, and dynamic graphing capabilities.
