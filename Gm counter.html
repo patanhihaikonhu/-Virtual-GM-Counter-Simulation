@@ -296,7 +296,10 @@
             
             <button onclick="closeUpdateModal()" class="w-full liquid-btn bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 py-4 rounded-xl font-bold hover:bg-cyan-500/30 hover:text-white transition-colors uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(0,242,254,0.3)]">
                 I Promise To Be Quiet
-            </button>
+            </button> <br>
+            <a href="https://patanhihaikonhu.github.io/-Virtual-GM-Counter-Simulation/Gm%20counter(1).html" class="w-full liquid-btn bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 py-4 rounded-xl font-bold hover:bg-cyan-500/30 hover:text-white transition-colors uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(0,242,254,0.3)]">
+                Previous version
+            </a>
         </div>
     </div>
 
@@ -318,7 +321,7 @@
                         <option value="amber">Retro CRT Amber</option>
                     </select>
                 </div>
-                <div>                    <span><a href="https://patanhihaikonhu.github.io/-Virtual-GM-Counter-Simulation/Gm%20counter(1).html" class="font-sans text-xs uppercase tracking-wider text-gray-400">Previous version</a> </span></div>
+                
                 <!-- CRT Toggle -->
                 <div class="flex items-center justify-between border-t border-gray-700/50 pt-4">
                     <span class="font-sans text-xs uppercase tracking-wider text-gray-400">Enable CRT Scanlines</span>
@@ -447,7 +450,7 @@
             <div class="liquid-panel p-4 md:p-5 flex-grow flex flex-col">
                 <h2 class="font-display text-cyan-400 font-bold text-xs md:text-sm mb-4 border-b border-white/10 pb-2 tracking-wider"><i class="fa-solid fa-sliders mr-2"></i>PHYSICS CONFIGURATION</h2>
                 
-                <select id="exp-selector" onchange="setupExperimentUI()" class="w-full bg-black/60 border border-cyan-500/30 text-white rounded-xl p-3 md:p-3.5 mb-5 font-mono text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[inset_0_2px_10px_rgba(0,0,0,0.6)] appearance-none cursor-pointer">
+                <select id="exp-selector" class="w-full bg-black/60 border border-cyan-500/30 text-white rounded-xl p-3 md:p-3.5 mb-5 font-mono text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[inset_0_2px_10px_rgba(0,0,0,0.6)] appearance-none cursor-pointer">
                     <option value="plateau">1. GM Tube Plateau Characteristics</option>
                     <option value="isl">2. Inverse Square Law ($I \propto 1/d^2$)</option>
                     <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
@@ -458,7 +461,7 @@
                 <div class="space-y-6 text-xs md:text-sm font-mono flex-grow">
                     <div id="ctrl-source" class="transition-opacity duration-300">
                         <label class="block text-gray-400 mb-2">Radioactive Source Isotope</label>
-                        <select id="input-source" onchange="updateParameters()" class="w-full bg-black/60 border border-gray-600/50 rounded-lg p-3 text-white outline-none appearance-none shadow-inner cursor-pointer">
+                        <select id="input-source" class="w-full bg-black/60 border border-gray-600/50 rounded-lg p-3 text-white outline-none appearance-none shadow-inner cursor-pointer">
                             <option value="co60">Cobalt-60 ($\gamma, \beta^-$)</option>
                             <option value="sr90">Strontium-90 ($\beta^-$)</option>
                             <option value="cs137">Cesium-137 ($\gamma, \beta^-$)</option>
@@ -471,7 +474,7 @@
                             <span>High Voltage (HV)</span>
                             <span id="val-voltage" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">500 V</span>
                         </label>
-                        <input type="range" id="input-voltage" oninput="updateVal('voltage', this.value, ' V')" min="300" max="1000" step="10" value="500">
+                        <input type="range" id="input-voltage" min="300" max="1000" step="10" value="500">
                     </div>
 
                     <div id="ctrl-distance" class="transition-opacity duration-300">
@@ -479,7 +482,7 @@
                             <span>Distance ($d$)</span>
                             <span id="val-distance" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">10 cm</span>
                         </label>
-                        <input type="range" id="input-distance" oninput="updateVal('distance', this.value, ' cm')" min="2" max="50" step="1" value="10">
+                        <input type="range" id="input-distance" min="2" max="50" step="1" value="10">
                     </div>
 
                     <div id="ctrl-thickness" class="transition-opacity duration-300">
@@ -487,7 +490,7 @@
                             <span>Al Thickness ($t$)</span>
                             <span id="val-thickness" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">0.00 cm</span>
                         </label>
-                        <input type="range" id="input-thickness" oninput="updateVal('thickness', this.value, ' cm')" min="0" max="0.5" step="0.01" value="0">
+                        <input type="range" id="input-thickness" min="0" max="0.5" step="0.01" value="0">
                     </div>
                 </div>
 
@@ -496,7 +499,7 @@
                         <span>Preset Timer Duration</span>
                         <span id="val-timer" class="text-emerald-400 font-bold bg-emerald-900/30 px-2 py-1 rounded border border-emerald-500/20">60 s</span>
                     </label>
-                    <input type="range" id="input-timer" oninput="formatTimer(this.value)" min="10" max="3600" step="10" value="60">
+                    <input type="range" id="input-timer" min="10" max="3600" step="10" value="60">
                 </div>
             </div>
 
@@ -671,8 +674,8 @@
         </div>
 
         <div class="p-3 bg-slate-950/90 border-t border-gray-700/50 flex gap-2 rounded-b-2xl">
-            <input type="text" id="chat-input" onkeypress="if(event.key === 'Enter') sendChat()" class="flex-grow bg-[#020617] text-white px-3 py-3 rounded-lg text-xs focus:outline-none border border-gray-700 focus:border-blue-400 transition-colors shadow-inner" placeholder="Type query here...">
-            <button onclick="sendChat()" class="liquid-btn bg-blue-500/20 text-blue-300 px-4 rounded-lg border-blue-500/30 hover:bg-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]"><i class="fa-solid fa-paper-plane"></i></button>
+            <input type="text" id="chat-input" class="flex-grow bg-[#020617] text-white px-3 py-3 rounded-lg text-xs focus:outline-none border border-gray-700 focus:border-blue-400 transition-colors shadow-inner" placeholder="Type query here...">
+            <button id="btn-send-chat" class="liquid-btn bg-blue-500/20 text-blue-300 px-4 rounded-lg border-blue-500/30 hover:bg-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -928,7 +931,7 @@
             playUIBeep(200, 0.4, 'sawtooth'); speakText("System successfully reset.");
         }
 
-        // Init Button directly inside DOM Event
+        // Init Button event
         document.getElementById('btn-init')?.addEventListener('click', function() {
             try { initAudio(); } catch(e) {}
             const intro = document.getElementById('intro-screen');
@@ -961,12 +964,6 @@
             }, 1000);
         }
 
-        function updateVal(id, val, unit) { 
-            const el = document.getElementById(`val-${id}`);
-            if(el) el.innerText = `${val}${unit}`; 
-            updateParameters(); 
-        }
-        
         function formatTimer(val) { 
             let mins = String(Math.floor(val / 60)).padStart(2, '0'); 
             let secs = String(val % 60).padStart(2, '0'); 
@@ -1009,8 +1006,31 @@
                 if(DOM.distance) DOM.distance.value = 2; 
                 if(DOM.thickness) DOM.thickness.value = 0;
             }
+            
+            // Sync values
+            if(DOM.voltage) { document.getElementById('val-voltage').innerText = `${DOM.voltage.value} V`; }
+            if(DOM.distance) { document.getElementById('val-distance').innerText = `${DOM.distance.value} cm`; }
+            if(DOM.thickness) { document.getElementById('val-thickness').innerText = `${DOM.thickness.value} cm`; }
+
             updateParameters(); updateTableHeaders(); loadManual(); renderTable(); updateGraph(); renderMath();
         }
+
+        // We export updateVal logic to ensure input events work
+        document.getElementById('input-voltage')?.addEventListener('input', (e) => { 
+            document.getElementById('val-voltage').innerText = `${e.target.value} V`; 
+            updateParameters(); 
+        });
+        document.getElementById('input-distance')?.addEventListener('input', (e) => { 
+            document.getElementById('val-distance').innerText = `${e.target.value} cm`; 
+            updateParameters(); 
+        });
+        document.getElementById('input-thickness')?.addEventListener('input', (e) => { 
+            document.getElementById('val-thickness').innerText = `${e.target.value} cm`; 
+            updateParameters(); 
+        });
+        document.getElementById('input-timer')?.addEventListener('input', (e) => formatTimer(e.target.value));
+        document.getElementById('exp-selector')?.addEventListener('change', setupExperimentUI);
+        document.getElementById('input-source')?.addEventListener('change', updateParameters);
 
         function updateParameters() {
             if(!DOM.voltage || !DOM.distance || !DOM.thickness || !DOM.source) return;
@@ -1024,14 +1044,8 @@
                 if(parseFloat(thickInput.value) > 0.5) thickInput.value = "0"; 
             }
             
-            const vVal = document.getElementById('val-voltage');
-            if(vVal) vVal.innerText = `${DOM.voltage.value} V`; 
-            const dVal = document.getElementById('val-distance');
-            if(dVal) dVal.innerText = `${DOM.distance.value} cm`; 
-            const tVal = document.getElementById('val-thickness');
-            if(tVal) tVal.innerText = `${DOM.thickness.value} cm`;
-            
-            const dist = parseFloat(DOM.distance.value); const thick = parseFloat(DOM.thickness.value); 
+            const dist = parseFloat(DOM.distance.value); 
+            const thick = parseFloat(DOM.thickness.value); 
             const vol = parseFloat(DOM.voltage.value);
             
             const pColor = PHYSICS_CONSTANTS.isotopes[src]?.color || '#ffffff'; 
@@ -1053,7 +1067,7 @@
             if (absorberContainer && absorber) {
                 if ((APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') && thick > 0) {
                     absorberContainer.style.opacity = '1'; 
-                    const maxThick = parseFloat(DOM.thickness.max) || 0.5; 
+                    const maxThick = parseFloat(thickInput.max) || 0.5; 
                     const widthPx = 2 + (Math.min(thick, maxThick) / maxThick) * 18; 
                     absorber.style.width = `${widthPx}px`;
                 } else { absorberContainer.style.opacity = '0'; }
@@ -1063,10 +1077,10 @@
             if(hwStatus) {
                 if(vol < 350 || vol > 850) { 
                     hwStatus.innerText = vol < 350 ? "HV LOW" : "DISCHARGE"; 
-                    hwStatus.className = "text-[8px] md:text-[9px] text-rose-400 font-sans tracking-widest bg-rose-500/20 px-1.5 py-0.5 rounded border border-rose-500/40"; 
+                    hwStatus.className = "text-[8px] md:text-[9px] text-rose-400 font-sans tracking-widest bg-rose-500/20 px-2 py-1 rounded border border-rose-500/40"; 
                 } else { 
                     hwStatus.innerText = "HV STABLE"; 
-                    hwStatus.className = "text-[8px] md:text-[9px] text-emerald-400 font-sans tracking-widest bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/40"; 
+                    hwStatus.className = "text-[8px] md:text-[9px] text-emerald-400 font-sans tracking-widest bg-emerald-500/20 px-2 py-1 rounded border border-emerald-500/40"; 
                 }
             }
             
@@ -1239,7 +1253,7 @@
         }
 
         /* -------------------------------------------------------------------------
-           10.7 PHYSICS & COUNTING ENGINE
+           10.7 ADVANCED PHYSICS & COUNTING ENGINE
            ------------------------------------------------------------------------- */
         function getPoissonRandom(lambda) {
             if (lambda <= 0) return 0;
@@ -1261,10 +1275,16 @@
             const src = DOM.source ? DOM.source.value : 'co60';
             
             let baseRate = PHYSICS_CONSTANTS.isotopes[src]?.baseActivity || 10000; 
+            
+            // Radioactive Decay
             if (src === 'ba137m') { 
                 let lambda = 0.693 / PHYSICS_CONSTANTS.isotopes['ba137m'].halfLife; 
                 baseRate = baseRate * Math.exp(-lambda * APP_STATE.masterTime); 
             }
+
+            // The Intensity universally depends on Inverse Square Law: I = I_0 / d^2
+            // We assume baseActivity is measured practically at 1cm.
+            let intensityDistance = baseRate / Math.pow(Math.max(d, 1), 2);
 
             let calculatedCPM = APP_STATE.bgRateCPM; 
             if (APP_STATE.cosmicBurstActive) calculatedCPM += 5000; 
@@ -1276,16 +1296,19 @@
                 else if (V <= 850) eff = 1.0 + ((V - 400) * 0.0001); 
                 else eff = 1.0 + Math.pow(Math.E, (V - 850) / 20); 
                 
-                let d_factor = Math.pow(2 / 10, 2); 
-                calculatedCPM += (baseRate * d_factor * eff);
+                calculatedCPM += (intensityDistance * eff);
             } 
-            else if (exp === 'isl') { calculatedCPM += baseRate / Math.pow(d + 0.5, 2); }
-            else if (exp === 'absorption' || exp === 'abs_factor') {
-                let R0 = baseRate / Math.pow(5 + 0.5, 2); 
-                let mu = PHYSICS_CONSTANTS.isotopes[src]?.mu || 0.15;
-                calculatedCPM += R0 * Math.exp(-mu * t);
+            else if (exp === 'isl') { 
+                calculatedCPM += intensityDistance; 
             }
-            else if (exp === 'halflife') { calculatedCPM += baseRate / Math.pow(d + 0.5, 2); }
+            else if (exp === 'absorption' || exp === 'abs_factor') {
+                let mu = PHYSICS_CONSTANTS.isotopes[src]?.mu || 0.15;
+                // I = I_0 * e^(-mu * t)
+                calculatedCPM += intensityDistance * Math.exp(-mu * t);
+            }
+            else if (exp === 'halflife') { 
+                calculatedCPM += intensityDistance; 
+            }
 
             return calculatedCPM;
         }
@@ -1314,6 +1337,7 @@
                 const trueExpectedCPM = calculateExpectedCPM();
                 const trueExpectedCPS = trueExpectedCPM / 60;
                 
+                // Physics: Non-Paralyzable Dead Time Correction
                 const observedCPS = trueExpectedCPS / (1 + (trueExpectedCPS * PHYSICS_CONSTANTS.deadTime));
                 
                 APP_STATE.countTimer++;
@@ -1362,7 +1386,7 @@
         }
 
         /* -------------------------------------------------------------------------
-           10.8 DATA LOGGING & GRAPHING ENGINE
+           10.8 DATA LOGGING & DYNAMIC GRAPHING ENGINE
            ------------------------------------------------------------------------- */
         function updateTableHeaders() {
             const head = document.getElementById('data-table-head'); 
@@ -1371,21 +1395,39 @@
             if (APP_STATE.currentExp === 'plateau') { tr.innerHTML = `<th>S.No</th><th>Volts ($V$)</th><th>Time ($s$)</th><th>Count ($N$)</th><th>Net CPS</th><th>Err ($\\pm$)</th>`; }
             else if (APP_STATE.currentExp === 'isl') { tr.innerHTML = `<th>S.No</th><th>Dist $d$</th><th>Time ($s$)</th><th>Count ($N$)</th><th>Net CPS</th><th>$1/d^2$</th>`; }
             else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { tr.innerHTML = `<th>S.No</th><th>Thick ($cm$)</th><th>Time ($s$)</th><th>Count ($N$)</th><th>Net CPS</th><th>$\\ln(CPS)$</th>`; }
-            else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elap. Time</th><th>Dur ($m$)</th><th>Count ($N$)</th><th>Corr CPM</th><th>$\\log(N)$</th>`; }
+            else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elap. Time</th><th>Dur ($m$)</th><th>Count ($N$)</th><th>Corr CPM</th><th>$\\ln(CPM)$</th>`; }
             head.innerHTML = ''; head.appendChild(tr); renderMath();
         }
 
         function recordData() {
             const N = APP_STATE.currentCounts; const T = APP_STATE.presetTimer; 
-            const V = DOM.voltage ? DOM.voltage.value : 500; const d = DOM.distance ? DOM.distance.value : 10; const t = DOM.thickness ? DOM.thickness.value : 0;
+            const V = DOM.voltage ? parseFloat(DOM.voltage.value) : 500; 
+            const d = DOM.distance ? parseFloat(DOM.distance.value) : 10; 
+            const t = DOM.thickness ? parseFloat(DOM.thickness.value) : 0;
+            
             const rawCPS = N / T; const bgCPS = APP_STATE.bgRateCPM / 60; 
-            const netCPS = Math.max(0, rawCPS - bgCPS); const error = Math.sqrt(N) / T; 
+            const netCPS = Math.max(0.01, rawCPS - bgCPS); // Ensure non-zero for Log functions
+            const error = Math.sqrt(N) / T; 
             
             let rowData = {};
-            if (APP_STATE.currentExp === 'plateau') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(V), t: T, N: N, y: netCPS, err: error.toFixed(2) };
-            else if (APP_STATE.currentExp === 'isl') rowData = { sno: APP_STATE.dataPoints.length + 1, d: parseFloat(d), t: T, N: N, y: netCPS, x: 1 / Math.pow(parseFloat(d), 2) };
-            else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
-            else if (APP_STATE.currentExp === 'halflife') rowData = { sno: APP_STATE.dataPoints.length + 1, x: APP_STATE.masterTime - T, dur: (T/60).toFixed(2), N: N, y: Math.max(0, (N * (60/T)) - APP_STATE.bgRateCPM), logN: N > 0 ? Math.log10(N).toFixed(3) : 0 };
+            const len = APP_STATE.dataPoints.length + 1;
+            
+            if (APP_STATE.currentExp === 'plateau') {
+                rowData = { sno: len, x: V, t: T, N: N, y: netCPS, err: error.toFixed(2), plotX: V, plotY: netCPS };
+            }
+            else if (APP_STATE.currentExp === 'isl') {
+                const invD2 = 1 / Math.pow(Math.max(d, 1), 2);
+                rowData = { sno: len, d: d, t: T, N: N, y: netCPS, x: invD2, plotX: invD2, plotY: netCPS };
+            }
+            else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') {
+                let lnY = Math.log(netCPS);
+                rowData = { sno: len, x: t, t: T, N: N, y: netCPS, lnY: lnY.toFixed(3), plotX: t, plotY: lnY };
+            }
+            else if (APP_STATE.currentExp === 'halflife') {
+                let corrCPM = Math.max(0.01, (N * (60/T)) - APP_STATE.bgRateCPM);
+                let lnY = Math.log(corrCPM);
+                rowData = { sno: len, x: APP_STATE.masterTime - T, dur: (T/60).toFixed(2), N: N, y: corrCPM, logN: lnY.toFixed(3), plotX: APP_STATE.masterTime - T, plotY: lnY };
+            }
             
             APP_STATE.dataPoints.push(rowData); renderTable();
         }
@@ -1441,70 +1483,78 @@
 
             const m = 40; const w = width - m * 2; const h = height - m * 2;
             
+            // Background Grid Lines
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.lineWidth = 1;
             for(let i=1; i<10; i++) { 
                 ctx.beginPath(); ctx.moveTo(m, m + (h/10)*i); ctx.lineTo(w + m, m + (h/10)*i); 
                 ctx.moveTo(m + (w/10)*i, m); ctx.lineTo(m + (w/10)*i, m + h); ctx.stroke(); 
             }
             
+            // X and Y Axes
             ctx.strokeStyle = '#00f2fe'; ctx.lineWidth = 2; 
             ctx.beginPath(); ctx.moveTo(m, m); ctx.lineTo(m, h + m); ctx.lineTo(w + m, h + m); ctx.stroke();
 
-            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x)); let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x)); 
-            let minY = 0; let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
+            // Coordinate limits using transformed Plot variables
+            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.plotX)); 
+            let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.plotX)); 
+            // MinY handles negative Ln outputs
+            let minY = Math.min(0, ...APP_STATE.dataPoints.map(d => d.plotY)); 
+            let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.plotY));
             
             if (minX === maxX) { minX -= 1; maxX += 1; } 
-            if (maxY === 0) maxY = 10; maxY *= 1.1;
+            if (minY === maxY) { minY -= 1; maxY += 1; }
+            
+            // Headroom margin
+            maxY += (maxY - minY) * 0.1;
 
             ctx.fillStyle = '#4ade80'; ctx.font = '12px Roboto Mono'; ctx.textAlign = 'center';
             let xLabel = "X Axis", yLabel = "Y Axis";
             if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; } 
             if(APP_STATE.currentExp === 'isl') { xLabel = "1/d² (cm⁻²)"; yLabel = "Net CPS"; }
-            if(APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; } 
-            if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "Corrected CPM"; }
+            if(APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { xLabel = "Thickness (cm)"; yLabel = "ln(Net CPS)"; } 
+            if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "ln(Corrected CPM)"; }
             
             ctx.fillText(xLabel, m + w/2, h + m + 30); 
             ctx.save(); ctx.translate(m - 25, m + h/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel, 0, 0); ctx.restore();
 
+            // Least Squares Regression Line
             if (APP_STATE.dataPoints.length >= 2 && APP_STATE.currentExp !== 'plateau') {
-                let validPoints = APP_STATE.dataPoints.filter(p => { 
-                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') { return p.y > 0; } 
-                    return true; 
+                const n = APP_STATE.dataPoints.length; 
+                let sumX=0, sumY=0, sumXY=0, sumX2=0;
+                APP_STATE.dataPoints.forEach(p => { 
+                    sumX += p.plotX; sumY += p.plotY; 
+                    sumXY += p.plotX * p.plotY; sumX2 += p.plotX * p.plotX; 
                 });
                 
-                if(validPoints.length >= 2) {
-                    const n = validPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
-                    validPoints.forEach(p => { 
-                        let calcY = p.y; 
-                        if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y); 
-                        sumX += p.x; sumY += calcY; sumXY += p.x * calcY; sumX2 += p.x * p.x; 
-                    });
-                    let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX); 
-                    let intercept = (sumY - slope * sumX) / n;
-                    
-                    ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.beginPath();
-                    
-                    if (APP_STATE.currentExp === 'isl') {
-                        let startYFit = slope * minX + intercept; let endYFit = slope * maxX + intercept;
-                        let py1 = m + h - ((startYFit - minY) / (maxY - minY)) * h; let py2 = m + h - ((endYFit - minY) / (maxY - minY)) * h;
-                        ctx.moveTo(m, py1); ctx.lineTo(m+w, py2); ctx.stroke();
-                    }
-                    ctx.setLineDash([]);
-                }
+                let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX); 
+                let intercept = (sumY - slope * sumX) / n;
+                
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.beginPath();
+                
+                let startYFit = slope * minX + intercept; 
+                let endYFit = slope * maxX + intercept;
+                
+                let py1 = m + h - ((startYFit - minY) / (maxY - minY)) * h; 
+                let py2 = m + h - ((endYFit - minY) / (maxY - minY)) * h;
+                
+                ctx.moveTo(m, py1); ctx.lineTo(m+w, py2); ctx.stroke();
+                ctx.setLineDash([]);
             }
 
+            // Real Data Line 
             ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 2; ctx.beginPath();
             APP_STATE.dataPoints.sort((a,b) => a.x - b.x).forEach((p, i) => { 
-                let px = m + ((p.x - minX) / (maxX - minX)) * w; 
-                let py = m + h - ((p.y - minY) / (maxY - minY)) * h; 
+                let px = m + ((p.plotX - minX) / (maxX - minX)) * w; 
+                let py = m + h - ((p.plotY - minY) / (maxY - minY)) * h; 
                 if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py); 
             }); 
             ctx.stroke();
             
+            // Plot points
             ctx.shadowBlur = 10; ctx.shadowColor = '#00f2fe'; ctx.fillStyle = '#00f2fe';
             APP_STATE.dataPoints.forEach(p => { 
-                let px = m + ((p.x - minX) / (maxX - minX)) * w; 
-                let py = m + h - ((p.y - minY) / (maxY - minY)) * h; 
+                let px = m + ((p.plotX - minX) / (maxX - minX)) * w; 
+                let py = m + h - ((p.plotY - minY) / (maxY - minY)) * h; 
                 ctx.beginPath(); ctx.arc(px, py, 5, 0, 2*Math.PI); ctx.fill(); 
                 ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); 
             });
@@ -1512,68 +1562,64 @@
         }
 
         /* -------------------------------------------------------------------------
-           10.9 AI SOLVER & REGRESSION COMPUTATION
+           10.9 AI SOLVER & LEAST SQUARES REGRESSION ENGINE
            ------------------------------------------------------------------------- */
         function runAISolver() {
             const out = document.getElementById('ai-output');
             if(!out) return;
             
             if(APP_STATE.dataPoints.length < 3) { 
-                out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-rose-400 text-center"><i class="fa-solid fa-triangle-exclamation text-4xl mb-4"></i><p class="font-bold text-lg">Error: Insufficient data.</p><p class="text-sm mt-2 text-rose-300">The AI model requires a minimum of 3 valid data points to perform Least Squares Regression Analysis.</p></div>`; 
+                out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-rose-400 text-center"><i class="fa-solid fa-triangle-exclamation text-4xl mb-4"></i><p class="font-bold text-lg">Error: Insufficient data.</p><p class="text-sm mt-2 text-rose-300">The AI model mathematically requires a minimum of 3 valid data points to perform Least Squares Regression Analysis.</p></div>`; 
                 playUIBeep(200, 0.4, 'sawtooth');
                 return; 
             }
 
-            out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-cyan-400"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i> <span class="font-bold tracking-widest uppercase">AI Computing physics parameters...</span><p class="text-xs text-cyan-700 mt-2">Executing Least Squares Logarithmic Regression...</p></div>`;
+            out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-cyan-400"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i> <span class="font-bold tracking-widest uppercase">AI Computing physics parameters...</span><p class="text-xs text-cyan-700 mt-2">Executing Least Squares Mathematical Modeling...</p></div>`;
             playUIBeep(900, 0.1, 'triangle');
             
             setTimeout(() => {
                 let html = `<h4 class="text-emerald-400 border-b border-gray-700/50 pb-3 mb-5 font-bold tracking-widest uppercase flex items-center"><i class="fa-solid fa-microchip mr-3"></i> AI COMPUTATION RESULTS</h4>`;
                 
-                let validPoints = APP_STATE.dataPoints.filter(p => { 
-                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') { return p.y > 0; } 
-                    return true; 
-                });
+                let validPoints = APP_STATE.dataPoints;
                 
-                if(validPoints.length < 2 && APP_STATE.currentExp !== 'plateau') { 
-                    out.innerHTML = html + `<span class="text-rose-400">Error: Zero counts detected. Logarithmic regression cannot compute $\\ln(0)$. Please run simulation longer.</span>`; 
-                    return; 
-                }
-
                 const n = validPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
                 validPoints.forEach(p => { 
-                    let calcX = p.x, calcY = p.y; 
-                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y); 
-                    sumX += calcX; sumY += calcY; sumXY += calcX * calcY; sumX2 += calcX * calcX; 
+                    sumX += p.plotX; sumY += p.plotY; 
+                    sumXY += p.plotX * p.plotY; sumX2 += p.plotX * p.plotX; 
                 });
+                // Math Formula for Linear Regression Slope (m)
                 let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
                 
                 if (APP_STATE.currentExp === 'plateau') { 
                     html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> GM Plateau Voltage Linear Regression</p><p class="text-lg">Average Plateau Slope: $${slope.toFixed(4)} \\text{ CPS/V}$</p>`; 
                 } 
                 else if (APP_STATE.currentExp === 'isl') { 
-                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Inverse Square Law Geometric Verification</p><p class="text-lg">Linear relationship strictly verifies $I \\propto 1/d^2$ within Poisson error bounds.</p>`; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Inverse Square Law Geometric Verification</p><p class="text-lg">Linear relationship perfectly verifies geometric expansion $I \\propto 1/d^2$.</p>`; 
                 }
                 else if (APP_STATE.currentExp === 'absorption') {
-                    let mu = -slope; let hvt = 0.693 / mu; let R_gcm2 = (hvt * 7) * PHYSICS_CONSTANTS.aluminumDensity;
+                    let mu = -slope; 
+                    let hvt = 0.693 / mu; 
+                    let R_gcm2 = (hvt * 7) * PHYSICS_CONSTANTS.aluminumDensity;
                     let Emax = (R_gcm2 + 0.09) / 0.52; 
-                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Beta Absorption Kinetics</p><p class="mb-2">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><p class="mb-4">Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p><div class="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl shadow-inner"><p class="text-rose-400 font-bold uppercase tracking-widest text-xs mb-1">Maximum End-Point Energy ($E_{\\max}$):</p><p class="text-white text-2xl">$${Emax.toFixed(3)} \\text{ MeV}$</p></div>`;
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Beta Particle Exponential Attenuation</p><p class="mb-2">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><p class="mb-4">Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p><div class="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl shadow-inner"><p class="text-rose-400 font-bold uppercase tracking-widest text-xs mb-1">Calculated Maximum End-Point Energy ($E_{\\max}$):</p><p class="text-white text-2xl">$${Emax.toFixed(3)} \\text{ MeV}$</p></div>`;
                 }
                 else if (APP_STATE.currentExp === 'abs_factor') {
-                    let mu = -slope; let mu_m = mu / PHYSICS_CONSTANTS.aluminumDensity; 
-                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Mass Absorption Factor of Aluminum</p><p class="mb-4">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><div class="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl shadow-inner"><p class="text-emerald-400 font-bold uppercase tracking-widest text-xs mb-1">Mass Absorption Coefficient ($\\mu_m$):</p><p class="text-white text-2xl">$${mu_m.toFixed(3)} \\text{ cm}^2\\text{/g}$</p></div>`;
+                    let mu = -slope; 
+                    let mu_m = mu / PHYSICS_CONSTANTS.aluminumDensity; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Mass Absorption Factor of Solid Aluminum</p><p class="mb-4">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><div class="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl shadow-inner"><p class="text-emerald-400 font-bold uppercase tracking-widest text-xs mb-1">Mass Absorption Coefficient ($\\mu_m$):</p><p class="text-white text-2xl">$${mu_m.toFixed(3)} \\text{ cm}^2\\text{/g}$</p></div>`;
                 }
                 else if (APP_STATE.currentExp === 'halflife') {
-                    let lambda = -slope; let t12 = 0.693 / lambda;
-                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Radioactive Half-Life Determination</p><p class="mb-4">Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p><div class="p-4 bg-cyan-950/40 border border-cyan-500/40 rounded-xl shadow-inner"><p class="text-cyan-400 font-bold uppercase tracking-widest text-xs mb-1">Computed Half-Life ($T_{1/2}$):</p><p class="text-white text-2xl">$${t12.toFixed(1)} \\text{ s}$</p></div>`;
+                    let lambda = -slope; 
+                    let t12 = 0.693 / lambda;
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Radioactive Half-Life Isotope Determination</p><p class="mb-4">Calculated Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p><div class="p-4 bg-cyan-950/40 border border-cyan-500/40 rounded-xl shadow-inner"><p class="text-cyan-400 font-bold uppercase tracking-widest text-xs mb-1">Computed Isotope Half-Life ($T_{1/2}$):</p><p class="text-white text-2xl">$${t12.toFixed(1)} \\text{ s}$</p></div>`;
                 }
                 
-                out.innerHTML = html; renderMath(); speakText("Analysis complete. Physics parameters successfully calculated."); playUIBeep(600, 0.2, 'sine');
+                out.innerHTML = html; renderMath(); speakText("Analysis complete. Physics parameters successfully calculated and modeled."); playUIBeep(600, 0.2, 'sine');
             }, 1200);
         }
 
         /* -------------------------------------------------------------------------
-           10.10 EXPORTS & REPORTS
+           10.10 EXPORTS & ACADEMIC LAB REPORTS
            ------------------------------------------------------------------------- */
         function exportCSV() {
             if(APP_STATE.dataPoints.length === 0) return alert("No data available to export.");
@@ -1662,11 +1708,11 @@
         function loadManual() {
             const manual = document.getElementById('manual-content');
             if(!manual) return;
-            if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">GM Tube Plateau Characteristics</h4><p><strong>Theory:</strong> The Geiger-Muller plateau is the voltage region where the count rate varies minimally with applied voltage. Operating in this region ensures stability. The operational voltage is generally chosen as $V_{op} \approx V_{th} + 100\\text{V}$. The simulation accounts for resolving dead time natively via the non-paralyzable model: $m = \\frac{n}{1+n\\tau}$.</p>`;
-            else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Inverse Square Law</h4><p><strong>Theory:</strong> Radiation intensity emitted from an isotropic point source drops proportionally to the square of the distance from the source: $I \\propto \\frac{1}{d^2}$. A plot of Count Rate vs $1/d^2$ yields a straight line verifying the geometric distribution of radiation.</p>`;
-            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Beta Particle Absorption</h4><p><strong>Theory:</strong> Beta particles are absorbed roughly exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$. By experimentally determining the Half-Value Thickness ($t_{1/2}$) where the intensity is halved, we can use empirical range formulas to determine the Maximum End-Point Energy ($E_{\\max}$) of the specific beta spectrum.</p>`;
-            else if (APP_STATE.currentExp === 'abs_factor') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Mass Absorption Coefficient</h4><p><strong>Theory:</strong> The linear absorption coefficient ($\\mu$) depends heavily on the density of the absorbing material. The <strong>Mass Absorption Factor</strong> removes this density dependence from the attenuation equation. It is defined as $\\mu_m = \\frac{\\mu}{\\rho}$. For Aluminum, $\\rho \\approx 2.70 \\text{ g/cm}^3$. This factor is useful for comparing the shielding effectiveness of different materials independent of their physical state.</p>`;
-            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Radioactive Half-Life</h4><p><strong>Theory:</strong> Radioactive decay is a random Poisson process that follows the exponential decay law $N(t) = N_0 e^{-\\lambda t}$, where $\\lambda$ is the decay constant. The half-life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.</p>`;
+            if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">GM Tube Plateau Characteristics</h4><p><strong>Theory:</strong> The Geiger-Muller plateau is the voltage region where the count rate varies minimally with applied voltage. Operating in this region ensures stability. The operational voltage is generally chosen as $V_{op} \approx V_{th} + 100\\text{V}$. The simulation natively accounts for tube resolving dead time via the non-paralyzable model: $m = \\frac{n}{1+n\\tau}$.</p>`;
+            else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Inverse Square Law</h4><p><strong>Theory:</strong> Radiation intensity emitted from an isotropic point source drops proportionally to the square of the distance from the source: $I \\propto \\frac{1}{d^2}$. A plot of Count Rate vs $1/d^2$ yields a straight line verifying the geometric distribution of radiation space.</p>`;
+            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Beta Particle Absorption</h4><p><strong>Theory:</strong> Beta particles are absorbed roughly exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$. By experimentally determining the Half-Value Thickness ($t_{1/2}$) where the intensity is halved, we can mathematically use empirical range formulas to determine the Maximum End-Point Energy ($E_{\\max}$) of the specific beta spectrum.</p>`;
+            else if (APP_STATE.currentExp === 'abs_factor') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Mass Absorption Coefficient</h4><p><strong>Theory:</strong> The linear absorption coefficient ($\\mu$) depends heavily on the density of the absorbing material. The <strong>Mass Absorption Factor</strong> geometrically removes this density dependence from the attenuation equation. It is mathematically defined as $\\mu_m = \\frac{\\mu}{\\rho}$. For Aluminum, $\\rho \\approx 2.70 \\text{ g/cm}^3$. This factor is useful for perfectly comparing the shielding effectiveness of different materials independent of their physical solid state.</p>`;
+            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Radioactive Half-Life</h4><p><strong>Theory:</strong> Radioactive decay is a mathematically random Poisson process that strictly follows the exponential decay law $N(t) = N_0 e^{-\\lambda t}$, where $\\lambda$ is the decay constant. The half-life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.</p>`;
             renderMath();
         }
 
@@ -1685,7 +1731,8 @@
                 btn.classList.add('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-400/40', 'shadow-[0_0_15px_rgba(0,242,254,0.2)]'); 
                 btn.classList.remove('text-gray-400', 'border-transparent');
             }
-            if(tabId === 'tab-graph') setTimeout(updateGraph, 50); 
+            // Delay graph redraw slightly so the DOM calculates width before painting canvas
+            if(tabId === 'tab-graph') setTimeout(updateGraph, 100); 
             playUIBeep(700, 0.05);
         }
 
@@ -1703,6 +1750,7 @@
             }
         }
 
+        // Secure Dragging Event Handler for Android Touch
         function makeDraggable(widgetId, handleId) {
             const widget = document.getElementById(widgetId);
             const handle = document.getElementById(handleId);
@@ -1712,7 +1760,10 @@
             let startX, startY, initialLeft, initialTop;
 
             const onDragStart = (e) => {
-                if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button') || e.target.tagName.toLowerCase() === 'input') return;
+                // Prevents dragging if touching an input, select, or button element directly
+                const tag = e.target.tagName.toLowerCase();
+                if(['button', 'input', 'select', 'textarea'].includes(tag) || e.target.closest('button')) return;
+                
                 isDragging = true;
                 const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                 const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
@@ -1725,6 +1776,7 @@
 
             const onDragMove = (e) => {
                 if (!isDragging) return;
+                // Force prevents Android background scrolling when dragging widget
                 if(e.type.includes('touch')) e.preventDefault(); 
                 
                 const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -1866,11 +1918,10 @@
            10.13 INITIALIZATION & STARTUP BINDINGS
            ------------------------------------------------------------------------- */
         
-        // Settings bindings
+        // Execute setups on explicit DOM elements (Fail-safe)
         document.getElementById('btn-close-settings')?.addEventListener('click', closeSettingsModal);
         document.getElementById('btn-close-update')?.addEventListener('click', closeUpdateModal);
         
-        // Header Controls
         document.getElementById('btn-reset')?.addEventListener('click', universalReset);
         document.getElementById('btn-audio')?.addEventListener('click', toggleAudio);
         document.getElementById('btn-voice')?.addEventListener('click', toggleVoice);
@@ -1878,13 +1929,11 @@
         document.getElementById('btn-toggle-chat')?.addEventListener('click', () => toggleWidget('widget-chat'));
         document.getElementById('btn-toggle-settings')?.addEventListener('click', toggleSettingsModal);
 
-        // Apparatus Controls
         document.getElementById('btn-burst')?.addEventListener('click', injectCosmicBurst);
         document.getElementById('btn-start')?.addEventListener('click', startCounting);
         document.getElementById('btn-stop')?.addEventListener('click', stopCounting);
         document.getElementById('btn-clear-scaler')?.addEventListener('click', resetApparatus);
 
-        // Data & Graph Analytics Controls
         document.getElementById('btn-clear-data')?.addEventListener('click', clearData);
         document.getElementById('btn-export-csv')?.addEventListener('click', exportCSV);
         document.getElementById('btn-export-png')?.addEventListener('click', exportPNG);
@@ -1895,14 +1944,12 @@
             if(manual) speakText(manual.innerText);
         });
 
-        // Chat Widget Controls
         document.getElementById('btn-close-chat')?.addEventListener('click', () => toggleWidget('widget-chat'));
         document.getElementById('btn-send-chat')?.addEventListener('click', sendChat);
         
-        // Calculator Widget Controls
         document.getElementById('btn-close-calc')?.addEventListener('click', () => toggleWidget('widget-calc'));
         
-        // Init Systems
+        // Initialize Systems
         initCalculator();
         makeDraggable('widget-calc', 'widget-calc-header');
         makeDraggable('widget-chat', 'widget-chat-header');
