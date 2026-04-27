@@ -2,6 +2,1408 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Virtual Nuclear Physics Lab | GM Counter Simulation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Conditional MathJax for LaTeX Rendering to avoid multiple loading errors -->
+    <script>
+        if (!window.MathJax) {
+            window.MathJax = {
+                tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+            };
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Roboto Mono', 'monospace'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyan: { 400: '#06b6d4', 500: '#0ea5e9' },
+                        emerald: { 400: '#34d399', 500: '#10b981' },
+                        rose: { 400: '#fb7185', 500: '#f43f5e' },
+                        dark: { 900: '#0f172a', 800: '#1e293b', 700: '#334155' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Security Constraints */
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            margin: 0;
+            background-color: #000;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.8); }
+
+        /* Background Canvas */
+        #space-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .neon-text-cyan { text-shadow: 0 0 10px rgba(6, 182, 212, 0.7); }
+        .neon-text-emerald { text-shadow: 0 0 10px rgba(16, 185, 129, 0.7); }
+        .neon-border-cyan { box-shadow: 0 0 10px rgba(6, 182, 212, 0.4), inset 0 0 5px rgba(6, 182, 212, 0.2); border-color: rgba(6, 182, 212, 0.8); }
+
+        /* Intro Screen 3D Atom */
+        #intro-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: radial-gradient(circle at center, #1e293b 0%, #000 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease-out;
+        }
+        .atom-container {
+            width: 200px; height: 200px; position: relative;
+            perspective: 1000px; transform-style: preserve-3d;
+            animation: rotate-atom 15s linear infinite;
+        }
+        .nucleus {
+            width: 40px; height: 40px; background: #06b6d4; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px #06b6d4, 0 0 60px #06b6d4;
+        }
+        .orbit {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px solid rgba(6, 182, 212, 0.3); border-radius: 50%;
+            transform-style: preserve-3d;
+        }
+        .orbit:nth-child(2) { transform: rotateX(60deg) rotateY(0deg); }
+        .orbit:nth-child(3) { transform: rotateX(60deg) rotateY(60deg); }
+        .orbit:nth-child(4) { transform: rotateX(60deg) rotateY(120deg); }
+        .electron {
+            width: 10px; height: 10px; background: #10b981; border-radius: 50%;
+            position: absolute; top: -5px; left: 50%; margin-left: -5px;
+            box-shadow: 0 0 15px #10b981;
+            animation: orbit-spin 2s linear infinite;
+        }
+        .orbit:nth-child(3) .electron { animation-delay: -0.6s; background: #f43f5e; box-shadow: 0 0 15px #f43f5e; }
+        .orbit:nth-child(4) .electron { animation-delay: -1.3s; }
+
+        @keyframes rotate-atom { 0% { transform: rotateX(0) rotateY(0); } 100% { transform: rotateX(360deg) rotateY(360deg); } }
+        @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(100px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(100px) rotateZ(-360deg); } }
+
+        /* Draggable Widgets */
+        .widget {
+            position: absolute; top: 100px; z-index: 50;
+            display: none; flex-direction: column;
+            resize: both; overflow: hidden;
+        }
+        .widget-header { cursor: move; }
+        
+        /* Custom Inputs */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #06b6d4; cursor: pointer; margin-top: -6px;
+            box-shadow: 0 0 10px #06b6d4;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px;
+        }
+
+        table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+        th, td { border: 1px solid rgba(6, 182, 212, 0.3); padding: 8px; text-align: center; }
+        th { background: rgba(6, 182, 212, 0.1); color: #06b6d4; font-family: 'Orbitron', sans-serif; }
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+        tr:hover { background: rgba(6, 182, 212, 0.05); }
+
+        .segment-display { font-family: 'Orbitron', monospace; font-weight: bold; letter-spacing: 2px; }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(6,182,212,0.2); border-top: 3px solid #06b6d4;
+            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Apparatus Specifics */
+        .gm-flash { animation: gmFlashAnim 0.1s ease-out; }
+        @keyframes gmFlashAnim {
+            0% { box-shadow: 0 0 20px #06b6d4, inset 0 0 10px #06b6d4; border-color: #06b6d4; }
+            100% { box-shadow: none; border-color: rgba(6, 182, 212, 0.5); }
+        }
+        
+        /* MathJax adjustments for dark theme */
+        .MathJax { color: #e2e8f0 !important; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col relative" oncontextmenu="return false;">
+
+    <!-- Background Canvas -->
+    <canvas id="space-canvas"></canvas>
+
+    <!-- Intro Screen -->
+    <div id="intro-screen">
+        <div class="atom-container mb-12">
+            <div class="nucleus"></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+        </div>
+        <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-4 neon-text-cyan tracking-wider text-center">VIRTUAL NUCLEAR LAB</h1>
+        <p class="text-emerald-400 font-mono mb-10 text-lg neon-text-emerald">Advanced GM Counter Simulation System v5.0 (LaTeX Enabled)</p>
+        <button id="btn-init" class="glass-panel text-cyan-400 border border-cyan-400 px-8 py-4 rounded-full font-display font-bold text-xl hover:bg-cyan-900/50 hover:neon-border-cyan transition-all duration-300 transform hover:scale-105">
+            <i class="fa-solid fa-power-off mr-2"></i> INITIALIZE LAB
+        </button>
+        <p class="mt-8 text-gray-500 text-sm"><i class="fa-solid fa-shield-halved"></i> Security Protocols Active. Audio context will be enabled upon initialization.</p>
+    </div>
+
+    <!-- Main Application Header -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-cyan-900/50 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <i class="fa-solid fa-atom text-cyan-400 text-2xl animate-pulse"></i>
+            <h1 class="font-display font-bold text-xl tracking-widest text-white"><span class="text-cyan-400">NUC</span>-LAB <span class="text-xs text-emerald-400 ml-2">ONLINE</span></h1>
+        </div>
+        <div class="flex gap-4">
+            <span id="save-status" class="text-xs text-emerald-400 font-mono flex items-center mr-4 opacity-0 transition-opacity duration-500"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Autosaved</span>
+            <button onclick="toggleAudio()" id="btn-audio" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-cyan-400 hover:text-white transition-colors" title="Toggle Sound">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button onclick="toggleVoice()" id="btn-voice" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-rose-400 hover:text-white transition-colors" title="Toggle AI Voice">
+                <i class="fa-solid fa-microphone-lines"></i>
+            </button>
+            <button onclick="toggleWidget('widget-calc')" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-emerald-400 hover:text-white transition-colors" title="Scientific Calculator">
+                <i class="fa-solid fa-calculator"></i>
+            </button>
+            <button onclick="toggleWidget('widget-chat')" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-blue-400 hover:text-white transition-colors" title="AI Comms Link">
+                <i class="fa-solid fa-robot"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        
+        <!-- Left Column: Apparatus & Controls -->
+        <aside class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- VIRTUAL APPARATUS VISUALIZER (NEW) -->
+            <div class="glass-panel rounded-xl p-4 relative overflow-hidden group border-b-4 border-b-cyan-500/50">
+                <h2 class="font-display text-cyan-400 font-bold mb-2 flex justify-between items-center">
+                    <span><i class="fa-solid fa-microscope mr-2"></i>LIVE APPARATUS</span>
+                    <span id="visual-status" class="text-[10px] bg-rose-900/50 text-rose-400 px-2 py-1 rounded border border-rose-500/50 animate-pulse">OFFLINE</span>
+                </h2>
+                
+                <div class="relative w-full h-40 bg-[#050505] border border-gray-700 rounded-lg overflow-hidden flex items-end pb-6 px-4 shadow-[inset_0_0_20px_rgba(0,0,0,1)]">
+                    
+                    <!-- Particle Overlay Canvas -->
+                    <canvas id="apparatus-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none z-20"></canvas>
+                    
+                    <!-- Optical Bench Rail -->
+                    <div class="absolute bottom-6 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700 shadow-md">
+                        <!-- Tick marks generated via CSS background -->
+                        <div class="w-full h-full opacity-30" style="background-image: repeating-linear-gradient(90deg, transparent, transparent 9px, #fff 9px, #fff 10px);"></div>
+                    </div>
+
+                    <!-- The GM Tube Array -->
+                    <div class="absolute bottom-[26px] left-4 flex items-center z-10">
+                        <div class="w-20 h-14 bg-gradient-to-br from-gray-600 to-gray-800 rounded-l-md border border-gray-500 flex flex-col justify-center items-center shadow-lg">
+                            <i class="fa-solid fa-plug text-gray-400 text-xs mb-1"></i>
+                            <span class="text-[8px] font-bold text-gray-300 tracking-widest">GM TUBE</span>
+                        </div>
+                        <!-- GM Window -->
+                        <div id="gm-window" class="w-3 h-10 bg-black border-2 border-cyan-500/50 rounded-r-md flex items-center justify-center transition-all duration-100 relative">
+                            <!-- Window Grid -->
+                            <div class="absolute inset-0 opacity-30" style="background-image: linear-gradient(#06b6d4 1px, transparent 1px), linear-gradient(90deg, #06b6d4 1px, transparent 1px); background-size: 3px 3px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Absorber Visualizer (Dynamic Width based on Thickness) -->
+                    <div id="visual-absorber-container" class="absolute bottom-[28px] left-[100px] h-12 w-0 flex justify-center items-end opacity-0 transition-opacity duration-300 z-15">
+                        <div id="visual-absorber" class="h-full bg-gradient-to-r from-gray-300 to-gray-400 border-x border-gray-200 shadow-[0_0_10px_rgba(255,255,255,0.2)] rounded-sm transition-all duration-300" style="width: 2px;"></div>
+                    </div>
+
+                    <!-- Radioactive Source Mount -->
+                    <div id="visual-source-mount" class="absolute bottom-[24px] w-10 h-16 bg-gray-800 border border-gray-600 rounded-t shadow-xl flex flex-col items-center z-30 transition-all duration-300 ease-out" style="left: 80%;">
+                        <!-- The Source Pellet -->
+                        <div id="visual-source-pellet" class="w-6 h-6 rounded-full mt-2 flex items-center justify-center shadow-[0_0_15px_#3b82f6] bg-[#3b82f6] transition-colors duration-300">
+                            <i class="fa-solid fa-radiation text-black text-[10px] animate-spin-slow"></i>
+                        </div>
+                        <div class="mt-auto w-full h-2 bg-gray-900 border-t border-gray-600"></div>
+                        <div class="absolute -bottom-5 text-[10px] font-mono text-cyan-400" id="visual-dist-label">50cm</div>
+                    </div>
+                </div>
+                
+                <button onclick="injectCosmicBurst()" class="absolute top-2 right-2 text-[10px] bg-purple-900/50 text-purple-400 px-2 py-1 rounded border border-purple-500/50 hover:bg-purple-800/80 transition-colors z-30" title="Simulate Random Cosmic Ray Shower">
+                    <i class="fa-solid fa-meteor"></i> Burst
+                </button>
+            </div>
+
+            <!-- Experiment Selector & Controls -->
+            <div class="glass-panel rounded-xl p-5">
+                <h2 class="font-display text-cyan-400 font-bold mb-4 border-b border-cyan-900/50 pb-2"><i class="fa-solid fa-sliders mr-2"></i>EXPERIMENT CONFIG</h2>
+                <select id="exp-selector" class="w-full bg-dark-800 border border-cyan-700 text-white rounded p-2 mb-4 font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[0_0_10px_rgba(6,182,212,0.1)]" onchange="setupExperimentUI()">
+                    <option value="plateau">1. GM Tube Plateau Characteristics</option>
+                    <option value="isl">2. Inverse Square Law ($I \propto 1/d^2$)</option>
+                    <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
+                    <option value="halflife">4. Radioactive Half-Life</option>
+                </select>
+
+                <!-- Dynamic Controls -->
+                <div id="controls-container" class="space-y-4 text-sm font-mono">
+                    
+                    <div id="ctrl-source" class="control-group">
+                        <label class="block text-gray-400 mb-1">Radioactive Source</label>
+                        <select id="input-source" class="w-full bg-dark-900 border border-gray-700 rounded p-1.5 text-white focus:outline-none focus:border-cyan-400" onchange="updateParameters()">
+                            <option value="co60">Cobalt-60 ($\gamma, \beta^-$)</option>
+                            <option value="sr90">Strontium-90 ($\beta^-$)</option>
+                            <option value="cs137">Cesium-137 ($\gamma, \beta^-$)</option>
+                            <option value="ba137m">Barium-137m (Simulation scale)</option>
+                        </select>
+                    </div>
+
+                    <div id="ctrl-voltage" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Operating Voltage</span>
+                            <span id="val-voltage" class="text-cyan-400 font-bold">500 V</span>
+                        </label>
+                        <input type="range" id="input-voltage" min="300" max="1000" step="10" value="500" oninput="updateVal('voltage', this.value, ' V')">
+                    </div>
+
+                    <div id="ctrl-distance" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Source Distance ($d$)</span>
+                            <span id="val-distance" class="text-cyan-400 font-bold">10 cm</span>
+                        </label>
+                        <input type="range" id="input-distance" min="2" max="50" step="1" value="10" oninput="updateVal('distance', this.value, ' cm')">
+                    </div>
+
+                    <div id="ctrl-thickness" class="control-group">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Al Absorber Thickness ($t$)</span>
+                            <span id="val-thickness" class="text-cyan-400 font-bold">0.00 cm</span>
+                        </label>
+                        <input type="range" id="input-thickness" min="0" max="0.5" step="0.01" value="0" oninput="updateVal('thickness', this.value, ' cm')">
+                    </div>
+
+                    <div class="control-group pt-2 border-t border-gray-700/50">
+                        <label class="flex justify-between text-gray-400 mb-1">
+                            <span>Preset Timer (Count Time)</span>
+                            <span id="val-timer" class="text-emerald-400 font-bold">60 s</span>
+                        </label>
+                        <input type="range" id="input-timer" min="1" max="3600" step="1" value="60" oninput="formatTimer(this.value)">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Digital Display / GM Counter Apparatus -->
+            <div class="glass-panel rounded-xl p-5 border-l-4 border-l-emerald-500 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-5"><i class="fa-solid fa-microchip text-9xl"></i></div>
+                <h2 class="font-display text-emerald-400 font-bold mb-4"><i class="fa-solid fa-stopwatch mr-2"></i>DIGITAL SCALER / TIMER</h2>
+                
+                <div class="bg-black/50 p-4 rounded-lg border border-gray-700 mb-4 shadow-inner">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-xs text-gray-500">DECAY CLOCK</span>
+                        <span id="display-decay-clock" class="segment-display text-gray-400 text-lg">00:00:00</span>
+                    </div>
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-xs text-gray-500">TIMER CLOCK</span>
+                        <span id="display-timer" class="segment-display text-rose-400 text-2xl">00:00</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-xs text-gray-500">COUNTS ($N$)</span>
+                        <span id="display-counts" class="segment-display text-cyan-400 text-4xl neon-text-cyan tracking-widest">000000</span>
+                    </div>
+                    <div class="mt-2 text-right flex justify-between">
+                        <span id="hw-status" class="text-[10px] text-gray-500 font-sans tracking-widest">HV: STABLE</span>
+                        <div>
+                            <span class="text-xs text-gray-500">RATE: </span>
+                            <span id="display-rate" class="segment-display text-emerald-400 text-sm">0 CPS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-start" onclick="startCounting()" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/50 py-2 rounded font-bold hover:bg-emerald-600/40 transition-colors uppercase text-sm shadow-[0_0_10px_rgba(16,185,129,0.2)]"><i class="fa-solid fa-play mr-1"></i> Start</button>
+                    <button id="btn-stop" onclick="stopCounting()" class="flex-1 bg-rose-600/20 text-rose-400 border border-rose-500/50 py-2 rounded font-bold hover:bg-rose-600/40 transition-colors uppercase text-sm" disabled><i class="fa-solid fa-stop mr-1"></i> Stop</button>
+                    <button onclick="resetApparatus()" class="flex-1 bg-gray-600/20 text-gray-400 border border-gray-500/50 py-2 rounded font-bold hover:bg-gray-600/40 transition-colors uppercase text-sm"><i class="fa-solid fa-rotate-right mr-1"></i> Reset</button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Right Column: Data & Analytics -->
+        <section class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Tabs Header -->
+            <div class="glass-panel rounded-xl p-2 flex gap-2 overflow-x-auto">
+                <button onclick="switchTab('tab-data')" id="btn-tab-data" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-cyan-900/50 text-cyan-400 border border-cyan-500/30 whitespace-nowrap"><i class="fa-solid fa-table mr-2"></i>Data Table</button>
+                <button onclick="switchTab('tab-graph')" id="btn-tab-graph" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-chart-line mr-2"></i>Dynamic Plot</button>
+                <button onclick="switchTab('tab-ai')" id="btn-tab-ai" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-brain mr-2"></i>AI Auto-Solver</button>
+                <button onclick="switchTab('tab-manual')" id="btn-tab-manual" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white whitespace-nowrap"><i class="fa-solid fa-book mr-2"></i>Lab Manual</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="glass-panel rounded-xl p-5 flex-grow relative min-h-[500px]">
+                
+                <!-- Data Table Tab -->
+                <div id="tab-data" class="tab-content h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-cyan-400 font-bold">Observation Table</h3>
+                        <div class="flex gap-2">
+                            <button onclick="clearData()" class="text-xs bg-rose-900/40 text-rose-400 px-3 py-1 rounded border border-rose-700/50 hover:bg-rose-800/60 transition-colors"><i class="fa-solid fa-trash mr-1"></i>Clear Data</button>
+                            <button onclick="exportCSV()" class="text-xs bg-emerald-900/40 text-emerald-400 px-3 py-1 rounded border border-emerald-700/50 hover:bg-emerald-800/60 transition-colors"><i class="fa-solid fa-file-csv mr-1"></i>Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto flex-grow rounded border border-gray-700/50 bg-black/20">
+                        <table id="data-table">
+                            <thead id="data-table-head">
+                                <!-- Dynamic Headers -->
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2" id="table-footer-note">* Statistical Error ($\pm \sqrt{N}$) is considered for Poisson counting statistics.</p>
+                </div>
+
+                <!-- Graph Tab -->
+                <div id="tab-graph" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-emerald-400 font-bold">Dynamic Plotter</h3>
+                        <button onclick="exportPNG()" class="text-xs bg-cyan-900/40 text-cyan-400 px-3 py-1 rounded border border-cyan-700/50 hover:bg-cyan-800/60 transition-colors"><i class="fa-solid fa-image mr-1"></i>Export PNG</button>
+                    </div>
+                    <div class="flex-grow w-full bg-[#050505] border border-gray-700 rounded relative flex items-center justify-center p-2 shadow-inner overflow-hidden">
+                        <canvas id="graph-canvas" class="w-full h-full max-h-[450px]"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 text-center">Graph includes automatic Linear Regression (Best Fit Line) computation.</p>
+                </div>
+
+                <!-- AI Solver Tab -->
+                <div id="tab-ai" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-rose-400 font-bold"><i class="fa-solid fa-microchip mr-2"></i>AI Computation Engine</h3>
+                        <div class="flex gap-2">
+                            <button onclick="runAISolver()" class="text-xs bg-indigo-900/40 text-indigo-400 px-3 py-1 rounded border border-indigo-700/50 hover:bg-indigo-800/60 transition-colors"><i class="fa-solid fa-gears mr-1"></i>Run Analysis</button>
+                            <button onclick="generateHTMLReport()" class="text-xs bg-emerald-900/40 text-emerald-400 px-3 py-1 rounded border border-emerald-700/50 hover:bg-emerald-800/60 transition-colors"><i class="fa-solid fa-file-code mr-1"></i>Generate Lab Report</button>
+                        </div>
+                    </div>
+                    <div id="ai-output" class="flex-grow overflow-y-auto bg-dark-900/50 p-4 rounded border border-gray-700 font-mono text-sm leading-relaxed text-gray-300 shadow-inner">
+                        <div class="flex flex-col items-center justify-center h-full text-gray-500 text-center">
+                            <i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i>
+                            <p>Awaiting data... Run experiment and click "Run Analysis" to compute physics parameters automatically with full LaTeX mathematical notation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab Manual Tab -->
+                <div id="tab-manual" class="tab-content hidden h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display text-cyan-400 font-bold">Lab Manual / Theory</h3>
+                        <button onclick="readManual()" class="text-xs bg-rose-900/40 text-rose-400 px-3 py-1 rounded border border-rose-700/50 hover:bg-rose-800/60 transition-colors"><i class="fa-solid fa-volume-high mr-1"></i>Read Aloud</button>
+                    </div>
+                    <div id="manual-content" class="flex-grow overflow-y-auto pr-2 font-serif text-gray-300 leading-relaxed space-y-4 text-sm bg-black/10 p-4 rounded border border-gray-800">
+                        <!-- Content generated dynamically based on selected experiment -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel sticky bottom-0 z-40 border-t border-cyan-900/50 px-6 py-2 text-center text-xs text-gray-500 font-mono">
+        © 2026 | Virtual GM Counter Simulation | Strictly adheres to physical laws | 
+        <a href="https://github.com/patanhihaikonhu/-Virtual-GM-Counter-Simulation" target="_blank" class="text-cyan-600 hover:text-cyan-400 transition-colors"><i class="fa-brands fa-github"></i> GitHub Repository</a>
+    </footer>
+
+    <!-- Draggable Scientific Calculator Widget -->
+    <div id="widget-calc" class="widget glass-panel rounded-xl shadow-[0_10px_40px_rgba(16,185,129,0.2)] w-64 border border-emerald-500/30">
+        <div class="widget-header bg-emerald-900/50 p-2 text-xs font-bold text-emerald-400 flex justify-between items-center border-b border-emerald-500/30">
+            <span><i class="fa-solid fa-calculator mr-1"></i> SCI-CALC</span>
+            <button onclick="toggleWidget('widget-calc')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-3 bg-dark-900">
+            <input type="text" id="calc-display" class="w-full bg-black text-right text-emerald-400 font-mono p-2 rounded border border-gray-700 mb-2 text-lg focus:outline-none" readonly value="0">
+            <div class="grid grid-cols-4 gap-1 text-sm font-mono">
+                <!-- Row 1 -->
+                <button onclick="calcOp('clear')" class="col-span-2 bg-rose-900/40 text-rose-400 p-2 rounded hover:bg-rose-800/60 transition-colors">AC</button>
+                <button onclick="calcOp('del')" class="bg-gray-800 text-gray-300 p-2 rounded hover:bg-gray-700 transition-colors">DEL</button>
+                <button onclick="calcOp('/')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60 transition-colors">/</button>
+                <!-- Row Math -->
+                <button onclick="calcMath('sqrt')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700 transition-colors">√</button>
+                <button onclick="calcMath('sq')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700 transition-colors">x²</button>
+                <button onclick="calcMath('ln')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700 transition-colors">ln</button>
+                <button onclick="calcMath('exp')" class="bg-gray-800 text-emerald-300 p-2 rounded hover:bg-gray-700 transition-colors">eˣ</button>
+                <!-- Nums -->
+                <button onclick="calcNum(7)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">7</button>
+                <button onclick="calcNum(8)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">8</button>
+                <button onclick="calcNum(9)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">9</button>
+                <button onclick="calcOp('*')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60 transition-colors">×</button>
+                
+                <button onclick="calcNum(4)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">4</button>
+                <button onclick="calcNum(5)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">5</button>
+                <button onclick="calcNum(6)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">6</button>
+                <button onclick="calcOp('-')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60 transition-colors">-</button>
+                
+                <button onclick="calcNum(1)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">1</button>
+                <button onclick="calcNum(2)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">2</button>
+                <button onclick="calcNum(3)" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">3</button>
+                <button onclick="calcOp('+')" class="bg-cyan-900/40 text-cyan-400 p-2 rounded hover:bg-cyan-800/60 transition-colors">+</button>
+                
+                <button onclick="calcNum(0)" class="col-span-2 bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">0</button>
+                <button onclick="calcNum('.')" class="bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">.</button>
+                <button onclick="calcEq()" class="bg-emerald-600/40 text-emerald-400 p-2 rounded hover:bg-emerald-500/60 font-bold transition-colors">=</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draggable AI Chatbot Widget -->
+    <div id="widget-chat" class="widget glass-panel rounded-xl shadow-[0_10px_40px_rgba(59,130,246,0.2)] w-80 border border-blue-500/30 flex flex-col" style="height: 400px; left: calc(100vw - 350px);">
+        <div class="widget-header bg-blue-900/50 p-2 text-xs font-bold text-blue-400 flex justify-between items-center border-b border-blue-500/30">
+            <span><i class="fa-solid fa-robot mr-1"></i> AI COMMS LINK</span>
+            <button onclick="toggleWidget('widget-chat')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="chat-history" class="flex-grow p-3 overflow-y-auto bg-dark-900/80 font-mono text-xs space-y-3">
+            <div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50">
+                <strong>System:</strong> Online. Ask me about GM tubes, Poisson error, Half-life equations, or ISL. (Math will render automatically via MathJax).
+            </div>
+        </div>
+        <div class="p-2 bg-dark-800 border-t border-gray-700 flex gap-1">
+            <input type="text" id="chat-input" class="flex-grow bg-black text-white px-2 py-1 rounded text-xs focus:outline-none border border-gray-600 focus:border-blue-500 transition-colors" placeholder="Type query..." onkeypress="if(event.key === 'Enter') sendChat()">
+            <button onclick="sendChat()" class="bg-blue-600/40 text-blue-400 px-3 rounded hover:bg-blue-500/60 transition-colors"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        /* =========================================================================
+           1. SECURITY PROTOCOLS & INIT
+           ========================================================================= */
+        document.addEventListener('keydown', function(e) {
+            if(e.keyCode == 123) { e.preventDefault(); return false; } // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; } // Ctrl+Shift+I
+            if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } // Ctrl+U
+            if(e.ctrlKey && e.keyCode == 67) { e.preventDefault(); return false; } // Ctrl+C
+        });
+
+        // Helper function to render LaTeX dynamically using MathJax
+        function renderMath() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err.message));
+            }
+        }
+
+        /* =========================================================================
+           2. CANVAS BACKGROUND ANIMATION
+           ========================================================================= */
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for (let i = 0; i < 200; i++) particles.push(new Particle());
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        /* =========================================================================
+           3. AUDIO & VOICE ENGINE
+           ========================================================================= */
+        let audioCtx;
+        let isAudioEnabled = true;
+        let isVoiceEnabled = true;
+        let whiteNoiseBuffer;
+
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const bufferSize = audioCtx.sampleRate * 0.05;
+            whiteNoiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = whiteNoiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+            playUIBeep(440, 0.1);
+        }
+
+        function playGeigerClick() {
+            if (!isAudioEnabled || !audioCtx) return;
+            const source = audioCtx.createBufferSource();
+            source.buffer = whiteNoiseBuffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass'; filter.frequency.value = 5000;
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+            source.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
+            source.start(); source.stop(audioCtx.currentTime + 0.05);
+
+            // Trigger Visual Flash
+            const gmWindow = document.getElementById('gm-window');
+            gmWindow.classList.remove('gm-flash');
+            void gmWindow.offsetWidth; // trigger reflow
+            gmWindow.classList.add('gm-flash');
+        }
+
+        function playUIBeep(freq = 600, duration = 0.1, type='sine') {
+            if (!isAudioEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-audio');
+            btn.innerHTML = isAudioEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark text-rose-500"></i>';
+            if (isAudioEnabled && !audioCtx) initAudio();
+        }
+
+        function toggleVoice() {
+            isVoiceEnabled = !isVoiceEnabled;
+            const btn = document.getElementById('btn-voice');
+            btn.innerHTML = isVoiceEnabled ? '<i class="fa-solid fa-microphone-lines"></i>' : '<i class="fa-solid fa-microphone-lines-slash text-rose-500"></i>';
+            if (!isVoiceEnabled) window.speechSynthesis.cancel();
+        }
+
+        function speakText(text) {
+            if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            
+            // Clean out LaTeX formatting for voice synthesis
+            let cleanText = text.replace(/[\$\\]/g, '')
+                                .replace(/_\{.*?\}/g, '')
+                                .replace(/\^\{.*?\}/g, '')
+                                .replace(/frac\{(.*?)\}\{(.*?)\}/g, "$1 over $2")
+                                .replace(/pm/g, "plus or minus")
+                                .replace(/propto/g, "proportional to");
+                                
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            const voices = window.speechSynthesis.getVoices();
+            const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google UK English Female'));
+            if(femaleVoice) utterance.voice = femaleVoice;
+            utterance.rate = 1.05; utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        /* =========================================================================
+           4. GLOBAL STATE & EXPERIMENT MODELS
+           ========================================================================= */
+        const APP_STATE = {
+            masterTime: 0,
+            masterInterval: null,
+            currentExp: 'plateau',
+            isCounting: false,
+            countTimer: 0,
+            presetTimer: 60,
+            currentCounts: 0,
+            countingInterval: null,
+            dataPoints: [],
+            bgRateCPM: 25,
+            cosmicBurstActive: false,
+            
+            // Visual Engine Variables
+            sourceColors: { 'co60': '#3b82f6', 'sr90': '#10b981', 'cs137': '#a855f7', 'ba137m': '#eab308' },
+            currentParticleColor: '#3b82f6'
+        };
+
+        const DOM = {
+            source: document.getElementById('input-source'),
+            voltage: document.getElementById('input-voltage'),
+            distance: document.getElementById('input-distance'),
+            thickness: document.getElementById('input-thickness'),
+            timer: document.getElementById('input-timer'),
+            dispDecay: document.getElementById('display-decay-clock'),
+            dispTimer: document.getElementById('display-timer'),
+            dispCounts: document.getElementById('display-counts'),
+            dispRate: document.getElementById('display-rate')
+        };
+
+        document.getElementById('btn-init').addEventListener('click', () => {
+            initAudio();
+            document.getElementById('intro-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.display = 'none';
+                startMasterClock();
+                loadDataFromStorage(); // Load saved data
+                setupExperimentUI();
+                initApparatusVisuals(); 
+                playUIBeep(880, 0.3);
+                speakText("Virtual Nuclear Laboratory initialized. Select an experiment from the configuration panel.");
+                renderMath(); // Initial render
+            }, 1000);
+        });
+
+        function startMasterClock() {
+            APP_STATE.masterInterval = setInterval(() => {
+                APP_STATE.masterTime++;
+                let hrs = String(Math.floor(APP_STATE.masterTime / 3600)).padStart(2, '0');
+                let mins = String(Math.floor((APP_STATE.masterTime % 3600) / 60)).padStart(2, '0');
+                let secs = String(APP_STATE.masterTime % 60).padStart(2, '0');
+                DOM.dispDecay.innerText = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function updateVal(id, val, unit) {
+            document.getElementById(`val-${id}`).innerText = `${val}${unit}`;
+            updateParameters(); 
+        }
+
+        function formatTimer(val) {
+            let mins = String(Math.floor(val / 60)).padStart(2, '0');
+            let secs = String(val % 60).padStart(2, '0');
+            document.getElementById('val-timer').innerText = `${mins}:${secs}`;
+            APP_STATE.presetTimer = parseInt(val);
+        }
+
+        function setupExperimentUI() {
+            APP_STATE.currentExp = document.getElementById('exp-selector').value;
+            const ctrls = ['voltage', 'distance', 'thickness'];
+            
+            ctrls.forEach(c => document.getElementById(`ctrl-${c}`).style.opacity = '0.3');
+            ctrls.forEach(c => document.getElementById(`input-${c}`).disabled = true);
+
+            if (APP_STATE.currentExp === 'plateau') {
+                document.getElementById('ctrl-voltage').style.opacity = '1';
+                document.getElementById('input-voltage').disabled = false;
+                DOM.source.value = 'co60';
+                DOM.distance.value = 10;
+            } else if (APP_STATE.currentExp === 'isl') {
+                document.getElementById('ctrl-distance').style.opacity = '1';
+                document.getElementById('input-distance').disabled = false;
+                DOM.source.value = 'co60';
+                DOM.voltage.value = 500;
+            } else if (APP_STATE.currentExp === 'absorption') {
+                document.getElementById('ctrl-thickness').style.opacity = '1';
+                document.getElementById('input-thickness').disabled = false;
+                DOM.source.value = 'sr90';
+                DOM.voltage.value = 500;
+                DOM.distance.value = 5;
+            } else if (APP_STATE.currentExp === 'halflife') {
+                DOM.source.value = 'ba137m';
+                DOM.voltage.value = 500;
+                DOM.distance.value = 2;
+            }
+            updateParameters();
+            updateTableHeaders();
+            loadManual();
+            
+            // Re-render table if data exists for this experiment
+            renderTable();
+            updateGraph();
+            renderMath();
+        }
+
+        // Feature: Cosmic Burst
+        function injectCosmicBurst() {
+            if (APP_STATE.cosmicBurstActive) return;
+            APP_STATE.cosmicBurstActive = true;
+            playUIBeep(200, 0.5, 'square');
+            setTimeout(() => { APP_STATE.cosmicBurstActive = false; }, 3000); // 3 seconds of high bg
+        }
+
+        /* =========================================================================
+           5. APPARATUS VISUALIZATION ENGINE (NEW)
+           ========================================================================= */
+        let visualApparatusInterval;
+        let vCanvas, vCtx;
+        let radiationRays = [];
+        
+        function resizeVisualCanvas() {
+            vCanvas = document.getElementById('apparatus-canvas');
+            if(!vCanvas) return;
+            vCtx = vCanvas.getContext('2d');
+            const rect = vCanvas.parentElement.getBoundingClientRect();
+            vCanvas.width = rect.width;
+            vCanvas.height = rect.height;
+        }
+
+        function initApparatusVisuals() {
+            resizeVisualCanvas();
+            window.addEventListener('resize', resizeVisualCanvas);
+            requestAnimationFrame(renderVisualApparatus);
+        }
+
+        function updateParameters() {
+            document.getElementById('val-voltage').innerText = `${DOM.voltage.value} V`;
+            document.getElementById('val-distance').innerText = `${DOM.distance.value} cm`;
+            document.getElementById('val-thickness').innerText = `${DOM.thickness.value} cm`;
+
+            const dist = parseFloat(DOM.distance.value);
+            const thick = parseFloat(DOM.thickness.value);
+            const src = DOM.source.value;
+            const vol = parseFloat(DOM.voltage.value);
+
+            const pColor = APP_STATE.sourceColors[src] || '#ffffff';
+            APP_STATE.currentParticleColor = pColor;
+            
+            const pellet = document.getElementById('visual-source-pellet');
+            pellet.style.backgroundColor = pColor;
+            pellet.style.boxShadow = `0 0 15px ${pColor}`;
+            document.getElementById('visual-source-mount').style.borderColor = pColor;
+
+            const minPos = 20; const maxPos = 90;
+            const percentPos = minPos + ((dist - 2) / 48) * (maxPos - minPos);
+            const mount = document.getElementById('visual-source-mount');
+            mount.style.left = `${percentPos}%`;
+            document.getElementById('visual-dist-label').innerText = `${dist}cm`;
+            document.getElementById('visual-dist-label').style.color = pColor;
+
+            const absorberContainer = document.getElementById('visual-absorber-container');
+            const absorber = document.getElementById('visual-absorber');
+            if (APP_STATE.currentExp === 'absorption' && thick > 0) {
+                absorberContainer.style.opacity = '1';
+                const widthPx = 2 + (thick / 0.5) * 18;
+                absorber.style.width = `${widthPx}px`;
+            } else {
+                absorberContainer.style.opacity = '0';
+            }
+
+            const hwStatus = document.getElementById('hw-status');
+            if(vol < 350) { hwStatus.innerText = "HV: TOO LOW"; hwStatus.style.color = "#f43f5e"; }
+            else if(vol > 850) { hwStatus.innerText = "HV: DISCHARGE"; hwStatus.style.color = "#f43f5e"; }
+            else { hwStatus.innerText = "HV: STABLE"; hwStatus.style.color = "#10b981"; }
+            
+            if(!APP_STATE.isCounting) playUIBeep(500, 0.05);
+        }
+
+        class RadiationRay {
+            constructor(startX, startY, endX, color, getsAbsorbed) {
+                this.x = startX;
+                this.y = startY + (Math.random() * 10 - 5); 
+                this.endX = endX; 
+                this.speed = 3 + Math.random() * 4;
+                this.color = color;
+                this.getsAbsorbed = getsAbsorbed; 
+                this.active = true;
+                this.length = 5 + Math.random() * 10;
+            }
+            update() {
+                this.x -= this.speed;
+                if (this.x <= this.endX) { this.active = false; }
+            }
+            draw(ctx) {
+                if(!this.active) return;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.length, this.y);
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.8;
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function renderVisualApparatus() {
+            if(!vCtx || !vCanvas) { requestAnimationFrame(renderVisualApparatus); return; }
+            
+            vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
+
+            const mountRect = document.getElementById('visual-source-pellet').getBoundingClientRect();
+            const canvasRect = vCanvas.getBoundingClientRect();
+            const gmWindowRect = document.getElementById('gm-window').getBoundingClientRect();
+            
+            const startX = mountRect.left - canvasRect.left;
+            const startY = (mountRect.top + mountRect.height/2) - canvasRect.top;
+            const gmTargetX = gmWindowRect.right - canvasRect.left;
+
+            let absorberTargetX = gmTargetX;
+            let hasAbsorber = false;
+            let absorptionProb = 0;
+
+            if (APP_STATE.currentExp === 'absorption') {
+                const thick = parseFloat(DOM.thickness.value);
+                if (thick > 0) {
+                    hasAbsorber = true;
+                    const absRect = document.getElementById('visual-absorber').getBoundingClientRect();
+                    absorberTargetX = absRect.right - canvasRect.left;
+                    absorptionProb = 1 - Math.exp(-14.0 * thick); 
+                }
+            }
+
+            let spawnChance = APP_STATE.isCounting ? 0.4 : 0.05; 
+            const V = parseFloat(DOM.voltage.value);
+            if (V < 350) spawnChance = 0.01; 
+            if (APP_STATE.cosmicBurstActive) spawnChance = 0.9;
+
+            if (Math.random() < spawnChance) {
+                let getsAbsorbed = false;
+                let targetX = gmTargetX;
+
+                if (hasAbsorber) {
+                    if (Math.random() < absorptionProb) {
+                        getsAbsorbed = true;
+                        targetX = absorberTargetX + (Math.random()*4); 
+                    }
+                }
+                radiationRays.push(new RadiationRay(startX, startY, targetX, APP_STATE.currentParticleColor, getsAbsorbed));
+            }
+
+            for(let i = radiationRays.length - 1; i >= 0; i--) {
+                const r = radiationRays[i];
+                r.update();
+                r.draw(vCtx);
+                if(!r.active) {
+                    vCtx.beginPath();
+                    vCtx.arc(r.x, r.y, 2, 0, Math.PI*2);
+                    vCtx.fillStyle = r.color;
+                    vCtx.fill();
+                    radiationRays.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(renderVisualApparatus);
+        }
+
+        /* =========================================================================
+           6. PHYSICS ENGINE (Core Math & Poisson)
+           ========================================================================= */
+        function getPoissonRandom(lambda) {
+            if (lambda <= 0) return 0;
+            if (lambda > 30) {
+                let u1 = Math.random(), u2 = Math.random();
+                let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                return Math.max(0, Math.round(z0 * Math.sqrt(lambda) + lambda));
+            }
+            let L = Math.exp(-lambda), k = 0, p = 1;
+            do { k++; p *= Math.random(); } while (p > L);
+            return k - 1;
+        }
+
+        function calculateExpectedCPM() {
+            const exp = APP_STATE.currentExp;
+            const V = parseFloat(DOM.voltage.value);
+            const d = parseFloat(DOM.distance.value);
+            const t = parseFloat(DOM.thickness.value);
+            const src = DOM.source.value;
+            
+            let baseRate = 0; 
+            if (src === 'co60') baseRate = 15000; 
+            if (src === 'sr90') baseRate = 8000;
+            if (src === 'cs137') baseRate = 10000;
+            if (src === 'ba137m') {
+                let lambda = 0.693 / 153; 
+                let A0 = 20000;
+                baseRate = A0 * Math.exp(-lambda * APP_STATE.masterTime);
+            }
+
+            let calculatedCPM = APP_STATE.bgRateCPM;
+            if (APP_STATE.cosmicBurstActive) calculatedCPM += 5000; // Cosmic Burst modifier
+
+            if (exp === 'plateau') {
+                let eff = 0;
+                if (V < 350) eff = 0;
+                else if (V < 400) eff = (V - 350) / 50;
+                else if (V <= 850) eff = 1.0 + ((V - 400) * 0.0001); 
+                else eff = 1.0 + Math.pow(Math.E, (V - 850) / 20); 
+                let d_factor = Math.pow(2 / 10, 2); 
+                calculatedCPM += (baseRate * d_factor * eff);
+            } 
+            else if (exp === 'isl') {
+                let R = baseRate / Math.pow(d + 0.5, 2);
+                calculatedCPM += R;
+            }
+            else if (exp === 'absorption') {
+                let R0 = baseRate / Math.pow(5 + 0.5, 2); 
+                calculatedCPM += R0 * Math.exp(-14.0 * t);
+            }
+            else if (exp === 'halflife') {
+                calculatedCPM += baseRate / Math.pow(d + 0.5, 2);
+            }
+
+            return calculatedCPM;
+        }
+
+        /* =========================================================================
+           7. COUNTING LOGIC
+           ========================================================================= */
+        function startCounting() {
+            if (APP_STATE.isCounting) return;
+            APP_STATE.isCounting = true;
+            APP_STATE.countTimer = 0;
+            APP_STATE.currentCounts = 0;
+            
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('btn-start').classList.add('opacity-50');
+            document.getElementById('btn-stop').classList.remove('opacity-50');
+
+            const vStatus = document.getElementById('visual-status');
+            vStatus.innerText = "COUNTING...";
+            vStatus.classList.replace('bg-rose-900/50', 'bg-emerald-900/50');
+            vStatus.classList.replace('text-rose-400', 'text-emerald-400');
+            vStatus.classList.replace('border-rose-500/50', 'border-emerald-500/50');
+
+            DOM.dispCounts.innerText = "000000";
+            DOM.dispTimer.innerText = "00:00";
+            DOM.dispRate.innerText = "0 CPS";
+            
+            playUIBeep(1000, 0.2);
+
+            APP_STATE.countingInterval = setInterval(() => {
+                const expectedCPM = calculateExpectedCPM();
+                const expectedCPS = expectedCPM / 60;
+                
+                APP_STATE.countTimer++;
+                let clicksThisSecond = getPoissonRandom(expectedCPS);
+                APP_STATE.currentCounts += clicksThisSecond;
+
+                let mins = String(Math.floor(APP_STATE.countTimer / 60)).padStart(2, '0');
+                let secs = String(APP_STATE.countTimer % 60).padStart(2, '0');
+                DOM.dispTimer.innerText = `${mins}:${secs}`;
+                DOM.dispCounts.innerText = String(APP_STATE.currentCounts).padStart(6, '0');
+                DOM.dispRate.innerText = `${clicksThisSecond} CPS`;
+
+                let audioClicks = Math.min(clicksThisSecond, 20);
+                for(let i=0; i<audioClicks; i++) {
+                    setTimeout(playGeigerClick, Math.random() * 900);
+                }
+
+                if (APP_STATE.countTimer >= APP_STATE.presetTimer) {
+                    stopCounting();
+                }
+            }, 1000);
+        }
+
+        function stopCounting() {
+            if (!APP_STATE.isCounting) return;
+            clearInterval(APP_STATE.countingInterval);
+            APP_STATE.isCounting = false;
+            
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('btn-start').classList.remove('opacity-50');
+            document.getElementById('btn-stop').classList.add('opacity-50');
+
+            const vStatus = document.getElementById('visual-status');
+            vStatus.innerText = "OFFLINE";
+            vStatus.classList.replace('bg-emerald-900/50', 'bg-rose-900/50');
+            vStatus.classList.replace('text-emerald-400', 'text-rose-400');
+            vStatus.classList.replace('border-emerald-500/50', 'border-rose-500/50');
+
+            playUIBeep(400, 0.3);
+            recordData();
+            updateGraph();
+        }
+
+        function resetApparatus() {
+            if(APP_STATE.isCounting) stopCounting();
+            APP_STATE.countTimer = 0;
+            APP_STATE.currentCounts = 0;
+            DOM.dispCounts.innerText = "000000";
+            DOM.dispTimer.innerText = "00:00";
+            DOM.dispRate.innerText = "0 CPS";
+        }
+
+        /* =========================================================================
+           8. DATA TABLE, GRAPH ENGINE, & LOCAL STORAGE
+           ========================================================================= */
+        function saveDataToStorage() {
+            const payload = {
+                currentExp: APP_STATE.currentExp,
+                dataPoints: APP_STATE.dataPoints
+            };
+            localStorage.setItem('nucLabData', JSON.stringify(payload));
+            
+            // Show saved indicator
+            const status = document.getElementById('save-status');
+            status.style.opacity = '1';
+            setTimeout(() => { status.style.opacity = '0'; }, 2000);
+        }
+
+        function loadDataFromStorage() {
+            const dataStr = localStorage.getItem('nucLabData');
+            if (dataStr) {
+                try {
+                    const parsed = JSON.parse(dataStr);
+                    // Only load if it matches the current starting experiment (plateau by default)
+                    // or let's actually just load the experiment they were on!
+                    if (parsed.currentExp) {
+                        document.getElementById('exp-selector').value = parsed.currentExp;
+                        APP_STATE.currentExp = parsed.currentExp;
+                        APP_STATE.dataPoints = parsed.dataPoints || [];
+                    }
+                } catch(e) { console.error("Could not load save data"); }
+            }
+        }
+
+        function updateTableHeaders() {
+            const head = document.getElementById('data-table-head');
+            let tr = document.createElement('tr');
+            if (APP_STATE.currentExp === 'plateau') { tr.innerHTML = `<th>S.No</th><th>Voltage ($V$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>Error ($\\pm$)</th>`; }
+            else if (APP_STATE.currentExp === 'isl') { tr.innerHTML = `<th>S.No</th><th>Dist $d$ ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$1/d^2$ ($cm^{-2}$)</th>`; }
+            else if (APP_STATE.currentExp === 'absorption') { tr.innerHTML = `<th>S.No</th><th>Thickness ($cm$)</th><th>Time ($s$)</th><th>Counts ($N$)</th><th>Net CPS</th><th>$\\ln(CPS)$</th>`; }
+            else if (APP_STATE.currentExp === 'halflife') { tr.innerHTML = `<th>S.No</th><th>Elapsed Time ($s$)</th><th>Duration ($min$)</th><th>Counts Reading ($N$)</th><th>Corrected CPM</th><th>$\\log(N)$</th>`; }
+            head.innerHTML = ''; head.appendChild(tr);
+            renderMath();
+        }
+
+        function recordData() {
+            const N = APP_STATE.currentCounts; const T = APP_STATE.presetTimer;
+            const V = DOM.voltage.value; const d = DOM.distance.value; const t = DOM.thickness.value;
+            const rawCPS = N / T; const bgCPS = APP_STATE.bgRateCPM / 60;
+            const netCPS = Math.max(0, rawCPS - bgCPS); const error = Math.sqrt(N) / T;
+
+            let rowData = {};
+            if (APP_STATE.currentExp === 'plateau') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(V), t: T, N: N, y: netCPS, err: error.toFixed(2) };
+            else if (APP_STATE.currentExp === 'isl') rowData = { sno: APP_STATE.dataPoints.length + 1, d: parseFloat(d), t: T, N: N, y: netCPS, x: 1 / Math.pow(parseFloat(d), 2) };
+            else if (APP_STATE.currentExp === 'absorption') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
+            else if (APP_STATE.currentExp === 'halflife') rowData = { sno: APP_STATE.dataPoints.length + 1, x: APP_STATE.masterTime - T, dur: (T/60).toFixed(2), N: N, y: Math.max(0, (N * (60/T)) - APP_STATE.bgRateCPM), logN: N > 0 ? Math.log10(N).toFixed(3) : 0 };
+
+            APP_STATE.dataPoints.push(rowData); 
+            renderTable();
+            saveDataToStorage();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('data-table-body'); tbody.innerHTML = '';
+            APP_STATE.dataPoints.forEach(row => {
+                let tr = document.createElement('tr');
+                if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>$\\pm ${row.err}$</td>`;
+                else if (APP_STATE.currentExp === 'isl') tr.innerHTML = `<td>${row.sno}</td><td>${row.d}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.x.toFixed(4)}</td>`;
+                else if (APP_STATE.currentExp === 'absorption') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
+                else if (APP_STATE.currentExp === 'halflife') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.dur}</td><td>${row.N}</td><td>${row.y.toFixed(2)}</td><td>${row.logN}</td>`;
+                tbody.appendChild(tr);
+            });
+            renderMath();
+        }
+
+        function clearData() {
+            APP_STATE.dataPoints = []; renderTable(); updateGraph();
+            saveDataToStorage();
+            document.getElementById('ai-output').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500 text-center"><i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i><p>Data cleared. Ready for new measurements.</p></div>`;
+        }
+
+        // Advanced Graph Engine with Best Fit Overlay and Grid
+        function updateGraph() {
+            const canvas = document.getElementById('graph-canvas'); const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (APP_STATE.dataPoints.length === 0) {
+                ctx.fillStyle = '#64748b'; ctx.font = '14px Orbitron'; ctx.textAlign = 'center';
+                ctx.fillText("NO DATA PLOTTED", canvas.width/2, canvas.height/2); return;
+            }
+
+            const m = 50; const w = canvas.width - m * 2; const h = canvas.height - m * 2;
+            
+            // Draw Grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for(let i=1; i<10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(m, m + (h/10)*i); ctx.lineTo(w + m, m + (h/10)*i); // Horiz
+                ctx.moveTo(m + (w/10)*i, m); ctx.lineTo(m + (w/10)*i, m + h); // Vert
+                ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(m, m); ctx.lineTo(m, h + m); ctx.lineTo(w + m, h + m); ctx.stroke();
+
+            // Limits
+            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x)); let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x));
+            let minY = 0; let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
+            if (minX === maxX) { minX -= 1; maxX += 1; }
+            if (maxY === 0) maxY = 10; maxY *= 1.1;
+
+            // Labels
+            ctx.fillStyle = '#34d399'; ctx.font = '12px monospace'; ctx.textAlign = 'center';
+            let xLabel = "X Axis", yLabel = "Y Axis";
+            if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'isl') { xLabel = "1/d² (cm⁻²)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'absorption') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; }
+            if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "Corrected CPM"; }
+
+            ctx.fillText(xLabel, m + w/2, h + m + 35);
+            ctx.save(); ctx.translate(m - 35, m + h/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel, 0, 0); ctx.restore();
+
+            // Plot Linear Regression Line (Best Fit)
+            if (APP_STATE.dataPoints.length >= 2 && APP_STATE.currentExp !== 'plateau') { // Plateau isn't fully linear
+                const n = APP_STATE.dataPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
+                APP_STATE.dataPoints.forEach(p => {
+                    let calcY = p.y;
+                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    sumX += p.x; sumY += calcY; sumXY += p.x * calcY; sumX2 += p.x * p.x;
+                });
+                let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                let intercept = (sumY - slope * sumX) / n;
+
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.4)'; // Rose 400 with opacity
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // Dashed line
+                ctx.beginPath();
+                
+                // For log plots, y axis mapped differently vs linear fits. For visual simplicity, 
+                // we'll draw the fit if it's a linear ISL, otherwise we just draw the connecting line.
+                if (APP_STATE.currentExp === 'isl') {
+                    let startYFit = slope * minX + intercept;
+                    let endYFit = slope * maxX + intercept;
+                    let py1 = m + h - ((startYFit - minY) / (maxY - minY)) * h;
+                    let py2 = m + h - ((endYFit - minY) / (maxY - minY)) * h;
+                    ctx.moveTo(m, py1); ctx.lineTo(m+w, py2);
+                    ctx.stroke();
+                }
+                ctx.setLineDash([]); // Reset
+            }
+
+            // Plot connecting line
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)'; ctx.lineWidth = 2; ctx.beginPath();
+            APP_STATE.dataPoints.sort((a,b) => a.x - b.x).forEach((p, i) => {
+                let px = m + ((p.x - minX) / (maxX - minX)) * w; let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
+                if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            });
+            ctx.stroke();
+
+            // Plot points
+            ctx.fillStyle = '#f43f5e';
+            APP_STATE.dataPoints.forEach(p => {
+                let px = m + ((p.x - minX) / (maxX - minX)) * w; let py = m + h - ((p.y - minY) / (maxY - minY)) * h;
+                ctx.beginPath(); ctx.arc(px, py, 4, 0, 2*Math.PI); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+            });
+        }
+
+        /* =========================================================================
+           9. AI AUTO-SOLVER & LOGIC (With LaTeX formatting)
+           ========================================================================= */
+        function runAISolver() {
+            const out = document.getElementById('ai-output');
+            if(APP_STATE.dataPoints.length < 3) { out.innerHTML = `<span class="text-rose-400">Error: Insufficient data. Minimum 3 points required.</span>`; return; }
+
+            out.innerHTML = `<div class="loader mr-2"></div> <span class="text-cyan-400">AI Computing physical parameters...</span>`;
+            
+            setTimeout(() => {
+                let html = `<h4 class="text-emerald-400 border-b border-gray-700 pb-2 mb-3"><i class="fa-solid fa-microchip"></i> AI Computation Results</h4>`;
+                const n = APP_STATE.dataPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
+                
+                APP_STATE.dataPoints.forEach(p => {
+                    let calcX = p.x, calcY = p.y;
+                    if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'halflife') calcY = Math.log(p.y > 0 ? p.y : 1);
+                    sumX += calcX; sumY += calcY; sumXY += calcX * calcY; sumX2 += calcX * calcX;
+                });
+
+                let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                
+                if (APP_STATE.currentExp === 'plateau') { 
+                    html += `<p><strong>Analysis:</strong> GM Tube Plateau</p>
+                             <p>Avg Slope across data: $${slope.toFixed(4)} \\text{ CPS/V}$</p>`; 
+                } 
+                else if (APP_STATE.currentExp === 'isl') { 
+                    html += `<p><strong>Analysis:</strong> Inverse Square Law</p>
+                             <p>Linear relationship with slope $K = ${slope.toFixed(2)}$ verifies $I \\propto \\frac{1}{d^2}$.</p>`; 
+                }
+                else if (APP_STATE.currentExp === 'absorption') {
+                    let mu = -slope; let hvt = 0.693 / mu; let R_gcm2 = (hvt * 7) * 2.7; let Emax = (R_gcm2 + 0.09) / 0.52;
+                    html += `<p><strong>Analysis:</strong> Beta Absorption</p>
+                             <p>Equation applied: $\\ln(I) = \\ln(I_0) - \\mu t$</p>
+                             <p>Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p>
+                             <p>Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed End-Point Energy ($E_{\\max}$):</strong> $${Emax.toFixed(3)} \\text{ MeV}$</p>`;
+                }
+                else if (APP_STATE.currentExp === 'halflife') {
+                    let lambda = -slope; let t12 = 0.693 / lambda;
+                    html += `<p><strong>Analysis:</strong> Radioactive Half-Life</p>
+                             <p>Equation applied: $\\ln(A) = \\ln(A_0) - \\lambda t$</p>
+                             <p>Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p>
+                             <p class="text-rose-400 mt-2"><strong>Computed Half-Life ($T_{1/2}$):</strong> $${t12.toFixed(1)} \\text{ s}$</p>`;
+                }
+                out.innerHTML = html;
+                renderMath(); // Re-render LaTeX natively
+                speakText("Analysis complete. Check the computation results panel for detailed parameters.");
+            }, 1000);
+        }
+
+        /* =========================================================================
+           10. EXPORTS & WIDGET UTILS
+           ========================================================================= */
+        function exportCSV() {
+            if(APP_STATE.dataPoints.length === 0) return alert("No data.");
+            let head = document.getElementById('data-table-head').innerText.replace(/\t/g, ',');
+            let body = APP_STATE.dataPoints.map(row => Object.values(row).join(',')).join('\n');
+            const blob = new Blob([head + '\n' + body], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob); a.download = `NucLab_${APP_STATE.currentExp}_Data.csv`; a.click();
+        }
+
+        function exportPNG() {
+            const canvas = document.getElementById('graph-canvas');
+            const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d'); tCtx.fillStyle = '#0f172a'; tCtx.fillRect(0,0, tempCanvas.width, tempCanvas.height); tCtx.drawImage(canvas, 0, 0);
+            const a = document.createElement('a'); a.href = tempCanvas.toDataURL("image/png"); a.download = `Plot_${APP_STATE.currentExp}.png`; a.click();
+        }
+
+        function generateHTMLReport() {
+            if(APP_STATE.dataPoints.length === 0) return alert("Run experiment first.");
+            
+            // Get graph image data
+            const canvas = document.getElementById('graph-canvas');
+            const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d'); tCtx.fillStyle = '#ffffff'; tCtx.fillRect(0,0, tempCanvas.width, tempCanvas.height); tCtx.drawImage(canvas, 0, 0);
+            const imgData = tempCanvas.toDataURL("image/png");
+
+            // Strip out raw LaTeX for pure HTML fallback (or inject MathJax into exported HTML)
+            let rawTable = document.getElementById('data-table-body').innerHTML.replace(/<td.*?>/g, "<td>");
+            let rawHead = document.getElementById('data-table-head').innerHTML.replace(/<th.*?>/g, "<th>");
+            
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html><head><title>Lab Report</title>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; max-width: 900px; margin: auto; color: #333; } 
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } 
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: center; } 
+                th { background-color: #f8f9fa; }
+                .calc { background: #eef2f5; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9; }
+                .graph-container { text-align: center; margin: 30px 0; padding: 20px; background: #000; border-radius: 8px;}
+                img { max-width: 100%; height: auto; }
+            </style>
+            <!-- Embed MathJax in Report -->
+            <script>
+                window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\\\(', '\\\\)']] } };
+            <\/script>
+            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"><\/script>
+            </head><body>
+            <h1>Comprehensive Experiment Report</h1>
+            <p><strong>Experiment:</strong> ${document.getElementById('exp-selector').options[document.getElementById('exp-selector').selectedIndex].text}</p>
+            <p><strong>Date Generated:</strong> ${new Date().toLocaleString()}</p>
+            
+            <h2>1. Observation Table</h2>
+            <table><thead>${rawHead}</thead><tbody>${rawTable}</tbody></table>
+            
+            <h2>2. Graphical Plot</h2>
+            <div class="graph-container">
+                <img src="${imgData}" alt="Experiment Graph">
+            </div>
+
+            <h2>3. Mathematical Analysis & Computations</h2>
+            <div class="calc">${document.getElementById('ai-output').innerHTML}</div>
+            
+            <p style="text-align:center; color:#888; margin-top:50px; font-size: 0.9em;">Generated automatically by Virtual Nuclear Physics Lab Engine.</p>
+            </body></html>`;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob); a.download = `LabReport_${APP_STATE.currentExp}.html`; a.click();
+        }
+
+        function loadManual() {
+            const manual = document.getElementById('manual-content');
+            if (APP_STATE.currentExp === 'plateau') manual.innerHTML = `<strong>Theory:</strong> GM plateau is the voltage region where count rate is virtually constant. Operational voltage is generally $V_{op} \approx V_{threshold} + 100\\text{V}$.`;
+            else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<strong>Theory:</strong> Radiation intensity follows the inverse square law: $I \\propto \\frac{1}{d^2}$. A plot of Rate vs $1/d^2$ yields a straight line.`;
+            else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<strong>Theory:</strong> Beta particles attenuate exponentially via $I = I_0 e^{-\\mu t}$. Half value thickness is $t_{1/2} = \\frac{\\ln(2)}{\\mu}$.`;
+            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<strong>Theory:</strong> Radioactive decay follows $N(t) = N_0 e^{-\\lambda t}$. Half life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.`;
+            renderMath();
+        }
+        function readManual() { speakText(document.getElementById('manual-content').innerText); }
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500/30'); el.classList.add('text-gray-400', 'border-transparent'); });
+            document.getElementById(tabId).classList.remove('hidden');
+            let btn = document.getElementById(`btn-${tabId}`); btn.classList.add('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500/30'); btn.classList.remove('text-gray-400', 'border-transparent');
+            if(tabId === 'tab-graph') updateGraph(); playUIBeep(700, 0.05);
+        }
+        function toggleWidget(id) { const w = document.getElementById(id); w.style.display = (w.style.display === 'flex') ? 'none' : 'flex'; playUIBeep(500, 0.1); }
+        
+        let isDragging = false, currentWidget = null, offsetX, offsetY;
+        document.querySelectorAll('.widget-header').forEach(h => { h.addEventListener('mousedown', function(e) { if(e.target.closest('button')) return; isDragging = true; currentWidget = this.parentElement; offsetX = e.clientX - currentWidget.getBoundingClientRect().left; offsetY = e.clientY - currentWidget.getBoundingClientRect().top; }); });
+        document.addEventListener('mousemove', function(e) { if (isDragging && currentWidget) { currentWidget.style.left = (e.clientX - offsetX) + 'px'; currentWidget.style.top = (e.clientY - offsetY) + 'px'; }});
+        document.addEventListener('mouseup', function() { isDragging = false; currentWidget = null; });
+
+        let calcStr = "0";
+        function updateCalc() { document.getElementById('calc-display').value = calcStr; }
+        function calcNum(n) { calcStr = calcStr === "0" ? String(n) : calcStr + n; updateCalc(); }
+        function calcOp(op) { if (op === 'clear') calcStr = "0"; else if (op === 'del') calcStr = calcStr.length > 1 ? calcStr.slice(0, -1) : "0"; else calcStr += op; updateCalc(); }
+        function calcMath(func) { try { let v = eval(calcStr); if (func === 'sqrt') calcStr = String(Math.sqrt(v)); if (func === 'sq') calcStr = String(v * v); if (func === 'ln') calcStr = String(Math.log(v)); if (func === 'exp') calcStr = String(Math.exp(v)); updateCalc(); } catch(e) { calcStr = "Error"; updateCalc(); } }
+        function calcEq() { try { calcStr = String(eval(calcStr)); updateCalc(); } catch(e) { calcStr = "Error"; updateCalc(); } }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input'); const msg = input.value.trim().toLowerCase(); if(!msg) return;
+            const history = document.getElementById('chat-history'); history.innerHTML += `<div class="text-white text-right mb-2">> ${input.value}</div>`; input.value = '';
+            let reply = "Ask about GM plateau, inverse square law, absorption, half-life, or Poisson error.";
+            if(msg.includes('poisson') || msg.includes('error')) reply = "The statistical error in nuclear counting is strictly related to Poisson statistics. Therefore, Error $= \\pm \\sqrt{N}$.";
+            else if (msg.includes('plateau')) reply = "The GM plateau provides a stable voltage region for reliable counting, avoiding proportional or continuous discharge zones.";
+            else if (msg.includes('inverse') || msg.includes('isl')) reply = "Intensity drops rapidly as the square of the distance: $I \\propto \\frac{1}{d^2}$.";
+            else if (msg.includes('absorption')) reply = "Beta particles are absorbed exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$";
+            else if (msg.includes('half')) reply = "Half life relates to the decay constant: $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$";
+            
+            setTimeout(() => { 
+                history.innerHTML += `<div class="text-blue-300 bg-blue-900/20 p-2 rounded border border-blue-800/50 mb-2"><strong>System:</strong> ${reply}</div>`; 
+                history.scrollTop = history.scrollHeight; 
+                renderMath(); // Render any LaTeX injected in chat
+                speakText(reply); 
+            }, 600);
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Advanced Virtual Nuclear Physics Lab | GM Counter Simulation</title>
     <!-- Tailwind CSS -->
