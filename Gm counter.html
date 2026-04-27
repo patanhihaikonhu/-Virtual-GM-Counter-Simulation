@@ -7,21 +7,20 @@
     
     <!-- 
       ========================================================================
-      EXTERNAL DEPENDENCIES & LIBRARIES
+      1. EXTERNAL DEPENDENCIES & LIBRARIES
       ======================================================================== 
     -->
-    <!-- Tailwind CSS (Loaded via CDN for standalone functionality) -->
+    <!-- Tailwind CSS Engine for rapid, responsive UI development -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome for Iconography -->
+    <!-- Font Awesome for Premium Iconography -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Premium Google Fonts: Orbitron (Digital/Display), Roboto Mono (Data/Math), Inter (Readability) -->
+    <!-- Premium Web Fonts: Orbitron (Displays), Roboto Mono (Data), Inter (UI) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- MathJax for Dynamic LaTeX Equation Rendering -->
     <script>
-        // Pre-configure MathJax before script loads
         if (!window.MathJax) {
             window.MathJax = { 
                 tex: { 
@@ -29,7 +28,7 @@
                     displayMath: [['$$', '$$'], ['\\[', '\\]']]
                 },
                 svg: { fontCache: 'global' },
-                startup: { typeset: false } // We manually invoke typeset later for performance
+                startup: { typeset: false } // Manually invoked for performance
             };
             var script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
@@ -38,7 +37,7 @@
         }
     </script>
 
-    <!-- Tailwind Configuration -->
+    <!-- Tailwind Deep Configuration & Theming -->
     <script>
         tailwind.config = {
             theme: {
@@ -76,35 +75,34 @@
 
     <!-- 
       ========================================================================
-      CUSTOM STYLESHEET (LIQUID GLASS & COMPONENT LOGIC)
+      2. ADVANCED CSS STYLESHEET (LIQUID GLASS & HARDWARE ACCELERATION)
       ======================================================================== 
     -->
     <style>
-        /* Base Environment Reset & Constraints */
+        /* Base Environment Reset & Hardware Acceleration */
         body {
-            background-color: #020617; /* Deep Slate 950 */
+            background-color: #020617; /* Deep Space Slate */
             color: #e2e8f0;
             margin: 0; padding: 0;
             overflow-x: hidden;
             user-select: none; -webkit-user-select: none;
             touch-action: manipulation;
             transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Responsive Custom Scrollbars */
+        /* Custom OS-Level Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(0, 242, 254, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(0, 242, 254, 0.8); }
 
-        /* =========================================
-           HOLOGRAPHIC THEMING ENGINE (Hue Rotation)
-           ========================================= */
-        body[data-theme="cyberpunk"] { filter: hue-rotate(60deg) saturate(1.4); }
-        body[data-theme="matrix"] { filter: sepia(1) hue-rotate(80deg) saturate(2.5) brightness(0.85); }
-        body[data-theme="amber"] { filter: sepia(1) hue-rotate(-30deg) saturate(2.5) brightness(0.9); }
+        /* Holographic Theming Engine */
+        body[data-theme="cyberpunk"] { filter: hue-rotate(60deg) saturate(1.5); }
+        body[data-theme="matrix"] { filter: sepia(1) hue-rotate(80deg) saturate(3) brightness(0.85); }
+        body[data-theme="amber"] { filter: sepia(1) hue-rotate(-30deg) saturate(3) brightness(0.9); }
 
-        /* CRT Scanline Effect (Toggled via Settings) */
+        /* Global CRT Scanline Effect Overlay */
         #crt-overlay {
             position: fixed; inset: 0; z-index: 9998; pointer-events: none;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -115,162 +113,139 @@
         .crt-flicker { animation: crtFlicker 0.15s infinite; }
         @keyframes crtFlicker { 0% { opacity: 0.95; } 50% { opacity: 0.85; } 100% { opacity: 0.95; } }
 
-        /* =========================================
-           TRUE LIQUID GLASS AESTHETICS
-           ========================================= */
-        /* Animated Plasma Background Blobs */
+        /* Animated Plasma Background (True Liquid Depth) */
         .plasma-bg { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
         .plasma-blob {
-            position: absolute; filter: blur(90px); opacity: 0.4; mix-blend-mode: screen;
+            position: absolute; filter: blur(100px); opacity: 0.4; mix-blend-mode: screen;
             border-radius: 50%; will-change: transform;
         }
         .plasma-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #00f2fe 0%, transparent 70%); }
         .plasma-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #4facfe 0%, transparent 70%); }
-        .plasma-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: radial-gradient(circle, #34d399 0%, transparent 70%); opacity: 0.2; }
+        .plasma-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: radial-gradient(circle, #34d399 0%, transparent 70%); opacity: 0.15; }
 
-        /* The Premium Glass Panel Class */
+        /* LIQUID GLASS PANELS: The core aesthetic of the simulation */
         .liquid-panel {
-            background: rgba(15, 23, 42, 0.5); /* Slate 900 semi-transparent */
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(0, 242, 254, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 
-                        inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
         }
         .liquid-panel:hover {
             border-color: rgba(0, 242, 254, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 
-                        0 0 20px rgba(0, 242, 254, 0.1),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 45px 0 rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 242, 254, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.2);
         }
 
-        /* Glass Buttons */
+        /* LIQUID GLASS BUTTONS */
         .liquid-btn {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; overflow: hidden;
+            cursor: pointer;
         }
         .liquid-btn:active { transform: scale(0.95); }
-        .liquid-btn:hover { background: rgba(255, 255, 255, 0.08); }
+        .liquid-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 242, 254, 0.3); }
 
-        /* =========================================
-           MOBILE-OPTIMIZED SLIDERS & INPUTS
-           ========================================= */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 30px; outline: none; margin: 5px 0; }
+        /* ANDROID/MOBILE OPTIMIZED RANGE SLIDERS */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 36px; outline: none; margin: 5px 0; }
         input[type=range]::-webkit-slider-runnable-track { 
-            width: 100%; height: 6px; cursor: pointer; 
-            background: rgba(0,0,0,0.5); border-radius: 4px; 
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 1px 3px rgba(0,0,0,0.8); 
+            width: 100%; height: 8px; cursor: pointer; 
+            background: rgba(0,0,0,0.6); border-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.15); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); 
         }
         input[type=range]::-webkit-slider-thumb { 
-            -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; 
+            -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; 
             background: radial-gradient(circle at center, #ffffff 0%, #00f2fe 100%); 
             cursor: pointer; margin-top: -11px; 
-            box-shadow: 0 0 15px rgba(0,242,254,0.5), inset 0 0 4px rgba(0,0,0,0.3); 
-            border: 2px solid rgba(255,255,255,0.8);
-            transition: transform 0.1s; 
+            box-shadow: 0 0 15px rgba(0,242,254,0.6), inset 0 0 5px rgba(0,0,0,0.4); 
+            border: 2px solid rgba(255,255,255,0.9);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
         }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.3); box-shadow: 0 0 25px rgba(0,242,254,0.9); }
+        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.3); box-shadow: 0 0 25px rgba(0,242,254,1); }
 
-        /* Typography Glows */
-        .neon-text-cyan { text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(0, 242, 254, 0.3); }
-        .neon-text-emerald { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
-        .segment-display { font-family: 'Orbitron', monospace; font-weight: bold; letter-spacing: 2px; }
+        /* NEON TYPOGRAPHY GLOWS */
+        .neon-text-cyan { text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(0, 242, 254, 0.4); }
+        .neon-text-emerald { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.3); }
+        .segment-display { font-family: 'Orbitron', monospace; font-weight: bold; letter-spacing: 3px; }
 
-        /* =========================================
-           ANIMATIONS & INTERACTIVITY
-           ========================================= */
-        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        /* UI ANIMATIONS */
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
+        /* GM Tube Hardware Flash */
         .gm-flash { animation: gmFlashAnim 0.15s ease-out; }
         @keyframes gmFlashAnim { 
-            0% { box-shadow: 0 0 40px #00f2fe, inset 0 0 30px #00f2fe; border-color: #00f2fe; background: rgba(0,242,254,0.3); } 
+            0% { box-shadow: 0 0 40px #00f2fe, inset 0 0 30px #00f2fe; border-color: #00f2fe; background: rgba(0,242,254,0.4); } 
             100% { box-shadow: none; border-color: rgba(0, 242, 254, 0.5); background: transparent; } 
         }
 
-        /* Custom Table Styling */
+        /* Data Tables */
         table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.75rem; }
         @media (min-width: 768px) { table { font-size: 0.85rem; } }
-        th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; white-space: nowrap; }
-        th { background: rgba(0, 242, 254, 0.05); color: #00f2fe; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; }
+        th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 10px; text-align: center; white-space: nowrap; }
+        th { background: rgba(0, 242, 254, 0.08); color: #00f2fe; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.7rem; }
         tr:hover td { background: rgba(0, 242, 254, 0.05); }
         th:first-child { border-top-left-radius: 8px; } th:last-child { border-top-right-radius: 8px; }
 
-        /* =========================================
-           MODALS & WIDGETS
-           ========================================= */
+        /* DRAGGABLE WIDGETS */
+        .widget { 
+            position: absolute; top: 80px; z-index: 1000; display: none; flex-direction: column; 
+            max-width: 95vw; box-shadow: 0 30px 60px rgba(0,0,0,0.9); overflow: hidden;
+            will-change: left, top;
+        }
+        .widget-header { cursor: grab; touch-action: none; } /* Prevents native scroll on mobile header grab */
+        .widget-header:active { cursor: grabbing; }
+
+        /* Intro Screen & 3D Atom */
         #intro-screen {
             position: fixed; inset: 0; z-index: 9999;
-            background: radial-gradient(circle at center, rgba(15,23,42,0.95) 0%, #000 100%); backdrop-filter: blur(15px);
+            background: radial-gradient(circle at center, rgba(15,23,42,0.98) 0%, #000 100%); backdrop-filter: blur(20px);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
 
-        .widget { 
-            position: absolute; top: 100px; z-index: 100; display: none; flex-direction: column; 
-            max-width: 95vw; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); overflow: hidden;
-            /* Ensures it stays above everything */
-        }
-        .widget-header { cursor: grab; }
-        .widget-header:active { cursor: grabbing; }
-
-        /* Tooltips */
-        .tooltip .tooltiptext { 
-            visibility: hidden; width: max-content; max-width: 220px; 
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); color: #fff; 
-            text-align: center; border-radius: 8px; padding: 8px 12px; 
-            position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px); 
-            opacity: 0; transition: all 0.3s ease; font-size: 0.75rem; border: 1px solid rgba(0,242,254,0.3); box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: none; 
-        }
-        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* 3D Atom Animation for Intro */
-        .atom-container { width: 140px; height: 140px; position: relative; perspective: 1000px; transform-style: preserve-3d; animation: rotate-atom 15s linear infinite; }
-        @media (min-width: 768px) { .atom-container { width: 180px; height: 180px; } }
-        .nucleus { width: 30px; height: 30px; background: radial-gradient(circle, #fff, #00f2fe); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 40px #00f2fe; }
-        .orbit { position: absolute; inset: 0; border: 2px solid rgba(0, 242, 254, 0.2); border-radius: 50%; transform-style: preserve-3d; }
+        .atom-container { width: 150px; height: 150px; position: relative; perspective: 1000px; transform-style: preserve-3d; animation: rotate-atom 15s linear infinite; }
+        @media (min-width: 768px) { .atom-container { width: 200px; height: 200px; } }
+        .nucleus { width: 34px; height: 34px; background: radial-gradient(circle, #ffffff, #00f2fe); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 50px #00f2fe; }
+        .orbit { position: absolute; inset: 0; border: 2px solid rgba(0, 242, 254, 0.25); border-radius: 50%; transform-style: preserve-3d; }
         .orbit:nth-child(2) { transform: rotateX(60deg) rotateY(0deg); } .orbit:nth-child(3) { transform: rotateX(60deg) rotateY(60deg); } .orbit:nth-child(4) { transform: rotateX(60deg) rotateY(120deg); }
-        .electron { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: absolute; top: -4px; left: 50%; margin-left: -4px; box-shadow: 0 0 15px #fff; animation: orbit-spin 2s linear infinite; }
-        .orbit:nth-child(3) .electron { animation-delay: -0.6s; background: #f43f5e; box-shadow: 0 0 15px #f43f5e; } .orbit:nth-child(4) .electron { animation-delay: -1.3s; background: #4ade80; box-shadow: 0 0 15px #4ade80; }
+        .electron { width: 10px; height: 10px; background: #fff; border-radius: 50%; position: absolute; top: -5px; left: 50%; margin-left: -5px; box-shadow: 0 0 20px #fff; animation: orbit-spin 2s linear infinite; }
+        .orbit:nth-child(3) .electron { animation-delay: -0.6s; background: #f43f5e; box-shadow: 0 0 20px #f43f5e; } .orbit:nth-child(4) .electron { animation-delay: -1.3s; background: #4ade80; box-shadow: 0 0 20px #4ade80; }
         @keyframes rotate-atom { 0% { transform: rotateX(0) rotateY(0); } 100% { transform: rotateX(360deg) rotateY(360deg); } }
-        @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(70px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(70px) rotateZ(-360deg); } }
-        @media (min-width: 768px) { @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(90px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(90px) rotateZ(-360deg); } } }
+        @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(75px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(75px) rotateZ(-360deg); } }
+        @media (min-width: 768px) { @keyframes orbit-spin { 0% { transform: rotateZ(0deg) translateX(100px) rotateZ(0deg); } 100% { transform: rotateZ(360deg) translateX(100px) rotateZ(-360deg); } } }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative" data-theme="default" oncontextmenu="return false;">
 
     <!-- =========================================
-         BACKGROUND ELEMENTS
+         3. GLOBAL BACKGROUND LAYERS & OVERLAYS
          ========================================= -->
-    <!-- Global CRT Overlay -->
     <div id="crt-overlay"></div>
 
-    <!-- Liquid Plasma Background Layers -->
     <div class="plasma-bg">
         <div class="plasma-blob plasma-1 animate-float-slow"></div>
         <div class="plasma-blob plasma-2 animate-float-delayed"></div>
         <div class="plasma-blob plasma-3 animate-float-slow"></div>
     </div>
     
-    <!-- Star/Particle Canvas Background -->
     <canvas id="space-canvas" class="fixed inset-0 w-full h-full z-[-1] opacity-60"></canvas>
 
-    <!-- Accessibility Announcer -->
-    <div aria-live="assertive" class="sr-only" id="a11y-announcer">Virtual Nuclear Laboratory Environment Loaded.</div>
+    <!-- Invisible Accessibility Announcer for Screen Readers -->
+    <div aria-live="assertive" class="sr-only" id="a11y-announcer">Simulation Engine Preparing.</div>
 
     <!-- =========================================
-         INTRO BOOT SCREEN
+         4. INTRO BOOT SCREEN
          ========================================= -->
     <div id="intro-screen">
         <div class="atom-container mb-10">
@@ -279,79 +254,77 @@
             <div class="orbit"><div class="electron"></div></div>
             <div class="orbit"><div class="electron"></div></div>
         </div>
-        <h1 class="font-display text-4xl md:text-7xl font-bold text-white mb-2 neon-text-cyan tracking-widest text-center px-4">NUC-LAB</h1>
-        <p class="font-mono text-emerald-400 mb-10 text-sm md:text-lg neon-text-emerald tracking-widest text-center px-4">Advanced Physics Engine v6.3</p>
+        <h1 class="font-display text-5xl md:text-7xl font-black text-white mb-2 neon-text-cyan tracking-widest text-center px-4">NUC-LAB</h1>
+        <p class="font-mono text-emerald-400 mb-12 text-sm md:text-lg neon-text-emerald tracking-widest text-center px-4">Advanced Physics Engine v6.4</p>
         
-        <button id="btn-init" aria-label="Initialize Laboratory" class="liquid-panel liquid-btn text-cyan-300 border-cyan-400/50 px-10 py-5 rounded-full font-display font-bold text-xl md:text-2xl hover:text-white transition-all transform hover:scale-105 active:scale-95 flex items-center shadow-[0_0_30px_rgba(0,242,254,0.3)]">
+        <!-- The Critical Init Button -->
+        <button id="btn-init" aria-label="Initialize Laboratory" class="liquid-panel liquid-btn text-cyan-300 border-cyan-400/50 px-12 py-5 rounded-full font-display font-bold text-xl md:text-2xl hover:text-white transition-all transform hover:scale-105 active:scale-95 flex items-center shadow-[0_0_40px_rgba(0,242,254,0.4)]">
             <i class="fa-solid fa-fingerprint mr-4"></i> INITIALIZE LAB
         </button>
         
-        <p class="mt-12 text-gray-500 text-xs font-mono text-center px-4"><i class="fa-solid fa-shield-halved text-cyan-600 mr-1"></i> Security protocols active. Audio engine initialized upon entry.</p>
+        <p class="mt-12 text-gray-500 text-xs font-mono text-center px-4 max-w-lg leading-relaxed"><i class="fa-solid fa-shield-halved text-cyan-600 mr-2"></i> Strict Security Protocols Active. By initializing, you authorize the AudioContext API and grant sandbox permissions.</p>
     </div>
 
     <!-- =========================================
-         HUMOROUS UPDATE / WARNING MODAL
+         5. HUMOROUS UPDATE / WARNING MODAL (STUDENT DIRECTED)
          ========================================= -->
-    <div id="update-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-500 px-4">
-        <div class="liquid-panel p-6 md:p-8 rounded-2xl max-w-lg w-full relative transform scale-95 transition-transform duration-500 bg-slate-900/80" id="update-modal-content">
+    <div id="update-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-500 px-4">
+        <div class="liquid-panel p-6 md:p-8 rounded-3xl max-w-lg w-full relative transform scale-95 transition-transform duration-500 bg-slate-900/95" id="update-modal-content">
             
-            <!-- Glowing Background Accent -->
-            <div class="absolute -top-6 -right-6 w-24 h-24 bg-rose-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+            <div class="absolute -top-6 -right-6 w-24 h-24 bg-rose-600 rounded-full blur-3xl opacity-40 animate-pulse"></div>
             
-            <h2 class="font-display text-white text-xl md:text-2xl font-bold mb-3 flex items-center tracking-wider">
+            <h2 class="font-display text-white text-xl md:text-2xl font-bold mb-4 flex items-center tracking-wider">
                 <i class="fa-solid fa-bullhorn text-rose-400 mr-3 animate-bounce"></i> LAB ANNOUNCEMENT
             </h2>
             <div class="h-px w-full bg-gradient-to-r from-rose-500/50 via-cyan-500/50 to-transparent mb-5"></div>
             
-            <!-- Humor Section for Students -->
-            <div class="bg-rose-950/40 border border-rose-500/30 rounded-xl p-4 mb-6 shadow-inner">
+            <!-- The Student Warning -->
+            <div class="bg-rose-950/50 border border-rose-500/40 rounded-xl p-5 mb-6 shadow-inner">
                 <h3 class="text-rose-400 font-display font-bold text-sm mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>WARNING TO STUDENTS</h3>
                 <p class="text-gray-300 text-sm leading-relaxed">
-                    High levels of background noise detected. Just kidding, it's just your lab partner. But seriously, <strong class="text-white">please maintain strict silence</strong> during the simulation. We are measuring sub-atomic particles, not decibel levels at a rock concert. The AI will artificially increase your error margins if talking exceeds 40dB. 🤫
+                    High levels of background noise detected. Just kidding, it's just your lab partner. But seriously, <strong class="text-white">please maintain strict silence</strong> during the simulation. We are measuring sub-atomic particles, not decibel levels at a rock concert. The AI is programmed to artificially increase your error margins if talking exceeds 40dB. 🤫
                 </p>
             </div>
 
-            <!-- Feature Update Section -->
-            <h3 class="text-emerald-400 font-mono font-bold text-base mb-2"><i class="fa-solid fa-flask mr-2"></i>System Update v6.3</h3>
+            <!-- Technical Updates -->
+            <h3 class="text-emerald-400 font-mono font-bold text-base mb-3"><i class="fa-solid fa-flask mr-2"></i>System Update v6.4</h3>
             <ul class="text-gray-400 text-sm space-y-2 mb-8 font-mono list-disc pl-5">
                 <li><strong class="text-white">New Experiment:</strong> Absorption Factor</li>
                 <li>Calculate Mass Absorption ($\mu_m = \mu/\rho$) for Aluminum.</li>
-                <li>Restored Advanced UI/UX, CRT Overlays, and strict Mobile Support fixes.</li>
+                <li>Completely overhauled Liquid UI, Physics Logic, and Android Touch mapping.</li>
             </ul>
             
-            <button onclick="closeUpdateModal()" class="w-full liquid-btn bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 py-3.5 rounded-xl font-bold hover:bg-cyan-500/30 hover:text-white transition-colors uppercase tracking-widest text-sm shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+            <button onclick="closeUpdateModal()" class="w-full liquid-btn bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 py-4 rounded-xl font-bold hover:bg-cyan-500/30 hover:text-white transition-colors uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(0,242,254,0.3)]">
                 I Promise To Be Quiet
             </button>
         </div>
     </div>
 
     <!-- =========================================
-         ADVANCED SETTINGS MODAL
+         6. ADVANCED SETTINGS MODAL
          ========================================= -->
-    <div id="settings-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 px-4">
-        <div class="liquid-panel p-6 md:p-8 rounded-2xl max-w-sm w-full relative transform scale-95 transition-transform duration-300 bg-slate-900/90" id="settings-modal-content">
-            <h3 class="font-display text-white text-lg md:text-xl font-bold mb-6 border-b border-gray-600/50 pb-3 flex items-center tracking-widest"><i class="fa-solid fa-sliders mr-3 text-cyan-400"></i>PARAMETERS</h3>
+    <div id="settings-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+        <div class="liquid-panel p-6 md:p-8 rounded-3xl max-w-sm w-full relative transform scale-95 transition-transform duration-300 bg-slate-900/95" id="settings-modal-content">
+            <h3 class="font-display text-white text-xl font-bold mb-6 border-b border-gray-600/50 pb-4 flex items-center tracking-widest"><i class="fa-solid fa-sliders mr-3 text-cyan-400"></i>PARAMETERS</h3>
             
             <div class="space-y-6 font-mono text-sm text-gray-300">
                 <!-- Theme Selection -->
                 <div>
                     <label class="block mb-2 text-gray-400 font-sans text-xs uppercase tracking-wider">UI Holographic Theme</label>
-                    <select id="setting-theme" class="w-full bg-black/50 border border-gray-600/50 rounded-lg p-3 text-white focus:border-cyan-400 outline-none appearance-none shadow-inner" onchange="changeTheme(this.value)">
+                    <select id="setting-theme" onchange="changeTheme(this.value)" class="w-full bg-black/60 border border-gray-600/50 rounded-lg p-3 text-white focus:border-cyan-400 outline-none appearance-none shadow-inner cursor-pointer">
                         <option value="default">Liquid Cyan (Default)</option>
                         <option value="cyberpunk">Neon Cyberpunk</option>
                         <option value="matrix">Matrix Terminal</option>
                         <option value="amber">Retro CRT Amber</option>
                     </select>
                 </div>
-
+                <div>                    <span><a href="https://patanhihaikonhu.github.io/-Virtual-GM-Counter-Simulation/Gm%20counter(1).html" class="font-sans text-xs uppercase tracking-wider text-gray-400">Previous version</a> </span></div>
                 <!-- CRT Toggle -->
                 <div class="flex items-center justify-between border-t border-gray-700/50 pt-4">
                     <span class="font-sans text-xs uppercase tracking-wider text-gray-400">Enable CRT Scanlines</span>
-                    <span><a href="https://patanhihaikonhu.github.io/-Virtual-GM-Counter-Simulation/Gm%20counter(1).html" class="font-sans text-xs uppercase tracking-wider text-gray-400">Previous version</a> </span>
-
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="setting-crt" class="sr-only peer" onchange="toggleCRT(this.checked)">
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                        <input type="checkbox" id="setting-crt" onchange="toggleCRT(this.checked)" class="sr-only peer">
+                        <div class="w-12 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
                     </label>
                 </div>
 
@@ -359,134 +332,122 @@
                 <div class="flex items-center justify-between border-t border-gray-700/50 pt-4">
                     <span class="font-sans text-xs uppercase tracking-wider text-gray-400">Lab Ambient Hum</span>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="setting-hum" class="sr-only peer" onchange="toggleAmbientHum(this.checked)">
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                        <input type="checkbox" id="setting-hum" onchange="toggleAmbientHum(this.checked)" class="sr-only peer">
+                        <div class="w-12 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
                     </label>
                 </div>
 
                 <!-- Background Radiation Slider -->
                 <div class="border-t border-gray-700/50 pt-4">
-                    <label class="flex justify-between text-gray-400 mb-2 font-sans text-xs uppercase tracking-wider">
-                        <span>Background Radiation</span>
-                        <span id="val-bg" class="text-white font-bold bg-black/50 border border-gray-600 px-2 py-0.5 rounded">25 CPM</span>
+                    <label class="flex justify-between text-gray-400 mb-3 font-sans text-xs uppercase tracking-wider items-center">
+                        <span>Background Cosmic Ray Level</span>
+                        <span id="val-bg" class="text-white font-bold bg-black/60 border border-gray-600 px-2 py-1 rounded">25 CPM</span>
                     </label>
-                    <input type="range" id="setting-bg" min="5" max="100" step="5" value="25" oninput="updateBGCpm(this.value)">
+                    <input type="range" id="setting-bg" oninput="updateBGCpm(this.value)" min="5" max="100" step="5" value="25">
                 </div>
             </div>
 
-            <button onclick="closeSettingsModal()" class="mt-8 w-full liquid-btn bg-gray-700/30 text-white border border-gray-500/40 py-3 rounded-xl hover:bg-gray-600/50 transition-colors uppercase text-sm font-bold tracking-widest">Close Panel</button>
+            <button onclick="closeSettingsModal()" class="mt-8 w-full liquid-btn bg-gray-700/30 text-white border border-gray-500/40 py-3.5 rounded-xl hover:bg-gray-600/50 transition-colors uppercase text-sm font-bold tracking-widest">Close Panel</button>
         </div>
     </div>
 
     <!-- =========================================
-         MAIN APPLICATION HEADER
+         7. MAIN APPLICATION HEADER
          ========================================= -->
     <header class="liquid-panel mx-2 md:mx-6 mt-2 md:mt-4 px-4 md:px-6 py-3 flex flex-wrap justify-between items-center gap-3 z-40 relative">
-        <!-- Logo -->
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/40 border border-cyan-500/50 flex items-center justify-center shadow-[inset_0_0_15px_rgba(0,242,254,0.3)]">
-                <i class="fa-solid fa-atom text-cyan-400 text-lg md:text-xl animate-spin-slow" style="animation-duration: 5s;"></i>
+        <div class="flex items-center gap-3 md:gap-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/50 border border-cyan-500/50 flex items-center justify-center shadow-[inset_0_0_15px_rgba(0,242,254,0.4)]">
+                <i class="fa-solid fa-atom text-cyan-400 text-lg md:text-xl animate-spin-slow" style="animation-duration: 6s;"></i>
             </div>
             <h1 class="font-display font-bold text-lg md:text-2xl tracking-widest text-white neon-text-cyan"><span class="text-cyan-400">NUC</span>-LAB</h1>
         </div>
         
-        <!-- Interactive Controls -->
         <div class="flex gap-2 items-center flex-wrap justify-end flex-grow">
-            <!-- Universal Reset Button -->
-            <button onclick="universalReset()" class="liquid-btn bg-rose-500/10 text-rose-300 border-rose-500/30 px-3 py-2 rounded-lg font-bold hover:bg-rose-500/20 transition-colors text-xs shadow-[0_0_10px_rgba(244,63,94,0.2)] tooltip">
-                <i class="fa-solid fa-triangle-exclamation sm:mr-2"></i> <span class="hidden sm:inline tracking-wider">RESET</span>
-                <span class="tooltiptext">Wipes all data, clocks, and apparatus.</span>
+            <!-- Reset Button -->
+            <button onclick="universalReset()" class="liquid-btn bg-rose-500/10 text-rose-300 border-rose-500/30 px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-bold hover:bg-rose-500/20 transition-colors text-xs shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+                <i class="fa-solid fa-triangle-exclamation sm:mr-2"></i> <span class="hidden sm:inline tracking-wider">SYSTEM RESET</span>
             </button>
             
-            <div class="w-px h-6 bg-white/20 mx-1 hidden sm:block"></div>
+            <div class="w-px h-8 bg-white/10 mx-1 hidden sm:block"></div>
             
-            <!-- Tool Buttons (Audio, TTS, Calculator, Chat, Settings) -->
-            <button onclick="toggleAudio()" id="btn-audio" class="w-9 h-9 md:w-10 md:h-10 rounded-full liquid-btn flex items-center justify-center text-cyan-300 hover:text-white text-sm tooltip">
-                <i class="fa-solid fa-volume-high"></i><span class="tooltiptext">Geiger Audio SFX</span>
+            <!-- Utility Buttons -->
+            <button onclick="toggleAudio()" id="btn-audio" class="w-10 h-10 md:w-11 md:h-11 rounded-full liquid-btn flex items-center justify-center text-cyan-300 hover:text-white text-sm transition-colors tooltip">
+                <i class="fa-solid fa-volume-high"></i><span class="tooltiptext">Toggle Audio Effects</span>
             </button>
-            <button onclick="toggleVoice()" id="btn-voice" class="w-9 h-9 md:w-10 md:h-10 rounded-full liquid-btn flex items-center justify-center text-rose-300 hover:text-white text-sm tooltip">
-                <i class="fa-solid fa-microphone-lines"></i><span class="tooltiptext">AI Voice TTS</span>
+            <button onclick="toggleVoice()" id="btn-voice" class="w-10 h-10 md:w-11 md:h-11 rounded-full liquid-btn flex items-center justify-center text-rose-300 hover:text-white text-sm transition-colors tooltip">
+                <i class="fa-solid fa-microphone-lines"></i><span class="tooltiptext">Toggle AI Voice</span>
             </button>
-            <button onclick="toggleWidget('widget-calc')" class="w-9 h-9 md:w-10 md:h-10 rounded-full liquid-btn flex items-center justify-center text-emerald-300 hover:text-white text-sm tooltip">
+            <button onclick="toggleWidget('widget-calc')" class="w-10 h-10 md:w-11 md:h-11 rounded-full liquid-btn flex items-center justify-center text-emerald-300 hover:text-white text-sm transition-colors tooltip">
                 <i class="fa-solid fa-calculator"></i><span class="tooltiptext">Scientific Calculator</span>
             </button>
-            <button onclick="toggleWidget('widget-chat')" class="w-9 h-9 md:w-10 md:h-10 rounded-full liquid-btn flex items-center justify-center text-blue-300 hover:text-white text-sm tooltip">
-                <i class="fa-solid fa-robot"></i><span class="tooltiptext">AI Comms Terminal</span>
+            <button onclick="toggleWidget('widget-chat')" class="w-10 h-10 md:w-11 md:h-11 rounded-full liquid-btn flex items-center justify-center text-blue-300 hover:text-white text-sm transition-colors tooltip">
+                <i class="fa-solid fa-robot"></i><span class="tooltiptext">AI Comms Link</span>
             </button>
-            <button onclick="toggleSettingsModal()" class="w-9 h-9 md:w-10 md:h-10 rounded-full liquid-btn flex items-center justify-center text-gray-300 hover:text-white text-sm tooltip">
+            <button onclick="toggleSettingsModal()" class="w-10 h-10 md:w-11 md:h-11 rounded-full liquid-btn flex items-center justify-center text-gray-300 hover:text-white text-sm transition-colors tooltip">
                 <i class="fa-solid fa-gear"></i><span class="tooltiptext">Advanced Settings</span>
             </button>
         </div>
     </header>
 
     <!-- =========================================
-         MAIN APPLICATION GRID
+         8. MAIN APPLICATION GRID (LEFT/RIGHT SPLIT)
          ========================================= -->
-    <main class="flex-grow px-2 md:px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 relative z-10 w-full max-w-[1600px] mx-auto">
+    <main class="flex-grow px-2 md:px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 relative z-10 w-full max-w-[1600px] mx-auto mb-6">
         
-        <!-- LEFT COLUMN: APPARATUS & CONTROLS (5/12) -->
-        <aside class="lg:col-span-5 flex flex-col gap-4">
+        <!-- LEFT COLUMN: LIVE APPARATUS & CONFIG (5 Columns) -->
+        <aside class="lg:col-span-5 flex flex-col gap-4 md:gap-6">
             
-            <!-- LIVE APPARATUS VISUALIZER -->
+            <!-- APPARATUS VISUALIZER MODULE -->
             <div class="liquid-panel p-4 md:p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 opacity-60"></div>
-                <h2 class="font-display text-cyan-400 font-bold text-xs md:text-sm mb-3 flex justify-between items-center tracking-wider">
-                    <span><i class="fa-solid fa-microscope mr-2"></i>LIVE APPARATUS</span>
-                    <span id="visual-status" class="text-[9px] bg-rose-900/40 text-rose-400 px-2 py-1 rounded-md border border-rose-500/40 animate-pulse tracking-widest shadow-inner">OFFLINE</span>
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 opacity-70"></div>
+                <h2 class="font-display text-cyan-400 font-bold text-xs md:text-sm mb-4 flex justify-between items-center tracking-wider">
+                    <span><i class="fa-solid fa-microscope mr-2"></i>LIVE APPARATUS STAGE</span>
+                    <span id="visual-status" class="text-[9px] bg-rose-900/40 text-rose-400 px-2.5 py-1 rounded-md border border-rose-500/40 animate-pulse tracking-widest shadow-inner">OFFLINE</span>
                 </h2>
                 
-                <!-- The Simulation Stage -->
-                <div class="relative w-full h-36 md:h-48 bg-[#010308] rounded-xl overflow-hidden flex items-end pb-5 md:pb-8 px-2 md:px-4 shadow-[inset_0_4px_30px_rgba(0,0,0,1)] border border-white/5">
+                <div class="relative w-full h-40 md:h-52 bg-[#010308] rounded-xl overflow-hidden flex items-end pb-6 md:pb-8 px-2 md:px-4 shadow-[inset_0_4px_40px_rgba(0,0,0,1)] border border-white/5">
                     
-                    <!-- Radiation Particle Overlay -->
                     <canvas id="apparatus-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none z-20"></canvas>
                     
-                    <!-- Optical Bench Rail -->
-                    <div class="absolute bottom-5 md:bottom-8 left-0 right-0 h-2 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 shadow-[0_5px_15px_rgba(0,0,0,1)] border-t border-gray-600">
+                    <div class="absolute bottom-6 md:bottom-8 left-0 right-0 h-2 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 shadow-[0_5px_20px_rgba(0,0,0,1)] border-t border-gray-600">
                         <div class="w-full h-full opacity-30" style="background-image: repeating-linear-gradient(90deg, transparent, transparent 19px, #fff 19px, #fff 20px);"></div>
                     </div>
 
-                    <!-- GM Tube Array Component -->
-                    <div class="absolute bottom-[20px] md:bottom-[32px] left-2 md:left-4 flex items-center z-10">
+                    <div class="absolute bottom-[24px] md:bottom-[32px] left-3 md:left-5 flex items-center z-10">
                         <div class="w-16 md:w-24 h-12 md:h-16 bg-gradient-to-br from-gray-700 to-black rounded-l-lg border border-gray-600 flex flex-col justify-center items-center shadow-[5px_0_20px_rgba(0,0,0,0.8)] relative">
-                            <!-- Hardware LED Indicator -->
-                            <div class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e]" id="hw-led"></div>
+                            <div class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-rose-600 shadow-[0_0_10px_#f43f5e]" id="hw-led"></div>
                             <span class="text-[7px] md:text-[9px] font-bold text-gray-400 tracking-widest mt-1">GM TUBE</span>
                         </div>
-                        <!-- Tube Mica Window -->
-                        <div id="gm-window" class="w-2 md:w-3 h-10 md:h-14 bg-black border-y-2 border-r-2 border-cyan-500/50 rounded-r-md flex items-center justify-center transition-all duration-100 relative shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+                        <div id="gm-window" class="w-2 md:w-3 h-10 md:h-14 bg-black border-y-2 border-r-2 border-cyan-500/50 rounded-r-md flex items-center justify-center transition-all duration-100 relative shadow-[0_0_20px_rgba(0,242,254,0.2)]">
                             <div class="absolute inset-0 opacity-40" style="background-image: linear-gradient(#00f2fe 1px, transparent 1px), linear-gradient(90deg, #00f2fe 1px, transparent 1px); background-size: 3px 3px;"></div>
                         </div>
                     </div>
 
-                    <!-- Aluminum Absorber Visualizer -->
-                    <div id="visual-absorber-container" class="absolute bottom-[22px] md:bottom-[34px] left-[80px] md:left-[110px] h-10 md:h-14 w-0 flex justify-center items-end opacity-0 transition-opacity duration-300 z-15">
-                        <div id="visual-absorber" class="h-full bg-gradient-to-r from-gray-200 to-gray-400 border-x border-white/80 shadow-[0_0_20px_rgba(255,255,255,0.4)] rounded-sm transition-all duration-300 relative" style="width: 2px;">
+                    <div id="visual-absorber-container" class="absolute bottom-[26px] md:bottom-[34px] left-[90px] md:left-[120px] h-10 md:h-14 w-0 flex justify-center items-end opacity-0 transition-opacity duration-300 z-15">
+                        <div id="visual-absorber" class="h-full bg-gradient-to-r from-gray-200 to-gray-400 border-x border-white/80 shadow-[0_0_25px_rgba(255,255,255,0.4)] rounded-sm transition-all duration-300 relative" style="width: 2px;">
                             <div class="absolute inset-0 bg-white opacity-0 transition-opacity duration-100" id="absorber-flash"></div>
                         </div>
                     </div>
 
-                    <!-- Radioactive Isotope Source Mount -->
-                    <div id="visual-source-mount" class="absolute bottom-[20px] md:bottom-[32px] w-8 md:w-10 h-14 md:h-18 bg-gradient-to-b from-gray-600 to-gray-900 border border-gray-500 rounded-t-md shadow-[0_0_30px_rgba(0,0,0,1)] flex flex-col items-center z-30 transition-all duration-300 ease-out" style="left: 80%;">
+                    <div id="visual-source-mount" class="absolute bottom-[24px] md:bottom-[32px] w-8 md:w-10 h-14 md:h-18 bg-gradient-to-b from-gray-600 to-gray-900 border border-gray-500 rounded-t-md shadow-[0_0_30px_rgba(0,0,0,1)] flex flex-col items-center z-30 transition-all duration-300 ease-out" style="left: 80%;">
                         <div id="visual-source-pellet" class="w-4 h-4 md:w-5 md:h-5 rounded-full mt-1.5 md:mt-2 flex items-center justify-center shadow-[0_0_25px_#3b82f6] bg-[#3b82f6] transition-colors duration-300 border border-white/30">
                             <i class="fa-solid fa-radiation text-black text-[8px] animate-spin-slow"></i>
                         </div>
                         <div class="mt-auto w-full h-3 bg-gray-950 border-t border-gray-700"></div>
-                        <div class="absolute -bottom-5 md:-bottom-6 text-[9px] md:text-[10px] font-mono text-cyan-400 bg-black/80 backdrop-blur-sm px-1.5 py-0.5 rounded border border-cyan-500/30" id="visual-dist-label">50cm</div>
+                        <div class="absolute -bottom-6 text-[9px] md:text-[10px] font-mono text-cyan-400 bg-black/90 backdrop-blur-sm px-1.5 py-0.5 rounded border border-cyan-500/30" id="visual-dist-label">50cm</div>
                     </div>
                 </div>
                 
-                <!-- Cosmic Ray Burst Injector -->
-                <button onclick="injectCosmicBurst()" class="absolute top-3 right-3 text-[9px] md:text-[11px] liquid-btn bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg border-purple-500/40 hover:bg-purple-500/30 transition-colors z-30 shadow-[0_0_15px_rgba(168,85,247,0.3)] tracking-widest font-bold">
+                <button onclick="injectCosmicBurst()" class="absolute top-4 right-4 text-[9px] md:text-[11px] liquid-btn bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg border-purple-500/40 hover:bg-purple-500/30 transition-colors z-30 shadow-[0_0_15px_rgba(168,85,247,0.3)] tracking-widest font-bold">
                     <i class="fa-solid fa-meteor mr-1"></i> BURST
                 </button>
             </div>
 
-            <!-- EXPERIMENT CONFIGURATION PANEL -->
+            <!-- PHYSICS CONFIGURATION MODULE -->
             <div class="liquid-panel p-4 md:p-5 flex-grow flex flex-col">
-                <h2 class="font-display text-cyan-400 font-bold text-xs md:text-sm mb-4 border-b border-white/10 pb-2 tracking-wider"><i class="fa-solid fa-sliders mr-2"></i>CONFIGURATION</h2>
+                <h2 class="font-display text-cyan-400 font-bold text-xs md:text-sm mb-4 border-b border-white/10 pb-2 tracking-wider"><i class="fa-solid fa-sliders mr-2"></i>PHYSICS CONFIGURATION</h2>
                 
-                <select id="exp-selector" class="w-full bg-black/50 border border-cyan-500/30 text-white rounded-xl p-3 mb-5 font-mono text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[inset_0_2px_5px_rgba(0,0,0,0.5)] appearance-none cursor-pointer" onchange="setupExperimentUI()">
+                <select id="exp-selector" onchange="setupExperimentUI()" class="w-full bg-black/60 border border-cyan-500/30 text-white rounded-xl p-3 md:p-3.5 mb-5 font-mono text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition-colors shadow-[inset_0_2px_10px_rgba(0,0,0,0.6)] appearance-none cursor-pointer">
                     <option value="plateau">1. GM Tube Plateau Characteristics</option>
                     <option value="isl">2. Inverse Square Law ($I \propto 1/d^2$)</option>
                     <option value="absorption">3. Beta Absorption (End-Point Energy)</option>
@@ -494,12 +455,10 @@
                     <option value="halflife">5. Radioactive Half-Life</option>
                 </select>
 
-                <!-- Dynamic Physics Controls -->
-                <div id="controls-container" class="space-y-5 text-xs md:text-sm font-mono flex-grow">
-                    
-                    <div id="ctrl-source" class="control-group transition-opacity duration-300">
-                        <label class="block text-gray-400 mb-1.5">Radioactive Source Isotope</label>
-                        <select id="input-source" class="w-full bg-black/50 border border-gray-600/50 rounded-lg p-2.5 text-white outline-none appearance-none shadow-inner cursor-pointer" onchange="updateParameters()">
+                <div class="space-y-6 text-xs md:text-sm font-mono flex-grow">
+                    <div id="ctrl-source" class="transition-opacity duration-300">
+                        <label class="block text-gray-400 mb-2">Radioactive Source Isotope</label>
+                        <select id="input-source" onchange="updateParameters()" class="w-full bg-black/60 border border-gray-600/50 rounded-lg p-3 text-white outline-none appearance-none shadow-inner cursor-pointer">
                             <option value="co60">Cobalt-60 ($\gamma, \beta^-$)</option>
                             <option value="sr90">Strontium-90 ($\beta^-$)</option>
                             <option value="cs137">Cesium-137 ($\gamma, \beta^-$)</option>
@@ -507,81 +466,77 @@
                         </select>
                     </div>
 
-                    <div id="ctrl-voltage" class="control-group transition-opacity duration-300">
-                        <label class="flex justify-between text-gray-400 mb-1.5 items-center">
+                    <div id="ctrl-voltage" class="transition-opacity duration-300">
+                        <label class="flex justify-between text-gray-400 mb-2 items-center">
                             <span>High Voltage (HV)</span>
                             <span id="val-voltage" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">500 V</span>
                         </label>
-                        <input type="range" id="input-voltage" min="300" max="1000" step="10" value="500" oninput="updateVal('voltage', this.value, ' V')">
+                        <input type="range" id="input-voltage" oninput="updateVal('voltage', this.value, ' V')" min="300" max="1000" step="10" value="500">
                     </div>
 
-                    <div id="ctrl-distance" class="control-group transition-opacity duration-300">
-                        <label class="flex justify-between text-gray-400 mb-1.5 items-center">
+                    <div id="ctrl-distance" class="transition-opacity duration-300">
+                        <label class="flex justify-between text-gray-400 mb-2 items-center">
                             <span>Distance ($d$)</span>
                             <span id="val-distance" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">10 cm</span>
                         </label>
-                        <input type="range" id="input-distance" min="2" max="50" step="1" value="10" oninput="updateVal('distance', this.value, ' cm')">
+                        <input type="range" id="input-distance" oninput="updateVal('distance', this.value, ' cm')" min="2" max="50" step="1" value="10">
                     </div>
 
-                    <div id="ctrl-thickness" class="control-group transition-opacity duration-300">
-                        <label class="flex justify-between text-gray-400 mb-1.5 items-center">
+                    <div id="ctrl-thickness" class="transition-opacity duration-300">
+                        <label class="flex justify-between text-gray-400 mb-2 items-center">
                             <span>Al Thickness ($t$)</span>
                             <span id="val-thickness" class="text-cyan-300 font-bold bg-cyan-900/30 px-2 py-1 rounded border border-cyan-500/20">0.00 cm</span>
                         </label>
-                        <input type="range" id="input-thickness" min="0" max="0.5" step="0.01" value="0" oninput="updateVal('thickness', this.value, ' cm')">
+                        <input type="range" id="input-thickness" oninput="updateVal('thickness', this.value, ' cm')" min="0" max="0.5" step="0.01" value="0">
                     </div>
                 </div>
 
-                <!-- Universal Timer Preset -->
-                <div class="pt-5 mt-auto border-t border-gray-700/50">
-                    <label class="flex justify-between text-gray-400 mb-2 text-xs md:text-sm font-mono items-center">
+                <div class="pt-6 mt-6 border-t border-gray-700/50">
+                    <label class="flex justify-between text-gray-400 mb-3 text-xs md:text-sm font-mono items-center">
                         <span>Preset Timer Duration</span>
                         <span id="val-timer" class="text-emerald-400 font-bold bg-emerald-900/30 px-2 py-1 rounded border border-emerald-500/20">60 s</span>
                     </label>
-                    <input type="range" id="input-timer" min="10" max="3600" step="10" value="60" oninput="formatTimer(this.value)">
+                    <input type="range" id="input-timer" oninput="formatTimer(this.value)" min="10" max="3600" step="10" value="60">
                 </div>
             </div>
 
-            <!-- DIGITAL SCALER / COUNTER DISPLAY -->
+            <!-- DIGITAL SCALER MODULE -->
             <div class="liquid-panel p-4 md:p-5 border-l-4 border-l-emerald-500 relative group">
                 <div class="absolute -right-10 -top-10 opacity-[0.02] transition-transform duration-700 group-hover:scale-110 pointer-events-none"><i class="fa-solid fa-microchip text-[12rem]"></i></div>
                 
-                <div class="bg-black/70 p-4 md:p-5 rounded-xl border border-gray-800/80 mb-4 shadow-[inset_0_0_30px_rgba(0,0,0,1)] relative backdrop-blur-md">
+                <div class="bg-black/80 p-4 md:p-5 rounded-xl border border-gray-800/80 mb-5 shadow-[inset_0_0_30px_rgba(0,0,0,1)] relative backdrop-blur-md">
                     <div class="flex justify-between items-end mb-3">
                         <span class="text-[9px] md:text-[10px] text-gray-500 tracking-widest font-display">DECAY CLOCK</span>
                         <span id="display-decay-clock" class="font-mono text-gray-400 text-sm md:text-base bg-gray-900/50 px-2 py-0.5 rounded border border-gray-700">00:00:00</span>
                     </div>
                     <div class="flex justify-between items-end mb-3">
                         <span class="text-[9px] md:text-[10px] text-gray-500 tracking-widest font-display">TIMER CLOCK</span>
-                        <span id="display-timer" class="segment-display text-rose-500 text-xl md:text-2xl bg-rose-950/40 px-2 py-0.5 rounded border border-rose-900/50 neon-text-rose">00:00</span>
+                        <span id="display-timer" class="segment-display text-rose-500 text-2xl md:text-3xl bg-rose-950/40 px-2 py-0.5 rounded border border-rose-900/50 neon-text-rose">00:00</span>
                     </div>
                     <div class="flex justify-between items-end border-b border-gray-800 pb-3 mb-3">
                         <span class="text-[9px] md:text-[10px] text-gray-500 tracking-widest font-display">COUNTS ($N$)</span>
-                        <span id="display-counts" class="segment-display text-cyan-400 text-4xl md:text-5xl neon-text-cyan tracking-widest">000000</span>
+                        <span id="display-counts" class="segment-display text-cyan-400 text-5xl md:text-6xl neon-text-cyan tracking-widest">000000</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <span id="hw-status" class="text-[8px] md:text-[9px] text-emerald-400 font-sans tracking-widest bg-emerald-900/30 px-1.5 py-0.5 rounded border border-emerald-800/50">HV STABLE</span>
-                            <span class="text-[8px] md:text-[9px] text-gray-500 font-sans tracking-widest tooltip bg-gray-800/50 px-1.5 py-0.5 rounded border border-gray-700">DEAD TIME: 200µs
-                                <span class="tooltiptext">Calculated internally via non-paralyzable model: $m = n / (1 + n\tau)$</span>
-                            </span>
+                            <span id="hw-status" class="text-[8px] md:text-[10px] text-emerald-400 font-sans tracking-widest bg-emerald-900/30 px-2 py-1 rounded border border-emerald-800/50">HV STABLE</span>
+                            <span class="text-[8px] md:text-[10px] text-gray-500 font-sans tracking-widest bg-gray-800/50 px-2 py-1 rounded border border-gray-700">DEAD TIME: 200µs</span>
                         </div>
                         <div class="font-mono">
                             <span class="text-[9px] md:text-[10px] text-gray-500 tracking-widest">RATE: </span>
-                            <span id="display-rate" class="text-emerald-400 font-bold bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-800/30">0 CPS</span>
+                            <span id="display-rate" class="text-emerald-400 font-bold bg-emerald-900/20 px-2 py-1 rounded border border-emerald-800/30">0 CPS</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Simulation Run Controls -->
                 <div class="flex gap-3">
-                    <button id="btn-start" onclick="startCounting()" class="flex-1 liquid-btn bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 py-3 md:py-3.5 rounded-xl font-bold tracking-widest hover:bg-emerald-500/30 hover:text-emerald-300 transition-colors uppercase text-xs md:text-sm shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                    <button id="btn-start" onclick="startCounting()" class="flex-1 liquid-btn bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 py-3.5 md:py-4 rounded-xl font-bold tracking-widest hover:bg-emerald-500/30 hover:text-emerald-300 transition-colors uppercase text-xs md:text-sm shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                         <i class="fa-solid fa-play mr-2"></i> START
                     </button>
-                    <button id="btn-stop" onclick="stopCounting()" class="flex-1 liquid-btn bg-rose-500/20 text-rose-400 border border-rose-500/40 py-3 md:py-3.5 rounded-xl font-bold tracking-widest hover:bg-rose-500/30 hover:text-rose-300 transition-colors uppercase text-xs md:text-sm shadow-[0_0_15px_rgba(244,63,94,0.2)]" disabled>
+                    <button id="btn-stop" onclick="stopCounting()" class="flex-1 liquid-btn bg-rose-500/20 text-rose-400 border border-rose-500/40 py-3.5 md:py-4 rounded-xl font-bold tracking-widest hover:bg-rose-500/30 hover:text-rose-300 transition-colors uppercase text-xs md:text-sm shadow-[0_0_15px_rgba(244,63,94,0.2)]" disabled>
                         <i class="fa-solid fa-stop mr-2"></i> STOP
                     </button>
-                    <button onclick="resetApparatus()" class="flex-none w-12 md:w-14 liquid-btn bg-gray-600/20 text-gray-300 border border-gray-500/40 py-3 md:py-3.5 rounded-xl hover:bg-gray-600/40 transition-colors">
+                    <button onclick="resetApparatus()" class="flex-none w-14 md:w-16 liquid-btn bg-gray-600/20 text-gray-300 border border-gray-500/40 py-3.5 md:py-4 rounded-xl hover:bg-gray-600/40 transition-colors">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
                 </div>
@@ -589,49 +544,51 @@
 
         </aside>
 
-        <!-- RIGHT COLUMN: DATA, GRAPH, & AI (7/12) -->
-        <section class="lg:col-span-7 flex flex-col gap-4">
+        <!-- RIGHT COLUMN: ANALYTICS & DATA TABS (7 Columns) -->
+        <section class="lg:col-span-7 flex flex-col gap-4 md:gap-6">
             
-            <!-- Tabs Navigation -->
+            <!-- Tab Navigation Header -->
             <div class="liquid-panel p-2 flex gap-1 md:gap-2 overflow-x-auto scrollable-y rounded-xl">
-                <button onclick="switchTab('tab-data')" id="btn-tab-data" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 transition-all tracking-wide shadow-[0_0_15px_rgba(0,242,254,0.2)]"><i class="fa-solid fa-table mr-2"></i>Data Table</button>
-                <button onclick="switchTab('tab-graph')" id="btn-tab-graph" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide"><i class="fa-solid fa-chart-line mr-2"></i>Dynamic Plot</button>
-                <button onclick="switchTab('tab-ai')" id="btn-tab-ai" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide"><i class="fa-solid fa-microchip mr-2"></i>AI Solver</button>
-                <button onclick="switchTab('tab-manual')" id="btn-tab-manual" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide"><i class="fa-solid fa-book mr-2"></i>Lab Manual</button>
+                <button onclick="switchTab('tab-data')" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-3 rounded-lg text-xs md:text-sm font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 transition-all tracking-wide shadow-[0_0_15px_rgba(0,242,254,0.2)]" data-target="tab-data"><i class="fa-solid fa-table mr-2"></i>Data Table</button>
+                <button onclick="switchTab('tab-graph')" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide" data-target="tab-graph"><i class="fa-solid fa-chart-line mr-2"></i>Dynamic Plot</button>
+                <button onclick="switchTab('tab-ai')" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide" data-target="tab-ai"><i class="fa-solid fa-microchip mr-2"></i>AI Solver</button>
+                <button onclick="switchTab('tab-manual')" class="tab-btn flex-1 min-w-[110px] px-3 md:px-4 py-3 rounded-lg text-xs md:text-sm font-bold text-gray-400 border border-transparent hover:bg-white/5 hover:text-white transition-all tracking-wide" data-target="tab-manual"><i class="fa-solid fa-book mr-2"></i>Lab Manual</button>
             </div>
 
-            <!-- Tab Content Area -->
-            <div class="liquid-panel p-4 md:p-6 flex-grow relative min-h-[450px] flex flex-col">
+            <!-- Main Dynamic Tab Content -->
+            <div class="liquid-panel p-4 md:p-6 flex-grow relative min-h-[500px] flex flex-col">
                 
                 <!-- DATA TABLE TAB -->
                 <div id="tab-data" class="tab-content h-full flex flex-col fade-in">
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                         <h3 class="font-display text-cyan-400 font-bold text-xs md:text-sm tracking-wider"><i class="fa-solid fa-database mr-2"></i>OBSERVATION LOG</h3>
                         <div class="flex gap-2">
-                            <button onclick="clearData()" class="liquid-btn text-[10px] md:text-xs bg-rose-500/10 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/20"><i class="fa-solid fa-trash mr-1.5"></i>Clear</button>
-                            <button onclick="exportCSV()" class="liquid-btn text-[10px] md:text-xs bg-emerald-500/10 text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20"><i class="fa-solid fa-file-csv mr-1.5"></i>CSV</button>
+                            <button onclick="clearData()" class="liquid-btn text-[10px] md:text-xs bg-rose-500/10 text-rose-300 px-3 py-2 rounded-lg border border-rose-500/30 hover:bg-rose-500/20 font-bold"><i class="fa-solid fa-trash mr-1.5"></i>Clear</button>
+                            <button onclick="exportCSV()" class="liquid-btn text-[10px] md:text-xs bg-emerald-500/10 text-emerald-300 px-3 py-2 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 font-bold"><i class="fa-solid fa-file-csv mr-1.5"></i>CSV</button>
                         </div>
                     </div>
-                    <div class="scrollable-y flex-grow rounded-xl border border-gray-700/50 bg-[#020617]/80 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm">
-                        <table>
-                            <thead id="data-table-head" class="sticky top-0 bg-[#0f172a] shadow-md z-10"></thead>
-                            <tbody id="data-table-body" class="text-gray-300"></tbody>
-                        </table>
+                    <div class="flex-grow rounded-xl border border-gray-700/50 bg-[#020617]/80 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm overflow-hidden flex flex-col">
+                        <div class="overflow-y-auto flex-grow" style="max-height: 400px;">
+                            <table>
+                                <thead id="data-table-head" class="sticky top-0 bg-[#0f172a] shadow-md z-10"></thead>
+                                <tbody id="data-table-body" class="text-gray-300"></tbody>
+                            </table>
+                        </div>
                     </div>
-                    <p class="text-[10px] md:text-xs text-gray-500 mt-4 border-t border-gray-700/50 pt-3 font-mono"><i class="fa-solid fa-circle-info mr-1.5 text-cyan-500"></i> Statistical Error ($\pm \sqrt{N}$) derived strictly from Poisson probability. Net rates automatically subtract background radiation.</p>
+                    <p class="text-[10px] md:text-xs text-gray-500 mt-4 border-t border-gray-700/50 pt-3 font-mono"><i class="fa-solid fa-circle-info mr-1.5 text-cyan-500"></i> Error calculations ($\pm \sqrt{N}$) strictly follow Poisson Probability. Net counting rates are algorithmically adjusted for local cosmic background noise.</p>
                 </div>
 
-                <!-- GRAPH TAB -->
+                <!-- GRAPH PLOTTER TAB -->
                 <div id="tab-graph" class="tab-content hidden h-full flex flex-col fade-in">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-display text-emerald-400 font-bold text-xs md:text-sm tracking-wider"><i class="fa-solid fa-chart-area mr-2"></i>DYNAMIC GRAPH PLOTTER</h3>
-                        <button onclick="exportPNG()" class="liquid-btn text-[10px] md:text-xs bg-cyan-500/10 text-cyan-300 px-3 py-1.5 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/20"><i class="fa-solid fa-image mr-1.5"></i>Export PNG</button>
+                        <button onclick="exportPNG()" class="liquid-btn text-[10px] md:text-xs bg-cyan-500/10 text-cyan-300 px-3 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/20 font-bold"><i class="fa-solid fa-image mr-1.5"></i>Export PNG</button>
                     </div>
                     <div class="flex-grow w-full bg-[#020617]/90 border border-gray-700/50 rounded-xl relative flex items-center justify-center p-2 shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-                        <!-- High DPI Canvas for crisp lines on mobile -->
-                        <canvas id="graph-canvas" class="w-full h-full max-h-[300px] md:max-h-[450px]"></canvas>
+                        <!-- High DPI Canvas explicitly requires dynamic sizing in JS -->
+                        <canvas id="graph-canvas" class="w-full h-full min-h-[300px] block"></canvas>
                     </div>
-                    <p class="text-[10px] md:text-xs text-gray-500 mt-4 text-center border-t border-gray-700/50 pt-3 font-mono"><i class="fa-solid fa-calculator mr-1.5 text-emerald-500"></i> AI renders automatic Least Squares Linear Regression (Line of Best Fit) if valid data exists.</p>
+                    <p class="text-[10px] md:text-xs text-gray-500 mt-4 text-center border-t border-gray-700/50 pt-3 font-mono"><i class="fa-solid fa-calculator mr-1.5 text-emerald-500"></i> AI natively computes and renders Least Squares Linear Regression Lines for appropriate datasets.</p>
                 </div>
 
                 <!-- AI SOLVER TAB -->
@@ -639,17 +596,19 @@
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                         <h3 class="font-display text-rose-400 font-bold text-xs md:text-sm tracking-wider"><i class="fa-solid fa-microchip mr-2"></i>AI COMPUTATION ENGINE</h3>
                         <div class="flex gap-2">
-                            <button onclick="runAISolver()" class="liquid-btn text-[10px] md:text-xs bg-indigo-500/20 text-indigo-300 px-3 py-1.5 rounded-lg border border-indigo-500/40 hover:bg-indigo-500/30 font-bold tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.3)]"><i class="fa-solid fa-gears mr-1.5"></i>RUN ANALYSIS</button>
-                            <button onclick="generateHTMLReport()" class="liquid-btn text-[10px] md:text-xs bg-emerald-500/10 text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20"><i class="fa-solid fa-file-pdf mr-1.5"></i>Full Report</button>
+                            <button onclick="runAISolver()" class="liquid-btn text-[10px] md:text-xs bg-indigo-500/20 text-indigo-300 px-4 py-2 rounded-lg border border-indigo-500/40 hover:bg-indigo-500/30 font-bold tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.3)]"><i class="fa-solid fa-gears mr-1.5"></i>RUN ANALYSIS</button>
+                            <button onclick="generateHTMLReport()" class="liquid-btn text-[10px] md:text-xs bg-emerald-500/10 text-emerald-300 px-3 py-2 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 font-bold"><i class="fa-solid fa-file-pdf mr-1.5"></i>Academic Report</button>
                         </div>
                     </div>
-                    <div id="ai-output" class="scrollable-y flex-grow bg-[#020617]/80 p-5 md:p-6 rounded-xl border border-gray-700/50 font-mono text-xs md:text-sm leading-relaxed text-gray-300 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm">
-                        <!-- Empty State -->
-                        <div class="flex flex-col items-center justify-center h-full text-gray-500 text-center px-4 opacity-60">
-                            <div class="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center mb-4 border border-gray-700">
-                                <i class="fa-solid fa-robot text-3xl animate-pulse text-indigo-400"></i>
+                    <div class="flex-grow bg-[#020617]/80 rounded-xl border border-gray-700/50 overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+                        <div id="ai-output" class="h-full overflow-y-auto p-5 md:p-6 font-mono text-xs md:text-sm leading-relaxed text-gray-300">
+                            <!-- Empty State -->
+                            <div class="flex flex-col items-center justify-center h-full text-gray-500 text-center px-4 opacity-60">
+                                <div class="w-20 h-20 rounded-full bg-gray-800/50 flex items-center justify-center mb-5 border border-gray-700">
+                                    <i class="fa-solid fa-robot text-4xl animate-pulse text-indigo-400"></i>
+                                </div>
+                                <p class="max-w-md">Awaiting valid dataset sequence. Run the selected experiment to generate a minimum of 3 data points, then click "Run Analysis" to mathematically model the physical parameters using Least Squares Regression.</p>
                             </div>
-                            <p>Awaiting valid dataset. Run experiment (min 3 points) and click "Run Analysis" to calculate exact physics parameters using mathematical modeling.</p>
                         </div>
                     </div>
                 </div>
@@ -658,10 +617,12 @@
                 <div id="tab-manual" class="tab-content hidden h-full flex flex-col fade-in">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-display text-cyan-400 font-bold text-xs md:text-sm tracking-wider"><i class="fa-solid fa-book-open mr-2"></i>LABORATORY THEORY</h3>
-                        <button onclick="readManual()" class="liquid-btn text-[10px] md:text-xs bg-rose-500/10 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/20"><i class="fa-solid fa-volume-high mr-1.5"></i>Read Aloud</button>
+                        <button onclick="readManual()" class="liquid-btn text-[10px] md:text-xs bg-rose-500/10 text-rose-300 px-4 py-2 rounded-lg border border-rose-500/30 hover:bg-rose-500/20 font-bold"><i class="fa-solid fa-volume-high mr-1.5"></i>Read Aloud</button>
                     </div>
-                    <div id="manual-content" class="scrollable-y flex-grow font-sans text-gray-300 leading-relaxed space-y-4 md:space-y-5 text-sm md:text-base bg-[#020617]/80 p-5 md:p-6 rounded-xl border border-gray-700/50 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm">
-                        <!-- Content populated dynamically by JS based on selection -->
+                    <div class="flex-grow bg-[#020617]/80 rounded-xl border border-gray-700/50 overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+                        <div id="manual-content" class="h-full overflow-y-auto p-5 md:p-6 font-sans text-gray-300 leading-relaxed space-y-4 md:space-y-5 text-sm md:text-base">
+                            <!-- Content injected via JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -669,169 +630,127 @@
         </section>
     </main>
 
-    <!-- =========================================
-         DRAGGABLE WIDGETS
-         ========================================= -->
+    <!-- 
+      ========================================================================
+      9. MOBILE OPTIMIZED DRAGGABLE WIDGETS
+      ======================================================================== 
+    -->
     
-    <!-- Scientific Calculator -->
-    <div id="widget-calc" class="widget liquid-panel w-[260px] md:w-64 border border-emerald-500/30 rounded-2xl pb-1 shadow-[0_30px_60px_rgba(0,0,0,0.9)] bg-slate-900/90">
-        <div class="widget-header bg-emerald-900/40 p-3 text-xs font-bold text-emerald-300 flex justify-between items-center border-b border-emerald-500/30 select-none rounded-t-2xl">
-            <span class="tracking-widest"><i class="fa-solid fa-calculator mr-2"></i>SCI-CALC</span>
-            <button onclick="toggleWidget('widget-calc')" aria-label="Close Calculator" class="text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+    <!-- SCIENTIFIC CALCULATOR -->
+    <div id="widget-calc" class="widget liquid-panel w-[280px] md:w-72 border border-emerald-500/30 rounded-2xl pb-1 shadow-[0_30px_60px_rgba(0,0,0,0.9)] bg-slate-900/95">
+        <div id="widget-calc-header" class="widget-header bg-emerald-900/40 p-3.5 text-xs font-bold text-emerald-300 flex justify-between items-center border-b border-emerald-500/30 select-none rounded-t-2xl">
+            <span class="tracking-widest flex items-center"><i class="fa-solid fa-grip-lines mr-3 opacity-50"></i> <i class="fa-solid fa-calculator mr-2"></i>SCI-CALC</span>
+            <button onclick="toggleWidget('widget-calc')" aria-label="Close Calculator" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
-        <div class="p-3 bg-black/40 rounded-b-2xl">
-            <input type="text" id="calc-display" class="w-full bg-[#020617] text-right text-emerald-400 font-mono p-3 rounded-xl border border-gray-700/80 mb-3 text-lg focus:outline-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)]" readonly value="0">
-            <div class="grid grid-cols-4 gap-1.5 text-sm font-mono">
-                <button onclick="calcOp('clear')" class="col-span-2 liquid-btn bg-rose-500/20 text-rose-300 p-2.5 rounded-lg border-rose-500/20">AC</button>
-                <button onclick="calcOp('del')" class="liquid-btn bg-gray-700/50 text-gray-300 p-2.5 rounded-lg border-gray-600/20">DEL</button>
-                <button onclick="calcOp('/')" class="liquid-btn bg-cyan-500/20 text-cyan-300 p-2.5 rounded-lg border-cyan-500/20">/</button>
-                <button onclick="calcMath('sqrt')" class="liquid-btn bg-gray-800/80 text-emerald-300 p-2.5 rounded-lg border-gray-700/50">√</button>
-                <button onclick="calcMath('sq')" class="liquid-btn bg-gray-800/80 text-emerald-300 p-2.5 rounded-lg border-gray-700/50">x²</button>
-                <button onclick="calcMath('ln')" class="liquid-btn bg-gray-800/80 text-emerald-300 p-2.5 rounded-lg border-gray-700/50">ln</button>
-                <button onclick="calcMath('exp')" class="liquid-btn bg-gray-800/80 text-emerald-300 p-2.5 rounded-lg border-gray-700/50">eˣ</button>
-                <button onclick="calcNum(7)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">7</button>
-                <button onclick="calcNum(8)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">8</button>
-                <button onclick="calcNum(9)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">9</button>
-                <button onclick="calcOp('*')" class="liquid-btn bg-cyan-500/20 text-cyan-300 p-2.5 rounded-lg border-cyan-500/20">×</button>
-                <button onclick="calcNum(4)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">4</button>
-                <button onclick="calcNum(5)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">5</button>
-                <button onclick="calcNum(6)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">6</button>
-                <button onclick="calcOp('-')" class="liquid-btn bg-cyan-500/20 text-cyan-300 p-2.5 rounded-lg border-cyan-500/20">-</button>
-                <button onclick="calcNum(1)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">1</button>
-                <button onclick="calcNum(2)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">2</button>
-                <button onclick="calcNum(3)" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">3</button>
-                <button onclick="calcOp('+')" class="liquid-btn bg-cyan-500/20 text-cyan-300 p-2.5 rounded-lg border-cyan-500/20">+</button>
-                <button onclick="calcNum(0)" class="col-span-2 liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">0</button>
-                <button onclick="calcNum('.')" class="liquid-btn bg-white/5 text-white p-2.5 rounded-lg border-white/5 hover:bg-white/10">.</button>
-                <button onclick="calcEq()" class="liquid-btn bg-emerald-500/30 text-emerald-300 p-2.5 rounded-lg font-bold border-emerald-500/30 text-glow-emerald shadow-[0_0_15px_rgba(16,185,129,0.2)]">=</button>
+        <div class="p-4 bg-black/40 rounded-b-2xl">
+            <input type="text" id="calc-display" class="w-full bg-[#020617] text-right text-emerald-400 font-mono p-3 rounded-xl border border-gray-700/80 mb-4 text-xl focus:outline-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)]" readonly value="0">
+            <div class="grid grid-cols-4 gap-2 text-sm font-mono" id="calc-buttons">
+                <!-- Generated in JS to avoid HTML bloat and ensure events are bound cleanly -->
             </div>
         </div>
     </div>
 
-    <!-- AI Chat Terminal -->
-    <div id="widget-chat" class="widget liquid-panel w-[300px] md:w-80 border border-blue-500/30 rounded-2xl flex flex-col bg-slate-900/90 shadow-[0_30px_60px_rgba(0,0,0,0.9)]" style="height: 420px;">
-        <div class="widget-header bg-blue-900/40 p-3 text-xs font-bold text-blue-300 flex justify-between items-center border-b border-blue-500/30 select-none rounded-t-2xl">
-            <span class="tracking-widest"><i class="fa-solid fa-robot mr-2"></i>COMMS LINK</span>
-            <button onclick="toggleWidget('widget-chat')" aria-label="Close Chat" class="text-gray-400 hover:text-white w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+    <!-- AI CHAT TERMINAL -->
+    <div id="widget-chat" class="widget liquid-panel w-[320px] md:w-80 border border-blue-500/30 rounded-2xl flex flex-col bg-slate-900/95 shadow-[0_30px_60px_rgba(0,0,0,0.9)]" style="height: 450px;">
+        <div id="widget-chat-header" class="widget-header bg-blue-900/40 p-3.5 text-xs font-bold text-blue-300 flex justify-between items-center border-b border-blue-500/30 select-none rounded-t-2xl">
+            <span class="tracking-widest flex items-center"><i class="fa-solid fa-grip-lines mr-3 opacity-50"></i> <i class="fa-solid fa-robot mr-2"></i>COMMS LINK</span>
+            <button onclick="toggleWidget('widget-chat')" aria-label="Close Chat" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
-        <div id="chat-history" class="scrollable-y flex-grow p-4 bg-black/40 font-mono text-xs space-y-4">
-            <div class="text-blue-200 bg-blue-900/40 p-3 rounded-xl border border-blue-500/30 shadow-inner rounded-tl-sm">
+        <div id="chat-history" class="overflow-y-auto flex-grow p-4 bg-black/40 font-mono text-xs space-y-4 overscroll-contain">
+            <div class="text-blue-200 bg-blue-900/40 p-3.5 rounded-xl border border-blue-500/30 shadow-inner rounded-tl-sm leading-relaxed">
                 <strong>System:</strong> Terminal active. I am programmed to assist with Virtual Laboratory physics queries. Ask me about Dead Time ($\tau$), Poisson stats, Half-life equations, ISL, or the new Mass Absorption Factor.
             </div>
         </div>
         
         <!-- Animated Typing Indicator -->
         <div id="chat-typing" class="hidden px-4 py-2 bg-black/60 text-blue-400 text-xs font-mono items-center gap-1.5 border-t border-gray-800">
-            <span class="text-gray-500 mr-1">AI Computing</span>
+            <span class="text-gray-500 mr-2">AI Computing</span>
             <div class="w-1.5 h-1.5 bg-blue-500 rounded-full typing-dot"></div>
             <div class="w-1.5 h-1.5 bg-blue-500 rounded-full typing-dot"></div>
             <div class="w-1.5 h-1.5 bg-blue-500 rounded-full typing-dot"></div>
         </div>
 
-        <div class="p-3 bg-slate-950/80 border-t border-gray-700/50 flex gap-2 rounded-b-2xl">
-            <input type="text" id="chat-input" class="flex-grow bg-[#020617] text-white px-3 py-2.5 rounded-lg text-xs focus:outline-none border border-gray-700 focus:border-blue-400 transition-colors shadow-inner" placeholder="Type query..." onkeypress="if(event.key === 'Enter') sendChat()">
+        <div class="p-3 bg-slate-950/90 border-t border-gray-700/50 flex gap-2 rounded-b-2xl">
+            <input type="text" id="chat-input" onkeypress="if(event.key === 'Enter') sendChat()" class="flex-grow bg-[#020617] text-white px-3 py-3 rounded-lg text-xs focus:outline-none border border-gray-700 focus:border-blue-400 transition-colors shadow-inner" placeholder="Type query here...">
             <button onclick="sendChat()" class="liquid-btn bg-blue-500/20 text-blue-300 px-4 rounded-lg border-blue-500/30 hover:bg-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
     <!-- 
       ========================================================================
-      JAVASCRIPT LOGIC ENGINE (EXTREMELY DETAILED & ROBUST)
+      10. CORE JAVASCRIPT ENGINE
       ======================================================================== 
     -->
     <script>
         /* -------------------------------------------------------------------------
-           1. SECURITY, A11Y, AND UTILS
+           10.1 GLOBAL CONSTANTS & APP STATE
            ------------------------------------------------------------------------- */
-        // Basic hotkey prevention for strict laboratory environments
+        const PHYSICS_CONSTANTS = {
+            deadTime: 0.0002, // 200 microseconds hardware resolving time
+            bgRate: 25, // Base Cosmic/Background CPM
+            aluminumDensity: 2.70, // g/cm^3
+            isotopes: {
+                'co60': { name: 'Cobalt-60', type: 'gamma, beta', baseActivity: 15000, mu: 0.15, color: '#3b82f6', halfLife: 166000000 },
+                'sr90': { name: 'Strontium-90', type: 'beta', baseActivity: 8000, mu: 14.0, color: '#10b981', halfLife: 910000000 },
+                'cs137': { name: 'Cesium-137', type: 'gamma, beta', baseActivity: 10000, mu: 0.20, color: '#a855f7', halfLife: 950000000 },
+                'ba137m': { name: 'Barium-137m', type: 'gamma', baseActivity: 20000, mu: 0.20, color: '#eab308', halfLife: 153 } // 2.55 min half life
+            }
+        };
+
+        const APP_STATE = {
+            masterTime: 0, masterInterval: null, currentExp: 'plateau', 
+            isCounting: false, countTimer: 0, presetTimer: 60, currentCounts: 0, 
+            countingInterval: null, dataPoints: [], bgRateCPM: PHYSICS_CONSTANTS.bgRate, 
+            cosmicBurstActive: false, currentParticleColor: PHYSICS_CONSTANTS.isotopes['co60'].color
+        };
+
+        // Getters to ensure DOM is accessed freshly after load
+        const DOM = {
+            get source() { return document.getElementById('input-source'); },
+            get voltage() { return document.getElementById('input-voltage'); },
+            get distance() { return document.getElementById('input-distance'); },
+            get thickness() { return document.getElementById('input-thickness'); },
+            get timer() { return document.getElementById('input-timer'); },
+            get dispDecay() { return document.getElementById('display-decay-clock'); },
+            get dispTimer() { return document.getElementById('display-timer'); },
+            get dispCounts() { return document.getElementById('display-counts'); },
+            get dispRate() { return document.getElementById('display-rate'); },
+            get expSelector() { return document.getElementById('exp-selector'); }
+        };
+
+        /* -------------------------------------------------------------------------
+           10.2 SECURITY & UTILITIES
+           ------------------------------------------------------------------------- */
         document.addEventListener('keydown', function(e) {
-            if(e.keyCode == 123) { e.preventDefault(); return false; } // Prevent F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; } // Prevent Ctrl+Shift+I
-            if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } // Prevent Ctrl+U
+            if(e.keyCode === 123) { e.preventDefault(); return false; } // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode === 73) { e.preventDefault(); return false; } // Ctrl+Shift+I
+            if(e.ctrlKey && e.keyCode === 85) { e.preventDefault(); return false; } // Ctrl+U
         });
 
-        // Trigger MathJax re-render safely
+        function announce(msg) { 
+            const a11y = document.getElementById('a11y-announcer');
+            if(a11y) a11y.textContent = msg; 
+        }
+
         function renderMath() {
             if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err.message));
+                window.MathJax.typesetPromise().catch(err => console.warn('MathJax error: ', err.message));
             }
         }
-        
-        // Announcer for screen readers (Accessibility)
-        function announce(msg) { document.getElementById('a11y-announcer').textContent = msg; }
 
         /* -------------------------------------------------------------------------
-           2. BACKGROUND CANVAS ANIMATION (DPI-Aware for Crisp Mobile Display)
+           10.3 AUDIO & TTS SUBSYSTEM (Protected)
            ------------------------------------------------------------------------- */
-        const canvas = document.getElementById('space-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        let audioCtx, whiteNoiseBuffer, ambientOsc, ambientGain;
+        let isAudioEnabled = true; let isVoiceEnabled = true; let isHumEnabled = false;
 
-        function resizeCanvas() { 
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr; 
-            canvas.height = window.innerHeight * dpr; 
-            ctx.scale(dpr, dpr);
-        }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * window.innerWidth; 
-                this.y = Math.random() * window.innerHeight;
-                this.size = Math.random() * 1.5;
-                this.speedX = (Math.random() - 0.5) * 0.2; 
-                this.speedY = (Math.random() - 0.5) * 0.2;
-                this.opacity = Math.random() * 0.5 + 0.1;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x < 0 || this.x > window.innerWidth) this.speedX *= -1;
-                if (this.y < 0 || this.y > window.innerHeight) this.speedY *= -1;
-            }
-            draw() {
-                ctx.fillStyle = `rgba(0, 242, 254, ${this.opacity})`; ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-            }
-        }
-        
-        // Scale particle count based on screen width for mobile performance
-        const particleCount = window.innerWidth < 768 ? 40 : 120;
-        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-        
-        function animateBg() {
-            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateBg);
-        }
-        animateBg();
-
-        /* -------------------------------------------------------------------------
-           3. AUDIO & TTS ENGINE (WITH ROBUST IFRAME/BROWSER POLICY FALLBACKS)
-           ------------------------------------------------------------------------- */
-        let audioCtx; 
-        let isAudioEnabled = true; 
-        let isVoiceEnabled = true; 
-        let isHumEnabled = false;
-        let whiteNoiseBuffer; 
-        let ambientOsc = null; 
-        let ambientGain = null;
-
-        // FIXED: The Audio engine now deeply handles initialization failures.
-        // In iframe environments without 'allow="autoplay"', new AudioContext() can throw an error.
         function initAudio() {
             if (audioCtx) return;
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) {
-                    console.warn("AudioContext not supported or restricted by browser policies.");
-                    isAudioEnabled = false;
-                    return;
-                }
+                if (!AudioContext) throw new Error("Audio API not supported");
                 
                 audioCtx = new AudioContext();
-                
-                // Create white noise buffer for geiger clicks
                 const bufferSize = audioCtx.sampleRate * 0.05;
                 whiteNoiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const output = whiteNoiseBuffer.getChannelData(0);
@@ -839,12 +758,11 @@
                 
                 playUIBeep(600, 0.1);
                 
-                if(document.getElementById('setting-hum') && document.getElementById('setting-hum').checked) {
-                    toggleAmbientHum(true);
-                }
+                const humInput = document.getElementById('setting-hum');
+                if(humInput && humInput.checked) toggleAmbientHum(true);
             } catch (e) {
-                console.error("Audio initialization explicitly failed. Silencing system to prevent halts.", e);
-                isAudioEnabled = false; // Gracefully degrade if audio fails
+                console.warn("Audio Sandbox blocked or unsupported. Operating silently.", e);
+                isAudioEnabled = false;
             }
         }
 
@@ -856,7 +774,6 @@
                 const source = audioCtx.createBufferSource(); 
                 source.buffer = whiteNoiseBuffer;
                 
-                // Filter noise to sound like a sharp metallic click
                 const filter = audioCtx.createBiquadFilter(); 
                 filter.type = 'highpass'; 
                 filter.frequency.value = 4000 + Math.random() * 3000;
@@ -865,15 +782,10 @@
                 gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
                 
-                source.connect(filter); 
-                filter.connect(gainNode); 
-                gainNode.connect(audioCtx.destination);
-                
-                source.start(); 
-                source.stop(audioCtx.currentTime + 0.05);
-            } catch(e) {} // Fail silently if audio context is interrupted
+                source.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
+                source.start(); source.stop(audioCtx.currentTime + 0.05);
+            } catch(e) {}
 
-            // Visual Trigger
             const gmWindow = document.getElementById('gm-window');
             if (gmWindow) {
                 gmWindow.classList.remove('gm-flash'); void gmWindow.offsetWidth; gmWindow.classList.add('gm-flash');
@@ -903,14 +815,13 @@
             try {
                 if (enable && !ambientOsc) {
                     ambientOsc = audioCtx.createOscillator(); ambientGain = audioCtx.createGain();
-                    ambientOsc.type = 'sine'; ambientOsc.frequency.value = 60; // 60Hz transformer electrical hum
+                    ambientOsc.type = 'sine'; ambientOsc.frequency.value = 60; // 60Hz transformer hum
                     
-                    // Add LFO for realistic wavering
                     const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.5;
                     const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 2;
                     lfo.connect(lfoGain); lfoGain.connect(ambientOsc.frequency); lfo.start();
                     
-                    ambientGain.gain.value = 0.02; // Subtle background noise
+                    ambientGain.gain.value = 0.02; // Very subtle
                     ambientOsc.connect(ambientGain); ambientGain.connect(audioCtx.destination);
                     ambientOsc.start();
                 } else if (!enable && ambientOsc) {
@@ -939,7 +850,7 @@
             if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
             try {
                 window.speechSynthesis.cancel();
-                // Clean complex math syntax for TTS reading
+                // Clean complex LaTeX syntax for accurate text-to-speech reading
                 let cleanText = text.replace(/[\$\\]/g, '')
                                     .replace(/_\{.*?\}/g, '')
                                     .replace(/\^\{.*?\}/g, '')
@@ -949,52 +860,16 @@
                                     
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 const voices = window.speechSynthesis.getVoices();
-                const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Google UK English Female'));
+                const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Google'));
                 if(femaleVoice) utterance.voice = femaleVoice;
                 utterance.rate = 1.05; utterance.pitch = 1.1; 
                 window.speechSynthesis.speak(utterance);
-            } catch(e) {
-                console.warn("TTS failed to execute:", e);
-            }
+            } catch(e) { console.warn("TTS failed:", e); }
         }
 
         /* -------------------------------------------------------------------------
-           4. GLOBAL STATE, PHYSICS CONSTANTS & MODAL LOGIC
+           10.4 MODAL CONTROLS & THEME TOGGLES
            ------------------------------------------------------------------------- */
-        // Explicit Physics constants to prove simulation accuracy
-        const PHYSICS_CONSTANTS = {
-            deadTime: 0.0002, // 200us hardware resolving time
-            bgRate: 25, // Base Cosmic/Background CPM
-            aluminumDensity: 2.70, // g/cm^3
-            isotopes: {
-                'co60': { name: 'Cobalt-60', type: 'gamma, beta', baseActivity: 15000, mu: 0.15, color: '#3b82f6' },
-                'sr90': { name: 'Strontium-90', type: 'beta', baseActivity: 8000, mu: 14.0, color: '#10b981' },
-                'cs137': { name: 'Cesium-137', type: 'gamma, beta', baseActivity: 10000, mu: 0.20, color: '#a855f7' },
-                'ba137m': { name: 'Barium-137m', type: 'gamma', baseActivity: 20000, mu: 0.20, color: '#eab308' } 
-            }
-        };
-
-        const APP_STATE = {
-            masterTime: 0, masterInterval: null, 
-            currentExp: 'plateau', 
-            isCounting: false, countTimer: 0, presetTimer: 60, currentCounts: 0, 
-            countingInterval: null, dataPoints: [], bgRateCPM: PHYSICS_CONSTANTS.bgRate, 
-            cosmicBurstActive: false,
-            currentParticleColor: PHYSICS_CONSTANTS.isotopes['co60'].color
-        };
-
-        const DOM = { 
-            source: document.getElementById('input-source'), 
-            voltage: document.getElementById('input-voltage'), 
-            distance: document.getElementById('input-distance'), 
-            thickness: document.getElementById('input-thickness'), 
-            timer: document.getElementById('input-timer'), 
-            dispDecay: document.getElementById('display-decay-clock'), 
-            dispTimer: document.getElementById('display-timer'), 
-            dispCounts: document.getElementById('display-counts'), 
-            dispRate: document.getElementById('display-rate') 
-        };
-
         function toggleSettingsModal() { 
             const m = document.getElementById('settings-modal');
             if(!m) return;
@@ -1003,6 +878,7 @@
             if(mc) mc.classList.remove('scale-95'); 
             playUIBeep(700,0.1); 
         }
+
         function closeSettingsModal() { 
             const m = document.getElementById('settings-modal');
             if(!m) return;
@@ -1022,6 +898,7 @@
         }
 
         function changeTheme(theme) { document.body.setAttribute('data-theme', theme); playUIBeep(800, 0.05); }
+        
         function toggleCRT(enabled) { 
             const crt = document.getElementById('crt-overlay');
             if(!crt) return;
@@ -1029,47 +906,38 @@
             else { crt.style.opacity = '0'; crt.classList.remove('crt-flicker'); }
             playUIBeep(200, 0.2, 'square');
         }
+        
         function updateBGCpm(val) { APP_STATE.bgRateCPM = parseInt(val); document.getElementById('val-bg').innerText = `${val} CPM`; }
 
+        /* -------------------------------------------------------------------------
+           10.5 CORE LOGIC & INITIALIZATION
+           ------------------------------------------------------------------------- */
         function universalReset() {
             if(!confirm("SYSTEM WARNING: Wiping all data, parameters, and clocks. Proceed?")) return;
             if(APP_STATE.isCounting) stopCounting();
-            APP_STATE.masterTime = 0; DOM.dispDecay.innerText = "00:00:00"; 
+            APP_STATE.masterTime = 0; if(DOM.dispDecay) DOM.dispDecay.innerText = "00:00:00"; 
             APP_STATE.countTimer = 0; APP_STATE.currentCounts = 0; 
-            DOM.dispCounts.innerText = "000000"; DOM.dispTimer.innerText = "00:00"; DOM.dispRate.innerText = "0 CPS";
+            if(DOM.dispCounts) DOM.dispCounts.innerText = "000000"; 
+            if(DOM.dispTimer) DOM.dispTimer.innerText = "00:00"; 
+            if(DOM.dispRate) DOM.dispRate.innerText = "0 CPS";
             APP_STATE.dataPoints = []; renderTable(); updateGraph();
             const out = document.getElementById('ai-output');
             if (out) out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500 text-center opacity-60"><i class="fa-solid fa-robot text-3xl mb-3 text-indigo-400"></i><p>Awaiting valid dataset (min 3 points).</p></div>`;
-            document.getElementById('exp-selector').value = 'plateau'; setupExperimentUI();
+            if(DOM.expSelector) DOM.expSelector.value = 'plateau'; 
+            setupExperimentUI();
             playUIBeep(200, 0.4, 'sawtooth'); speakText("System successfully reset.");
         }
 
-        // INIT BUTTON EVENT LISTENER (HEAVILY PROTECTED AGAINST CRASHES)
-        document.getElementById('btn-init').addEventListener('click', () => {
-            try { 
-                initAudio(); 
-            } catch(e) { 
-                console.warn("Audio Context explicitly skipped during init."); 
-            }
-
+        // Init Button directly inside DOM Event
+        document.getElementById('btn-init')?.addEventListener('click', function() {
+            try { initAudio(); } catch(e) {}
             const intro = document.getElementById('intro-screen');
-            if(intro) {
-                intro.style.opacity = '0';
-                intro.style.transform = 'scale(1.1)';
-            }
+            if(intro) { intro.style.opacity = '0'; intro.style.transform = 'scale(1.1)'; }
 
             setTimeout(() => {
-                try {
-                    if(intro) intro.style.display = 'none';
-                    startMasterClock(); 
-                    setupExperimentUI(); 
-                    initApparatusVisuals(); 
-                    renderMath();
-                } catch(e) {
-                    console.error("Critical error during application boot sequence:", e);
-                }
+                if(intro) intro.style.display = 'none';
+                startMasterClock(); setupExperimentUI(); initApparatusVisuals(); renderMath();
                 
-                // Show Humorous Update Modal safely
                 setTimeout(() => {
                     const m = document.getElementById('update-modal');
                     if(m) {
@@ -1108,20 +976,15 @@
         }
 
         function setupExperimentUI() {
-            const selector = document.getElementById('exp-selector');
-            if(!selector) return;
-            APP_STATE.currentExp = selector.value;
-            
+            if(!DOM.expSelector) return;
+            APP_STATE.currentExp = DOM.expSelector.value;
             const ctrls = ['voltage', 'distance', 'thickness'];
-            // Reset all opacity safely
+            
             ctrls.forEach(c => { 
-                const el = document.getElementById(`ctrl-${c}`);
-                const inp = document.getElementById(`input-${c}`);
-                if(el) el.style.opacity = '0.3'; 
-                if(inp) inp.disabled = true; 
+                const el = document.getElementById(`ctrl-${c}`); const inp = document.getElementById(`input-${c}`);
+                if(el) el.style.opacity = '0.3'; if(inp) inp.disabled = true; 
             });
 
-            // Enable specific controls based on mode
             if (APP_STATE.currentExp === 'plateau') {
                 document.getElementById('ctrl-voltage').style.opacity = '1'; document.getElementById('input-voltage').disabled = false;
                 if(DOM.source) DOM.source.value = 'co60'; 
@@ -1146,76 +1009,21 @@
                 if(DOM.distance) DOM.distance.value = 2; 
                 if(DOM.thickness) DOM.thickness.value = 0;
             }
-            updateParameters(); 
-            updateTableHeaders(); 
-            loadManual(); 
-            renderTable(); 
-            updateGraph(); 
-            renderMath();
+            updateParameters(); updateTableHeaders(); loadManual(); renderTable(); updateGraph(); renderMath();
         }
 
-        function injectCosmicBurst() {
-            if (APP_STATE.cosmicBurstActive) return; 
-            APP_STATE.cosmicBurstActive = true;
-            playUIBeep(200, 0.5, 'sawtooth'); 
-            setTimeout(() => { APP_STATE.cosmicBurstActive = false; }, 3000); 
-        }
-
-        /* -------------------------------------------------------------------------
-           5. APPARATUS VISUALIZATION ENGINE (DPI-Aware & Liquid Styled)
-           ------------------------------------------------------------------------- */
-        let vCanvas, vCtx; 
-        let radiationRays = []; 
-        let sparks = [];
-        
-        function resizeVisualCanvas() { 
-            vCanvas = document.getElementById('apparatus-canvas'); 
-            if(!vCanvas) return; 
-            vCtx = vCanvas.getContext('2d'); 
+        function updateParameters() {
+            if(!DOM.voltage || !DOM.distance || !DOM.thickness || !DOM.source) return;
             
-            const parent = vCanvas.parentElement;
-            if(!parent) return;
-            const rect = parent.getBoundingClientRect(); 
-            const dpr = window.devicePixelRatio || 1;
-            
-            // Handle cases where rect is 0 (display: none during init)
-            const width = rect.width || parent.offsetWidth || 300;
-            const height = rect.height || parent.offsetHeight || 150;
-
-            vCanvas.width = width * dpr; 
-            vCanvas.height = height * dpr; 
-            vCtx.scale(dpr, dpr);
-            
-            // Maintain CSS bounds
-            vCanvas.style.width = `${width}px`; 
-            vCanvas.style.height = `${height}px`;
-        }
-        
-        function initApparatusVisuals() { 
-            resizeVisualCanvas(); 
-            window.addEventListener('resize', resizeVisualCanvas); 
-            requestAnimationFrame(renderVisualApparatus); 
-        }
-
-        function adjustThicknessSlider() {
-            if(!DOM.source || !DOM.thickness) return;
             const src = DOM.source.value; 
             const thickInput = DOM.thickness;
-            
             if (src === 'cs137' || src === 'co60' || src === 'ba137m') { 
                 thickInput.max = "20"; thickInput.step = "1"; 
             } else { 
                 thickInput.max = "0.5"; thickInput.step = "0.01"; 
                 if(parseFloat(thickInput.value) > 0.5) thickInput.value = "0"; 
             }
-        }
-
-        function updateParameters() {
-            if(!DOM.voltage || !DOM.distance || !DOM.thickness || !DOM.source) return;
             
-            adjustThicknessSlider();
-            
-            // Update UI Labels
             const vVal = document.getElementById('val-voltage');
             if(vVal) vVal.innerText = `${DOM.voltage.value} V`; 
             const dVal = document.getElementById('val-distance');
@@ -1223,34 +1031,23 @@
             const tVal = document.getElementById('val-thickness');
             if(tVal) tVal.innerText = `${DOM.thickness.value} cm`;
             
-            const dist = parseFloat(DOM.distance.value); 
-            const thick = parseFloat(DOM.thickness.value); 
-            const src = DOM.source.value; 
+            const dist = parseFloat(DOM.distance.value); const thick = parseFloat(DOM.thickness.value); 
             const vol = parseFloat(DOM.voltage.value);
             
-            // Theme Particles Based on Source
             const pColor = PHYSICS_CONSTANTS.isotopes[src]?.color || '#ffffff'; 
             APP_STATE.currentParticleColor = pColor;
             
             const pellet = document.getElementById('visual-source-pellet'); 
-            if(pellet) {
-                pellet.style.backgroundColor = pColor; 
-                pellet.style.boxShadow = `0 0 25px ${pColor}`;
-            }
+            if(pellet) { pellet.style.backgroundColor = pColor; pellet.style.boxShadow = `0 0 25px ${pColor}`; }
             
-            // Move Source Mount physically across the optical bench
             const minPos = 20; const maxPos = 85; 
             const percentPos = minPos + ((dist - 2) / 48) * (maxPos - minPos);
             const mount = document.getElementById('visual-source-mount'); 
             if(mount) mount.style.left = `${percentPos}%`;
             
             const distLabel = document.getElementById('visual-dist-label');
-            if(distLabel) {
-                distLabel.innerText = `${dist}cm`; 
-                distLabel.style.color = pColor;
-            }
+            if(distLabel) { distLabel.innerText = `${dist}cm`; distLabel.style.color = pColor; }
             
-            // Update Absorber Visual Component
             const absorberContainer = document.getElementById('visual-absorber-container'); 
             const absorber = document.getElementById('visual-absorber');
             if (absorberContainer && absorber) {
@@ -1259,12 +1056,9 @@
                     const maxThick = parseFloat(DOM.thickness.max) || 0.5; 
                     const widthPx = 2 + (Math.min(thick, maxThick) / maxThick) * 18; 
                     absorber.style.width = `${widthPx}px`;
-                } else { 
-                    absorberContainer.style.opacity = '0'; 
-                }
+                } else { absorberContainer.style.opacity = '0'; }
             }
 
-            // HV Status Logic Validation
             const hwStatus = document.getElementById('hw-status');
             if(hwStatus) {
                 if(vol < 350 || vol > 850) { 
@@ -1279,150 +1073,181 @@
             if(!APP_STATE.isCounting) playUIBeep(500, 0.05);
         }
 
-        class Spark {
-            constructor(x, y, color) { 
-                this.x = x; this.y = y; 
-                this.vx = (Math.random() - 0.5) * 6; 
-                this.vy = (Math.random() - 0.5) * 6; 
-                this.life = 1.0; 
-                this.color = color; 
-            }
-            update() { this.x += this.vx; this.y += this.vy; this.life -= 0.08; }
-            draw(ctx) { 
-                if(this.life <= 0) return; 
-                ctx.globalAlpha = this.life; 
-                ctx.fillStyle = this.color; 
-                ctx.beginPath(); 
-                ctx.arc(this.x, this.y, 1.5, 0, Math.PI*2); 
-                ctx.fill(); 
-                ctx.globalAlpha = 1.0; 
-            }
-        }
-
-        class RadiationRay {
-            constructor(startX, startY, endX, color, getsAbsorbed, isWavy) {
-                this.x = startX; 
-                this.y = startY + (Math.random() * 14 - 7); 
-                this.startY = this.y;
-                this.endX = endX; 
-                this.speed = 5 + Math.random() * 7; 
-                this.color = color;
-                this.getsAbsorbed = getsAbsorbed; 
-                this.active = true; 
-                this.length = 8 + Math.random() * 10;
-                this.isWavy = isWavy; 
-                this.wavePhase = Math.random() * Math.PI * 2;
-            }
-            update() {
-                this.x -= this.speed;
-                // Beta particles scatter slightly
-                if(this.isWavy) this.y = this.startY + Math.sin(this.x * 0.15 + this.wavePhase) * 4;
-                if (this.x <= this.endX) { this.active = false; }
-            }
-            draw(ctx) {
-                if(!this.active) return;
-                ctx.beginPath(); 
-                ctx.moveTo(this.x, this.y); 
-                ctx.lineTo(this.x + this.length, this.y);
-                ctx.strokeStyle = this.color; 
-                ctx.lineWidth = 2; 
-                ctx.globalAlpha = 0.9; 
-                ctx.stroke(); 
-                ctx.globalAlpha = 1.0;
-            }
-        }
-
-        function renderVisualApparatus() {
-            if(!vCtx || !vCanvas) { requestAnimationFrame(renderVisualApparatus); return; }
-            
-            const rectWidth = parseFloat(vCanvas.style.width) || vCanvas.width; 
-            const rectHeight = parseFloat(vCanvas.style.height) || vCanvas.height;
-            vCtx.clearRect(0, 0, rectWidth, rectHeight);
-
-            const mount = document.getElementById('visual-source-pellet');
-            const gmWindow = document.getElementById('gm-window');
-            if(!mount || !gmWindow) { requestAnimationFrame(renderVisualApparatus); return; }
-
-            const mountRect = mount.getBoundingClientRect(); 
-            const canvasRect = vCanvas.getBoundingClientRect(); 
-            const gmWindowRect = gmWindow.getBoundingClientRect();
-            
-            const startX = mountRect.left - canvasRect.left; 
-            const startY = (mountRect.top + mountRect.height/2) - canvasRect.top; 
-            const gmTargetX = gmWindowRect.right - canvasRect.left;
-
-            let absorberTargetX = gmTargetX; 
-            let hasAbsorber = false; 
-            let absorptionProb = 0;
-            
-            const thick = parseFloat(DOM.thickness.value); 
-            const src = DOM.source.value;
-            
-            if ((APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') && thick > 0) {
-                hasAbsorber = true; 
-                const absEl = document.getElementById('visual-absorber');
-                if(absEl) {
-                    const absRect = absEl.getBoundingClientRect(); 
-                    absorberTargetX = absRect.right - canvasRect.left;
-                }
-                
-                let mu = PHYSICS_CONSTANTS.isotopes[src]?.mu || 0.15;
-                absorptionProb = 1 - Math.exp(-mu * thick); 
-            }
-
-            let spawnChance = APP_STATE.isCounting ? 0.5 : 0.05; 
-            const V = parseFloat(DOM.voltage.value);
-            if (V < 350) spawnChance = 0.01; 
-            if (APP_STATE.cosmicBurstActive) spawnChance = 0.9;
-
-            if (Math.random() < spawnChance) {
-                let getsAbsorbed = false; 
-                let targetX = gmTargetX;
-                if (hasAbsorber && Math.random() < absorptionProb) { 
-                    getsAbsorbed = true; 
-                    targetX = absorberTargetX + (Math.random()*2); 
-                }
-                let isWavy = (src === 'sr90'); // Beta is wavy
-                radiationRays.push(new RadiationRay(startX, startY, targetX, APP_STATE.currentParticleColor, getsAbsorbed, isWavy));
-            }
-
-            for(let i = sparks.length - 1; i >= 0; i--) { 
-                sparks[i].update(); 
-                sparks[i].draw(vCtx); 
-                if(sparks[i].life <= 0) sparks.splice(i, 1); 
-            }
-
-            for(let i = radiationRays.length - 1; i >= 0; i--) {
-                const r = radiationRays[i]; r.update(); r.draw(vCtx);
-                if(!r.active) {
-                    if(r.getsAbsorbed) {
-                        for(let s=0; s<4; s++) sparks.push(new Spark(r.x, r.y, '#ffffff')); 
-                        const flash = document.getElementById('absorber-flash');
-                        if(flash) {
-                            flash.style.opacity = '0.5'; 
-                            setTimeout(() => { flash.style.opacity = '0'; }, 50);
-                        }
-                    } else {
-                        for(let s=0; s<6; s++) sparks.push(new Spark(r.x, r.y, '#00f2fe')); 
-                    }
-                    radiationRays.splice(i, 1);
-                }
-            }
-            requestAnimationFrame(renderVisualApparatus);
+        function injectCosmicBurst() {
+            if (APP_STATE.cosmicBurstActive) return; 
+            APP_STATE.cosmicBurstActive = true;
+            playUIBeep(200, 0.5, 'sawtooth'); 
+            setTimeout(() => { APP_STATE.cosmicBurstActive = false; }, 3000); 
         }
 
         /* -------------------------------------------------------------------------
-           6. ADVANCED PHYSICS ENGINE (Poisson & Dead Time Logic)
+           10.6 VISUAL ENGINE (Background + Apparatus)
+           ------------------------------------------------------------------------- */
+        let bgCanvas, bgCtx, bgParticles = [];
+        function initBackground() {
+            bgCanvas = document.getElementById('space-canvas');
+            if(!bgCanvas) return;
+            bgCtx = bgCanvas.getContext('2d');
+            const resizeBg = () => {
+                const dpr = window.devicePixelRatio || 1;
+                bgCanvas.width = window.innerWidth * dpr;
+                bgCanvas.height = window.innerHeight * dpr;
+                bgCtx.scale(dpr, dpr);
+            };
+            window.addEventListener('resize', resizeBg); resizeBg();
+
+            class BgParticle {
+                constructor() {
+                    this.x = Math.random() * window.innerWidth; this.y = Math.random() * window.innerHeight;
+                    this.size = Math.random() * 1.5;
+                    this.speedX = (Math.random() - 0.5) * 0.2; this.speedY = (Math.random() - 0.5) * 0.2;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                update() {
+                    this.x += this.speedX; this.y += this.speedY;
+                    if (this.x < 0 || this.x > window.innerWidth) this.speedX *= -1;
+                    if (this.y < 0 || this.y > window.innerHeight) this.speedY *= -1;
+                }
+                draw() {
+                    bgCtx.fillStyle = `rgba(0, 242, 254, ${this.opacity})`; bgCtx.beginPath();
+                    bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); bgCtx.fill();
+                }
+            }
+            const pCount = window.innerWidth < 768 ? 40 : 100;
+            for (let i = 0; i < pCount; i++) bgParticles.push(new BgParticle());
+            
+            const animateBg = () => {
+                bgCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+                bgParticles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animateBg);
+            };
+            animateBg();
+        }
+
+        let vCanvas, vCtx, radiationRays = [], sparks = [];
+        function initApparatusVisuals() {
+            vCanvas = document.getElementById('apparatus-canvas');
+            if(!vCanvas) return;
+            vCtx = vCanvas.getContext('2d');
+            const resizeVisualCanvas = () => { 
+                const parent = vCanvas.parentElement;
+                if(!parent) return;
+                const rect = parent.getBoundingClientRect(); 
+                const dpr = window.devicePixelRatio || 1;
+                const width = rect.width || parent.offsetWidth;
+                const height = rect.height || parent.offsetHeight;
+                if(width === 0) return;
+
+                vCanvas.width = width * dpr; vCanvas.height = height * dpr; 
+                vCtx.scale(dpr, dpr);
+                vCanvas.style.width = `${width}px`; vCanvas.style.height = `${height}px`;
+            };
+            window.addEventListener('resize', resizeVisualCanvas); resizeVisualCanvas();
+
+            class Spark {
+                constructor(x, y, color) { 
+                    this.x = x; this.y = y; 
+                    this.vx = (Math.random() - 0.5) * 6; this.vy = (Math.random() - 0.5) * 6; 
+                    this.life = 1.0; this.color = color; 
+                }
+                update() { this.x += this.vx; this.y += this.vy; this.life -= 0.08; }
+                draw() { 
+                    if(this.life <= 0) return; 
+                    vCtx.globalAlpha = this.life; vCtx.fillStyle = this.color; 
+                    vCtx.beginPath(); vCtx.arc(this.x, this.y, 1.5, 0, Math.PI*2); vCtx.fill(); 
+                    vCtx.globalAlpha = 1.0; 
+                }
+            }
+
+            class RadiationRay {
+                constructor(startX, startY, endX, color, getsAbsorbed, isWavy) {
+                    this.x = startX; this.y = startY + (Math.random() * 14 - 7); this.startY = this.y;
+                    this.endX = endX; this.speed = 5 + Math.random() * 7; this.color = color;
+                    this.getsAbsorbed = getsAbsorbed; this.active = true; this.length = 8 + Math.random() * 10;
+                    this.isWavy = isWavy; this.wavePhase = Math.random() * Math.PI * 2;
+                }
+                update() {
+                    this.x -= this.speed;
+                    if(this.isWavy) this.y = this.startY + Math.sin(this.x * 0.15 + this.wavePhase) * 4;
+                    if (this.x <= this.endX) { this.active = false; }
+                }
+                draw() {
+                    if(!this.active) return;
+                    vCtx.beginPath(); vCtx.moveTo(this.x, this.y); vCtx.lineTo(this.x + this.length, this.y);
+                    vCtx.strokeStyle = this.color; vCtx.lineWidth = 2; vCtx.globalAlpha = 0.9; vCtx.stroke(); vCtx.globalAlpha = 1.0;
+                }
+            }
+
+            const renderVisualApparatus = () => {
+                if(!vCtx || !vCanvas) { requestAnimationFrame(renderVisualApparatus); return; }
+                const rectWidth = parseFloat(vCanvas.style.width) || vCanvas.width; 
+                const rectHeight = parseFloat(vCanvas.style.height) || vCanvas.height;
+                vCtx.clearRect(0, 0, rectWidth, rectHeight);
+
+                const mount = document.getElementById('visual-source-pellet');
+                const gmWindow = document.getElementById('gm-window');
+                if(!mount || !gmWindow) { requestAnimationFrame(renderVisualApparatus); return; }
+
+                const mountRect = mount.getBoundingClientRect(); const canvasRect = vCanvas.getBoundingClientRect(); const gmWindowRect = gmWindow.getBoundingClientRect();
+                
+                const startX = mountRect.left - canvasRect.left; 
+                const startY = (mountRect.top + mountRect.height/2) - canvasRect.top; 
+                const gmTargetX = gmWindowRect.right - canvasRect.left;
+
+                let absorberTargetX = gmTargetX; let hasAbsorber = false; let absorptionProb = 0;
+                const thick = DOM.thickness ? parseFloat(DOM.thickness.value) : 0; 
+                const src = DOM.source ? DOM.source.value : 'co60';
+                
+                if ((APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') && thick > 0) {
+                    hasAbsorber = true; 
+                    const absEl = document.getElementById('visual-absorber');
+                    if(absEl) absorberTargetX = absEl.getBoundingClientRect().right - canvasRect.left;
+                    let mu = PHYSICS_CONSTANTS.isotopes[src]?.mu || 0.15;
+                    absorptionProb = 1 - Math.exp(-mu * thick); 
+                }
+
+                let spawnChance = APP_STATE.isCounting ? 0.5 : 0.05; 
+                const V = DOM.voltage ? parseFloat(DOM.voltage.value) : 500;
+                if (V < 350) spawnChance = 0.01; 
+                if (APP_STATE.cosmicBurstActive) spawnChance = 0.9;
+
+                if (Math.random() < spawnChance) {
+                    let getsAbsorbed = false; let targetX = gmTargetX;
+                    if (hasAbsorber && Math.random() < absorptionProb) { getsAbsorbed = true; targetX = absorberTargetX + (Math.random()*2); }
+                    let isWavy = (src === 'sr90'); 
+                    radiationRays.push(new RadiationRay(startX, startY, targetX, APP_STATE.currentParticleColor, getsAbsorbed, isWavy));
+                }
+
+                for(let i = sparks.length - 1; i >= 0; i--) { sparks[i].update(); sparks[i].draw(); if(sparks[i].life <= 0) sparks.splice(i, 1); }
+
+                for(let i = radiationRays.length - 1; i >= 0; i--) {
+                    const r = radiationRays[i]; r.update(); r.draw();
+                    if(!r.active) {
+                        if(r.getsAbsorbed) {
+                            for(let s=0; s<4; s++) sparks.push(new Spark(r.x, r.y, '#ffffff')); 
+                            const flash = document.getElementById('absorber-flash');
+                            if(flash) { flash.style.opacity = '0.5'; setTimeout(() => { flash.style.opacity = '0'; }, 50); }
+                        } else {
+                            for(let s=0; s<6; s++) sparks.push(new Spark(r.x, r.y, '#00f2fe')); 
+                        }
+                        radiationRays.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(renderVisualApparatus);
+            };
+            renderVisualApparatus();
+        }
+
+        /* -------------------------------------------------------------------------
+           10.7 PHYSICS & COUNTING ENGINE
            ------------------------------------------------------------------------- */
         function getPoissonRandom(lambda) {
             if (lambda <= 0) return 0;
-            // Gaussian approximation for large lambda
             if (lambda > 30) { 
                 let u1 = Math.random(), u2 = Math.random(); 
                 let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2); 
                 return Math.max(0, Math.round(z0 * Math.sqrt(lambda) + lambda)); 
             }
-            // Knuth's exact algorithm for small lambda
             let L = Math.exp(-lambda), k = 0, p = 1; 
             do { k++; p *= Math.random(); } while (p > L); 
             return k - 1;
@@ -1430,46 +1255,37 @@
 
         function calculateExpectedCPM() {
             const exp = APP_STATE.currentExp; 
-            const V = parseFloat(DOM.voltage.value); 
-            const d = parseFloat(DOM.distance.value); 
-            const t = parseFloat(DOM.thickness.value); 
-            const src = DOM.source.value;
+            const V = DOM.voltage ? parseFloat(DOM.voltage.value) : 500; 
+            const d = DOM.distance ? parseFloat(DOM.distance.value) : 10; 
+            const t = DOM.thickness ? parseFloat(DOM.thickness.value) : 0; 
+            const src = DOM.source ? DOM.source.value : 'co60';
             
             let baseRate = PHYSICS_CONSTANTS.isotopes[src]?.baseActivity || 10000; 
-            
-            // Specific decay calculation for Barium-137m Half Life simulation
             if (src === 'ba137m') { 
                 let lambda = 0.693 / PHYSICS_CONSTANTS.isotopes['ba137m'].halfLife; 
                 baseRate = baseRate * Math.exp(-lambda * APP_STATE.masterTime); 
             }
 
             let calculatedCPM = APP_STATE.bgRateCPM; 
-            if (APP_STATE.cosmicBurstActive) calculatedCPM += 5000; // Inject massive burst
+            if (APP_STATE.cosmicBurstActive) calculatedCPM += 5000; 
 
-            // GM Plateau Logic (Simulating Threshold, Plateau, and Discharge regions)
             if (exp === 'plateau') {
                 let eff = 0; 
-                if (V < 350) eff = 0; // Below threshold
-                else if (V < 400) eff = (V - 350) / 50; // Proportional region
-                else if (V <= 850) eff = 1.0 + ((V - 400) * 0.0001); // Plateau (slight slope)
-                else eff = 1.0 + Math.pow(Math.E, (V - 850) / 20); // Continuous discharge
+                if (V < 350) eff = 0; 
+                else if (V < 400) eff = (V - 350) / 50; 
+                else if (V <= 850) eff = 1.0 + ((V - 400) * 0.0001); 
+                else eff = 1.0 + Math.pow(Math.E, (V - 850) / 20); 
                 
-                let d_factor = Math.pow(2 / 10, 2); // Baseline distance factor
+                let d_factor = Math.pow(2 / 10, 2); 
                 calculatedCPM += (baseRate * d_factor * eff);
             } 
-            else if (exp === 'isl') { 
-                // Inverse Square Law: Intensity is inversely proportional to square of distance
-                calculatedCPM += baseRate / Math.pow(d + 0.5, 2); 
-            }
+            else if (exp === 'isl') { calculatedCPM += baseRate / Math.pow(d + 0.5, 2); }
             else if (exp === 'absorption' || exp === 'abs_factor') {
-                // Exponential Attenuation Law
                 let R0 = baseRate / Math.pow(5 + 0.5, 2); 
                 let mu = PHYSICS_CONSTANTS.isotopes[src]?.mu || 0.15;
                 calculatedCPM += R0 * Math.exp(-mu * t);
             }
-            else if (exp === 'halflife') { 
-                calculatedCPM += baseRate / Math.pow(d + 0.5, 2); 
-            }
+            else if (exp === 'halflife') { calculatedCPM += baseRate / Math.pow(d + 0.5, 2); }
 
             return calculatedCPM;
         }
@@ -1486,7 +1302,7 @@
             const vStatus = document.getElementById('visual-status'); 
             if(vStatus) {
                 vStatus.innerText = "COUNTING"; 
-                vStatus.className = "text-[9px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/40 animate-pulse tracking-widest shadow-inner";
+                vStatus.className = "text-[9px] bg-emerald-900/40 text-emerald-400 px-2.5 py-1 rounded-md border border-emerald-500/40 animate-pulse tracking-widest shadow-inner";
             }
             
             if(DOM.dispCounts) DOM.dispCounts.innerText = "000000"; 
@@ -1498,8 +1314,6 @@
                 const trueExpectedCPM = calculateExpectedCPM();
                 const trueExpectedCPS = trueExpectedCPM / 60;
                 
-                // DEAD TIME PHYSICS: Non-paralyzable model where true rate N produces observed rate m
-                // m = N / (1 + N*tau). (Our N here is trueExpectedCPS)
                 const observedCPS = trueExpectedCPS / (1 + (trueExpectedCPS * PHYSICS_CONSTANTS.deadTime));
                 
                 APP_STATE.countTimer++;
@@ -1513,7 +1327,7 @@
                 if(DOM.dispCounts) DOM.dispCounts.innerText = String(APP_STATE.currentCounts).padStart(6, '0'); 
                 if(DOM.dispRate) DOM.dispRate.innerText = `${clicksThisSecond} CPS`;
 
-                let audioClicks = Math.min(clicksThisSecond, 20); // Cap audio events for performance
+                let audioClicks = Math.min(clicksThisSecond, 20);
                 for(let i=0; i<audioClicks; i++) { setTimeout(playGeigerClick, Math.random() * 900); }
                 
                 if (APP_STATE.countTimer >= APP_STATE.presetTimer) { stopCounting(); }
@@ -1533,7 +1347,7 @@
             const vStatus = document.getElementById('visual-status'); 
             if(vStatus) {
                 vStatus.innerText = "OFFLINE"; 
-                vStatus.className = "text-[9px] bg-rose-900/40 text-rose-400 px-2 py-1 rounded-md border border-rose-500/40 animate-pulse tracking-widest shadow-inner";
+                vStatus.className = "text-[9px] bg-rose-900/40 text-rose-400 px-2.5 py-1 rounded-md border border-rose-500/40 animate-pulse tracking-widest shadow-inner";
             }
             
             playUIBeep(400, 0.3); recordData(); updateGraph();
@@ -1548,7 +1362,7 @@
         }
 
         /* -------------------------------------------------------------------------
-           7. DATA LOGGING & GRAPHING ENGINE (Using Native Canvas)
+           10.8 DATA LOGGING & GRAPHING ENGINE
            ------------------------------------------------------------------------- */
         function updateTableHeaders() {
             const head = document.getElementById('data-table-head'); 
@@ -1562,18 +1376,12 @@
         }
 
         function recordData() {
-            const N = APP_STATE.currentCounts; 
-            const T = APP_STATE.presetTimer; 
-            const V = DOM.voltage ? DOM.voltage.value : 500; 
-            const d = DOM.distance ? DOM.distance.value : 10; 
-            const t = DOM.thickness ? DOM.thickness.value : 0;
+            const N = APP_STATE.currentCounts; const T = APP_STATE.presetTimer; 
+            const V = DOM.voltage ? DOM.voltage.value : 500; const d = DOM.distance ? DOM.distance.value : 10; const t = DOM.thickness ? DOM.thickness.value : 0;
+            const rawCPS = N / T; const bgCPS = APP_STATE.bgRateCPM / 60; 
+            const netCPS = Math.max(0, rawCPS - bgCPS); const error = Math.sqrt(N) / T; 
             
-            const rawCPS = N / T; 
-            const bgCPS = APP_STATE.bgRateCPM / 60; 
-            const netCPS = Math.max(0, rawCPS - bgCPS); 
-            const error = Math.sqrt(N) / T; // Poisson standard deviation error
             let rowData = {};
-            
             if (APP_STATE.currentExp === 'plateau') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(V), t: T, N: N, y: netCPS, err: error.toFixed(2) };
             else if (APP_STATE.currentExp === 'isl') rowData = { sno: APP_STATE.dataPoints.length + 1, d: parseFloat(d), t: T, N: N, y: netCPS, x: 1 / Math.pow(parseFloat(d), 2) };
             else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') rowData = { sno: APP_STATE.dataPoints.length + 1, x: parseFloat(t), t: T, N: N, y: netCPS, lnY: netCPS > 0 ? Math.log(netCPS).toFixed(3) : 0 };
@@ -1588,17 +1396,19 @@
             tbody.innerHTML = '';
             APP_STATE.dataPoints.forEach(row => {
                 let tr = document.createElement('tr');
-                if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td class="text-emerald-400 font-bold">${row.y.toFixed(2)}</td><td class="text-rose-400 text-[10px]">$\\pm ${row.err}$</td>`;
+                if (APP_STATE.currentExp === 'plateau') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td class="text-emerald-400 font-bold">${row.y.toFixed(2)}</td><td class="text-rose-400 text-[10px] md:text-xs">$\\pm ${row.err}$</td>`;
                 else if (APP_STATE.currentExp === 'isl') tr.innerHTML = `<td>${row.sno}</td><td>${row.d}</td><td>${row.t}</td><td>${row.N}</td><td class="text-emerald-400 font-bold">${row.y.toFixed(2)}</td><td>${row.x.toFixed(4)}</td>`;
                 else if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.t}</td><td>${row.N}</td><td class="text-emerald-400 font-bold">${row.y.toFixed(2)}</td><td>${row.lnY}</td>`;
                 else if (APP_STATE.currentExp === 'halflife') tr.innerHTML = `<td>${row.sno}</td><td>${row.x}</td><td>${row.dur}</td><td>${row.N}</td><td class="text-emerald-400 font-bold">${row.y.toFixed(2)}</td><td>${row.logN}</td>`;
                 tbody.appendChild(tr);
             }); renderMath();
+            
+            const tableContainer = tbody.parentElement.parentElement;
+            if(tableContainer) tableContainer.scrollTop = tableContainer.scrollHeight;
         }
 
         function clearData() { 
-            APP_STATE.dataPoints = []; 
-            renderTable(); updateGraph(); 
+            APP_STATE.dataPoints = []; renderTable(); updateGraph(); 
             const out = document.getElementById('ai-output');
             if(out) out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500 text-center opacity-60"><i class="fa-solid fa-robot text-3xl mb-3 text-indigo-400"></i><p>Data cleared.</p></div>`; 
         }
@@ -1608,13 +1418,12 @@
             if(!canvas) return;
             const ctx = canvas.getContext('2d'); 
             
-            const dpr = window.devicePixelRatio || 1;
             const parent = canvas.parentElement;
-            if(!parent) return;
-            const rect = parent.getBoundingClientRect();
-            
-            const width = rect.width || parent.offsetWidth || 400;
-            const height = rect.height || parent.offsetHeight || 300;
+            if(!parent || parent.clientWidth === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const width = parent.clientWidth;
+            const height = parent.clientHeight;
             
             canvas.width = width * dpr; 
             canvas.height = height * dpr; 
@@ -1625,46 +1434,38 @@
             ctx.clearRect(0, 0, width, height);
             
             if (APP_STATE.dataPoints.length === 0) { 
-                ctx.fillStyle = '#64748b'; ctx.font = '12px Roboto Mono'; ctx.textAlign = 'center'; 
+                ctx.fillStyle = '#64748b'; ctx.font = '14px Roboto Mono'; ctx.textAlign = 'center'; 
                 ctx.fillText("AWAITING DATA", width/2, height/2); 
                 return; 
             }
 
-            const m = 35; const w = width - m * 2; const h = height - m * 2;
+            const m = 40; const w = width - m * 2; const h = height - m * 2;
             
-            // Draw Grid
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.lineWidth = 1;
             for(let i=1; i<10; i++) { 
                 ctx.beginPath(); ctx.moveTo(m, m + (h/10)*i); ctx.lineTo(w + m, m + (h/10)*i); 
                 ctx.moveTo(m + (w/10)*i, m); ctx.lineTo(m + (w/10)*i, m + h); ctx.stroke(); 
             }
             
-            // Draw Main Axes
             ctx.strokeStyle = '#00f2fe'; ctx.lineWidth = 2; 
             ctx.beginPath(); ctx.moveTo(m, m); ctx.lineTo(m, h + m); ctx.lineTo(w + m, h + m); ctx.stroke();
 
-            // Establish coordinate limits
-            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x)); 
-            let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x)); 
-            let minY = 0; 
-            let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
+            let minX = Math.min(...APP_STATE.dataPoints.map(d => d.x)); let maxX = Math.max(...APP_STATE.dataPoints.map(d => d.x)); 
+            let minY = 0; let maxY = Math.max(...APP_STATE.dataPoints.map(d => d.y));
             
             if (minX === maxX) { minX -= 1; maxX += 1; } 
-            if (maxY === 0) maxY = 10; 
-            maxY *= 1.1; // 10% Headroom
+            if (maxY === 0) maxY = 10; maxY *= 1.1;
 
-            // Draw Labels
-            ctx.fillStyle = '#4ade80'; ctx.font = '10px Roboto Mono'; ctx.textAlign = 'center';
+            ctx.fillStyle = '#4ade80'; ctx.font = '12px Roboto Mono'; ctx.textAlign = 'center';
             let xLabel = "X Axis", yLabel = "Y Axis";
             if(APP_STATE.currentExp === 'plateau') { xLabel = "Voltage (V)"; yLabel = "Net CPS"; } 
             if(APP_STATE.currentExp === 'isl') { xLabel = "1/d² (cm⁻²)"; yLabel = "Net CPS"; }
             if(APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor') { xLabel = "Thickness (cm)"; yLabel = "Net CPS"; } 
             if(APP_STATE.currentExp === 'halflife') { xLabel = "Time (s)"; yLabel = "Corrected CPM"; }
             
-            ctx.fillText(xLabel, m + w/2, h + m + 25); 
-            ctx.save(); ctx.translate(m - 20, m + h/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel, 0, 0); ctx.restore();
+            ctx.fillText(xLabel, m + w/2, h + m + 30); 
+            ctx.save(); ctx.translate(m - 25, m + h/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel, 0, 0); ctx.restore();
 
-            // Least Squares Regression Line (AI Line of Best Fit)
             if (APP_STATE.dataPoints.length >= 2 && APP_STATE.currentExp !== 'plateau') {
                 let validPoints = APP_STATE.dataPoints.filter(p => { 
                     if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') { return p.y > 0; } 
@@ -1681,9 +1482,8 @@
                     let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX); 
                     let intercept = (sumY - slope * sumX) / n;
                     
-                    ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.beginPath();
                     
-                    // We only easily plot linear regressions for ISL visually here for simplicity without log scales
                     if (APP_STATE.currentExp === 'isl') {
                         let startYFit = slope * minX + intercept; let endYFit = slope * maxX + intercept;
                         let py1 = m + h - ((startYFit - minY) / (maxY - minY)) * h; let py2 = m + h - ((endYFit - minY) / (maxY - minY)) * h;
@@ -1693,7 +1493,6 @@
                 }
             }
 
-            // Draw Real Data Line connecting points
             ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 2; ctx.beginPath();
             APP_STATE.dataPoints.sort((a,b) => a.x - b.x).forEach((p, i) => { 
                 let px = m + ((p.x - minX) / (maxX - minX)) * w; 
@@ -1702,45 +1501,45 @@
             }); 
             ctx.stroke();
             
-            // Draw Interactive Points
-            ctx.shadowBlur = 8; ctx.shadowColor = '#00f2fe'; ctx.fillStyle = '#00f2fe';
+            ctx.shadowBlur = 10; ctx.shadowColor = '#00f2fe'; ctx.fillStyle = '#00f2fe';
             APP_STATE.dataPoints.forEach(p => { 
                 let px = m + ((p.x - minX) / (maxX - minX)) * w; 
                 let py = m + h - ((p.y - minY) / (maxY - minY)) * h; 
-                ctx.beginPath(); ctx.arc(px, py, 4, 0, 2*Math.PI); ctx.fill(); 
+                ctx.beginPath(); ctx.arc(px, py, 5, 0, 2*Math.PI); ctx.fill(); 
                 ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); 
             });
             ctx.shadowBlur = 0;
         }
 
         /* -------------------------------------------------------------------------
-           8. AI SOLVER & LEAST SQUARES REGRESSION COMPUTATION
+           10.9 AI SOLVER & REGRESSION COMPUTATION
            ------------------------------------------------------------------------- */
         function runAISolver() {
             const out = document.getElementById('ai-output');
             if(!out) return;
             
             if(APP_STATE.dataPoints.length < 3) { 
-                out.innerHTML = `<span class="text-rose-400 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Error: Insufficient data. Min 3 points required.</span>`; 
+                out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-rose-400 text-center"><i class="fa-solid fa-triangle-exclamation text-4xl mb-4"></i><p class="font-bold text-lg">Error: Insufficient data.</p><p class="text-sm mt-2 text-rose-300">The AI model requires a minimum of 3 valid data points to perform Least Squares Regression Analysis.</p></div>`; 
+                playUIBeep(200, 0.4, 'sawtooth');
                 return; 
             }
 
-            out.innerHTML = `<div class="flex items-center text-cyan-400"><i class="fa-solid fa-circle-notch fa-spin mr-3 text-2xl"></i> <span>AI Computing exact physical parameters via mathematical modeling...</span></div>`;
+            out.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-cyan-400"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i> <span class="font-bold tracking-widest uppercase">AI Computing physics parameters...</span><p class="text-xs text-cyan-700 mt-2">Executing Least Squares Logarithmic Regression...</p></div>`;
             playUIBeep(900, 0.1, 'triangle');
             
             setTimeout(() => {
-                let html = `<h4 class="text-emerald-400 border-b border-white/10 pb-2 mb-4 font-bold tracking-widest"><i class="fa-solid fa-microchip mr-2"></i> COMPUTATION RESULTS</h4>`;
+                let html = `<h4 class="text-emerald-400 border-b border-gray-700/50 pb-3 mb-5 font-bold tracking-widest uppercase flex items-center"><i class="fa-solid fa-microchip mr-3"></i> AI COMPUTATION RESULTS</h4>`;
+                
                 let validPoints = APP_STATE.dataPoints.filter(p => { 
                     if (APP_STATE.currentExp === 'absorption' || APP_STATE.currentExp === 'abs_factor' || APP_STATE.currentExp === 'halflife') { return p.y > 0; } 
                     return true; 
                 });
                 
                 if(validPoints.length < 2 && APP_STATE.currentExp !== 'plateau') { 
-                    out.innerHTML = html + `<span class="text-rose-400">Error: Not enough non-zero data points for logarithmic regression analysis.</span>`; 
+                    out.innerHTML = html + `<span class="text-rose-400">Error: Zero counts detected. Logarithmic regression cannot compute $\\ln(0)$. Please run simulation longer.</span>`; 
                     return; 
                 }
 
-                // Least Squares Regression Formula
                 const n = validPoints.length; let sumX=0, sumY=0, sumXY=0, sumX2=0;
                 validPoints.forEach(p => { 
                     let calcX = p.x, calcY = p.y; 
@@ -1749,38 +1548,32 @@
                 });
                 let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
                 
-                // Formulate output based on physics experiment
                 if (APP_STATE.currentExp === 'plateau') { 
-                    html += `<p class="mb-2"><strong class="text-white">Analysis:</strong> GM Plateau Voltage</p><p>Average Slope: $${slope.toFixed(4)} \\text{ CPS/V}$</p>`; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> GM Plateau Voltage Linear Regression</p><p class="text-lg">Average Plateau Slope: $${slope.toFixed(4)} \\text{ CPS/V}$</p>`; 
                 } 
                 else if (APP_STATE.currentExp === 'isl') { 
-                    html += `<p class="mb-2"><strong class="text-white">Analysis:</strong> Inverse Square Law</p><p>Linear relationship strictly verifies $I \\propto 1/d^2$ within error bounds.</p>`; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Inverse Square Law Geometric Verification</p><p class="text-lg">Linear relationship strictly verifies $I \\propto 1/d^2$ within Poisson error bounds.</p>`; 
                 }
                 else if (APP_STATE.currentExp === 'absorption') {
-                    let mu = -slope; 
-                    let hvt = 0.693 / mu; 
-                    let R_gcm2 = (hvt * 7) * PHYSICS_CONSTANTS.aluminumDensity; // Empirical range formula
-                    let Emax = (R_gcm2 + 0.09) / 0.52; // Feather's rule for end point energy
-                    html += `<p class="mb-2"><strong class="text-white">Analysis:</strong> Beta Absorption Kinetics</p><p>Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><p>Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p><p class="text-rose-400 mt-4 p-4 bg-rose-900/30 border border-rose-500/40 rounded-xl shadow-inner text-base"><strong>Maximum End-Point Energy ($E_{\\max}$):</strong> $${Emax.toFixed(3)} \\text{ MeV}$</p>`;
+                    let mu = -slope; let hvt = 0.693 / mu; let R_gcm2 = (hvt * 7) * PHYSICS_CONSTANTS.aluminumDensity;
+                    let Emax = (R_gcm2 + 0.09) / 0.52; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Beta Absorption Kinetics</p><p class="mb-2">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><p class="mb-4">Half-Value Thickness ($t_{1/2}$) = $${hvt.toFixed(3)} \\text{ cm}$</p><div class="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl shadow-inner"><p class="text-rose-400 font-bold uppercase tracking-widest text-xs mb-1">Maximum End-Point Energy ($E_{\\max}$):</p><p class="text-white text-2xl">$${Emax.toFixed(3)} \\text{ MeV}$</p></div>`;
                 }
                 else if (APP_STATE.currentExp === 'abs_factor') {
-                    let mu = -slope; 
-                    let hvt = 0.693 / mu; 
-                    let mu_m = mu / PHYSICS_CONSTANTS.aluminumDensity; 
-                    html += `<p class="mb-2"><strong class="text-white">Analysis:</strong> Mass Absorption Factor of Aluminum</p><p>Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><p class="text-emerald-400 mt-4 p-4 bg-emerald-900/30 border border-emerald-500/40 rounded-xl shadow-inner text-base"><strong>Mass Absorption Coefficient ($\\mu_m$):</strong> $${mu_m.toFixed(3)} \\text{ cm}^2\\text{/g}$</p>`;
+                    let mu = -slope; let mu_m = mu / PHYSICS_CONSTANTS.aluminumDensity; 
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Mass Absorption Factor of Aluminum</p><p class="mb-4">Linear Attenuation Coefficient ($\\mu$) = $${mu.toFixed(3)} \\text{ cm}^{-1}$</p><div class="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl shadow-inner"><p class="text-emerald-400 font-bold uppercase tracking-widest text-xs mb-1">Mass Absorption Coefficient ($\\mu_m$):</p><p class="text-white text-2xl">$${mu_m.toFixed(3)} \\text{ cm}^2\\text{/g}$</p></div>`;
                 }
                 else if (APP_STATE.currentExp === 'halflife') {
-                    let lambda = -slope; 
-                    let t12 = 0.693 / lambda;
-                    html += `<p class="mb-2"><strong class="text-white">Analysis:</strong> Radioactive Half-Life Determination</p><p>Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p><p class="text-cyan-400 mt-4 p-4 bg-cyan-900/30 border border-cyan-500/40 rounded-xl shadow-inner text-base"><strong>Computed Half-Life ($T_{1/2}$):</strong> $${t12.toFixed(1)} \\text{ s}$</p>`;
+                    let lambda = -slope; let t12 = 0.693 / lambda;
+                    html += `<p class="mb-3"><strong class="text-white">Analysis Type:</strong> Radioactive Half-Life Determination</p><p class="mb-4">Decay Constant ($\\lambda$) = $${lambda.toFixed(5)} \\text{ s}^{-1}$</p><div class="p-4 bg-cyan-950/40 border border-cyan-500/40 rounded-xl shadow-inner"><p class="text-cyan-400 font-bold uppercase tracking-widest text-xs mb-1">Computed Half-Life ($T_{1/2}$):</p><p class="text-white text-2xl">$${t12.toFixed(1)} \\text{ s}$</p></div>`;
                 }
                 
-                out.innerHTML = html; renderMath(); speakText("Analysis complete. Physics parameters calculated."); playUIBeep(600, 0.2, 'sine');
-            }, 1000);
+                out.innerHTML = html; renderMath(); speakText("Analysis complete. Physics parameters successfully calculated."); playUIBeep(600, 0.2, 'sine');
+            }, 1200);
         }
 
         /* -------------------------------------------------------------------------
-           9. EXPORTS & ACADEMIC REPORTS
+           10.10 EXPORTS & REPORTS
            ------------------------------------------------------------------------- */
         function exportCSV() {
             if(APP_STATE.dataPoints.length === 0) return alert("No data available to export.");
@@ -1805,7 +1598,7 @@
         }
 
         function generateHTMLReport() {
-            if(APP_STATE.dataPoints.length === 0) return alert("You must run the experiment to generate a report.");
+            if(APP_STATE.dataPoints.length === 0) return alert("You must run the experiment to generate an academic report.");
             
             const canvas = document.getElementById('graph-canvas'); 
             const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
@@ -1854,7 +1647,7 @@
                 <h2>3. AI Computation & Regression Analysis</h2>
                 <div class="calc">${aiOutput.innerHTML}</div>
                 
-                <div class="footer">Generated dynamically by Advanced Virtual Nuclear Physics Lab Engine v6.3</div>
+                <div class="footer">Generated dynamically by Advanced Virtual Nuclear Physics Lab Engine v6.4</div>
             </body>
             </html>`;
             
@@ -1864,7 +1657,7 @@
         }
 
         /* -------------------------------------------------------------------------
-           10. TAB & DRAGGABLE WIDGET LOGIC (Strictly Mobile-Optimized)
+           10.11 TABS & WIDGET LOGIC
            ------------------------------------------------------------------------- */
         function loadManual() {
             const manual = document.getElementById('manual-content');
@@ -1873,10 +1666,10 @@
             else if (APP_STATE.currentExp === 'isl') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Inverse Square Law</h4><p><strong>Theory:</strong> Radiation intensity emitted from an isotropic point source drops proportionally to the square of the distance from the source: $I \\propto \\frac{1}{d^2}$. A plot of Count Rate vs $1/d^2$ yields a straight line verifying the geometric distribution of radiation.</p>`;
             else if (APP_STATE.currentExp === 'absorption') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Beta Particle Absorption</h4><p><strong>Theory:</strong> Beta particles are absorbed roughly exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$. By experimentally determining the Half-Value Thickness ($t_{1/2}$) where the intensity is halved, we can use empirical range formulas to determine the Maximum End-Point Energy ($E_{\\max}$) of the specific beta spectrum.</p>`;
             else if (APP_STATE.currentExp === 'abs_factor') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Mass Absorption Coefficient</h4><p><strong>Theory:</strong> The linear absorption coefficient ($\\mu$) depends heavily on the density of the absorbing material. The <strong>Mass Absorption Factor</strong> removes this density dependence from the attenuation equation. It is defined as $\\mu_m = \\frac{\\mu}{\\rho}$. For Aluminum, $\\rho \\approx 2.70 \\text{ g/cm}^3$. This factor is useful for comparing the shielding effectiveness of different materials independent of their physical state.</p>`;
-            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Radioactive Half-Life</h4><p><strong>Theory:</strong> Radioactive decay is a random Poisson process that follows the exponential decay law $N(t) = N_0 e^{-\\lambda t}$, where $\\lambda$ is the decay constant. The half-life is the time required for half of the radioactive nuclei to decay, mathematically given by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.</p>`;
+            else if (APP_STATE.currentExp === 'halflife') manual.innerHTML = `<h4 class="text-cyan-400 font-bold mb-2">Radioactive Half-Life</h4><p><strong>Theory:</strong> Radioactive decay is a random Poisson process that follows the exponential decay law $N(t) = N_0 e^{-\\lambda t}$, where $\\lambda$ is the decay constant. The half-life is calculated by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.</p>`;
             renderMath();
         }
-        
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('fade-in'); });
             document.querySelectorAll('.tab-btn').forEach(el => { 
@@ -1887,15 +1680,15 @@
             if(target) {
                 target.classList.remove('hidden'); void target.offsetWidth; target.classList.add('fade-in');
             }
-            let btn = document.getElementById(`btn-${tabId}`); 
+            const btn = document.querySelector(`[data-target="${tabId}"]`);
             if(btn) {
                 btn.classList.add('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-400/40', 'shadow-[0_0_15px_rgba(0,242,254,0.2)]'); 
                 btn.classList.remove('text-gray-400', 'border-transparent');
             }
-            if(tabId === 'tab-graph') updateGraph(); 
+            if(tabId === 'tab-graph') setTimeout(updateGraph, 50); 
             playUIBeep(700, 0.05);
         }
-        
+
         function toggleWidget(id) { 
             const w = document.getElementById(id); 
             if(!w) return;
@@ -1903,64 +1696,70 @@
                 w.style.display = 'none'; 
             } else {
                 w.style.display = 'flex'; 
-                // Center widget securely within viewport
-                w.style.left = Math.max(10, (window.innerWidth - w.offsetWidth) / 2) + 'px'; 
-                w.style.top = Math.max(10, (window.innerHeight - w.offsetHeight) / 2) + 'px'; 
+                const newLeft = Math.max(10, (window.innerWidth - w.offsetWidth) / 2);
+                const newTop = Math.max(10, (window.innerHeight - w.offsetHeight) / 2);
+                w.style.left = `${newLeft}px`; w.style.top = `${newTop}px`; 
                 playUIBeep(500, 0.1);
             }
         }
-        
-        // Touch/Mouse Draggable Widget Logic - Fully Android Optimized
-        let isDragging = false, currentWidget = null, offsetX, offsetY;
-        
-        document.querySelectorAll('.widget-header').forEach(h => { 
-            const startDrag = function(e) { 
-                // Don't drag if clicking the close button or inputs
-                if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button') || e.target.tagName.toLowerCase() === 'input') return; 
-                isDragging = true; currentWidget = this.parentElement; 
+
+        function makeDraggable(widgetId, handleId) {
+            const widget = document.getElementById(widgetId);
+            const handle = document.getElementById(handleId);
+            if(!widget || !handle) return;
+
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            const onDragStart = (e) => {
+                if(e.target.tagName.toLowerCase() === 'button' || e.target.closest('button') || e.target.tagName.toLowerCase() === 'input') return;
+                isDragging = true;
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                 
-                let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; 
-                let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY; 
-                
-                const rect = currentWidget.getBoundingClientRect();
-                offsetX = clientX - rect.left; 
-                offsetY = clientY - rect.top; 
+                const rect = widget.getBoundingClientRect();
+                startX = clientX; startY = clientY;
+                initialLeft = rect.left; initialTop = rect.top;
+                widget.style.transition = 'none';
             };
-            h.addEventListener('mousedown', startDrag); 
-            // passive: false allows us to conditionally prevent default during move to stop scrolling
-            h.addEventListener('touchstart', startDrag, {passive: false}); 
-        });
-        
-        const doDrag = function(e) { 
-            if (isDragging && currentWidget) { 
-                // Prevent scrolling the body while dragging the widget on Android
-                if(e.cancelable && !e.type.includes('mouse')) e.preventDefault(); 
+
+            const onDragMove = (e) => {
+                if (!isDragging) return;
+                if(e.type.includes('touch')) e.preventDefault(); 
                 
-                let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; 
-                let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY; 
-                let newX = clientX - offsetX; 
-                let newY = clientY - offsetY;
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                 
-                // Safe bounds checking referencing documentElement for mobile address bars
-                const maxX = document.documentElement.clientWidth - currentWidget.offsetWidth;
-                const maxY = window.innerHeight - currentWidget.offsetHeight; 
+                let newX = initialLeft + (clientX - startX);
+                let newY = initialTop + (clientY - startY);
+                
+                const maxX = document.documentElement.clientWidth - widget.offsetWidth;
+                const maxY = window.innerHeight - widget.offsetHeight;
                 
                 newX = Math.max(0, Math.min(newX, maxX));
                 newY = Math.max(0, Math.min(newY, maxY));
                 
-                currentWidget.style.left = newX + 'px'; currentWidget.style.top = newY + 'px'; 
-            } 
-        };
-        
-        document.addEventListener('mousemove', doDrag); 
-        document.addEventListener('touchmove', doDrag, {passive: false});
-        
-        const stopDrag = function() { isDragging = false; currentWidget = null; }; 
-        document.addEventListener('mouseup', stopDrag); 
-        document.addEventListener('touchend', stopDrag);
+                widget.style.left = `${newX}px`;
+                widget.style.top = `${newY}px`;
+            };
+
+            const onDragEnd = () => { 
+                if(isDragging) {
+                    isDragging = false; 
+                    widget.style.transition = 'opacity 0.3s, transform 0.3s';
+                }
+            };
+
+            handle.addEventListener('mousedown', onDragStart);
+            handle.addEventListener('touchstart', onDragStart, {passive: false});
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('touchmove', onDragMove, {passive: false});
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchend', onDragEnd);
+        }
 
         /* -------------------------------------------------------------------------
-           11. SCIENTIFIC CALCULATOR LOGIC
+           10.12 CALCULATOR & CHAT WIDGET LOGIC
            ------------------------------------------------------------------------- */
         let calcStr = "0";
         function updateCalc() { 
@@ -1989,9 +1788,41 @@
             catch(e) { calcStr = "Error"; updateCalc(); } 
         }
 
-        /* -------------------------------------------------------------------------
-           12. DEEP AI CHATBOT LOGIC
-           ------------------------------------------------------------------------- */
+        function initCalculator() {
+            const container = document.getElementById('calc-buttons');
+            if(!container) return;
+            const buttons = [
+                { text: 'AC', action: () => calcOp('clear'), classes: 'col-span-2 liquid-btn bg-rose-500/20 text-rose-300 p-3 rounded-lg border-rose-500/20 shadow-inner' },
+                { text: 'DEL', action: () => calcOp('del'), classes: 'liquid-btn bg-gray-700/50 text-gray-300 p-3 rounded-lg border-gray-600/20 shadow-inner' },
+                { text: '/', action: () => calcOp('/'), classes: 'liquid-btn bg-cyan-500/20 text-cyan-300 p-3 rounded-lg border-cyan-500/20 shadow-inner' },
+                { text: '√', action: () => calcMath('sqrt'), classes: 'liquid-btn bg-gray-800/80 text-emerald-300 p-3 rounded-lg border-gray-700/50 shadow-inner' },
+                { text: 'x²', action: () => calcMath('sq'), classes: 'liquid-btn bg-gray-800/80 text-emerald-300 p-3 rounded-lg border-gray-700/50 shadow-inner' },
+                { text: 'ln', action: () => calcMath('ln'), classes: 'liquid-btn bg-gray-800/80 text-emerald-300 p-3 rounded-lg border-gray-700/50 shadow-inner' },
+                { text: 'eˣ', action: () => calcMath('exp'), classes: 'liquid-btn bg-gray-800/80 text-emerald-300 p-3 rounded-lg border-gray-700/50 shadow-inner' },
+                { text: '7', action: () => calcNum(7), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '8', action: () => calcNum(8), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '9', action: () => calcNum(9), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '×', action: () => calcOp('*'), classes: 'liquid-btn bg-cyan-500/20 text-cyan-300 p-3 rounded-lg border-cyan-500/20 shadow-inner' },
+                { text: '4', action: () => calcNum(4), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '5', action: () => calcNum(5), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '6', action: () => calcNum(6), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '-', action: () => calcOp('-'), classes: 'liquid-btn bg-cyan-500/20 text-cyan-300 p-3 rounded-lg border-cyan-500/20 shadow-inner' },
+                { text: '1', action: () => calcNum(1), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '2', action: () => calcNum(2), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '3', action: () => calcNum(3), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '+', action: () => calcOp('+'), classes: 'liquid-btn bg-cyan-500/20 text-cyan-300 p-3 rounded-lg border-cyan-500/20 shadow-inner' },
+                { text: '0', action: () => calcNum(0), classes: 'col-span-2 liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '.', action: () => calcNum('.'), classes: 'liquid-btn bg-white/5 text-white p-3 rounded-lg border-white/5 hover:bg-white/10' },
+                { text: '=', action: () => calcEq(), classes: 'liquid-btn bg-emerald-500/30 text-emerald-300 p-3 rounded-lg font-bold border-emerald-500/30 text-glow-emerald shadow-[0_0_15px_rgba(16,185,129,0.2)]' }
+            ];
+            buttons.forEach(b => {
+                let btn = document.createElement('button');
+                btn.className = b.classes; btn.innerText = b.text;
+                btn.addEventListener('click', b.action);
+                container.appendChild(btn);
+            });
+        }
+
         function sendChat() {
             const input = document.getElementById('chat-input'); 
             if(!input) return;
@@ -2001,56 +1832,82 @@
             const history = document.getElementById('chat-history');
             const typing = document.getElementById('chat-typing');
 
-            // Append User Message
             if(history) {
-                history.innerHTML += `<div class="text-white text-right mb-3"><span class="bg-blue-500/20 border border-blue-400/40 px-3 py-1.5 rounded-xl rounded-tr-sm inline-block shadow-[0_0_10px_rgba(59,130,246,0.1)]">> ${input.value}</span></div>`; 
+                history.innerHTML += `<div class="text-white text-right mb-4"><span class="bg-blue-500/20 border border-blue-400/40 px-4 py-2 rounded-xl rounded-tr-sm inline-block shadow-[0_0_10px_rgba(59,130,246,0.1)]">> ${input.value}</span></div>`; 
                 input.value = ''; 
                 history.scrollTop = history.scrollHeight;
             }
 
-            // Show Typing Indicator
-            if(typing) {
-                typing.classList.remove('hidden'); typing.classList.add('flex'); 
-                if(history) history.scrollTop = history.scrollHeight;
-            }
+            if(typing) { typing.classList.remove('hidden'); typing.classList.add('flex'); if(history) history.scrollTop = history.scrollHeight; }
 
-            // Expanded AI Knowledge Base
-            let reply = "I am ready to compute. Ask me about...";
+            let reply = "I am an analytical physics model. Ask me about Dead Time ($\\tau$), Poisson stats, Half-life equations, ISL, or the new Mass Absorption Factor.";
             
-            if(msg.includes('error') || msg.includes('poisson')) {
-                reply = "Statistical error in nuclear counting is strictly related to Poisson probability. The standard deviation is Error $= \\pm \\sqrt{N}$. This is because radioactive decay is a completely random, independent event.";
-            } else if(msg.includes('mass') || msg.includes('factor')) {
-                reply = "The Mass Absorption coefficient removes density dependence. $\\mu_m = \\frac{\\mu}{\\rho}$. The AI will compute this automatically for you using Least Squares Regression.";
-            } else if(msg.includes('dead') || msg.includes('tau') || msg.includes('resolving')) {
-                reply = "Dead time ($\\tau$) prevents the tube from recording simultaneous events. The system automatically corrects expected true counts $N$ to observed counts $m$ using the non-paralyzable model: $m = \\frac{N}{1 + N\\tau}$. Our simulated GM tube has a dead time of 200 microseconds.";
-            } else if(msg.includes('plateau') || msg.includes('voltage')) {
-                reply = "The Geiger-Muller plateau is the voltage range where the count rate is almost constant. Operating below this range (proportional region) misses counts. Operating above it causes continuous electrical discharge, ruining the tube.";
-            } else if(msg.includes('inverse') || msg.includes('square') || msg.includes('isl')) {
-                reply = "The Inverse Square Law states that radiation intensity drops proportionally to the square of the distance: $I \\propto 1/d^2$. This is purely a geometric effect of isotropic emission.";
-            } else if(msg.includes('absorption') || msg.includes('beta')) {
-                reply = "Beta particles are absorbed exponentially by matter like Aluminum. $I = I_0 e^{-\\mu t}$. By measuring the Half-Value Thickness (HVT), we can determine the maximum end-point energy of the beta spectrum.";
-            } else if(msg.includes('half life') || msg.includes('decay') || msg.includes('lambda')) {
-                reply = "Radioactive decay follows the exponential law $N(t) = N_0 e^{-\\lambda t}$. The half-life is the time taken for half the atoms to decay, given by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.";
-            } else if(msg.includes('quiet') || msg.includes('noise')) {
-                reply = "Strict lab rules. Silence is mandatory for precise sub-atomic measurements. Ambient sound vibrations can theoretically interfere with sensitive high-voltage equipment.";
-            } else if(msg.includes('hello') || msg.includes('hi')) {
-                reply = "Greetings. Terminal linked. Physics simulation parameters are stable and ready for input.";
-            } else {
-                reply = "Query not recognized in current lab database. Please ask about GM plateau, dead time, inverse square law, absorption factor, half-life, or Poisson statistics.";
-            }
+            if(msg.includes('error') || msg.includes('poisson')) reply = "Statistical error in nuclear counting is strictly mathematically bound to Poisson probability. The standard deviation is Error $= \\pm \\sqrt{N}$. This occurs because radioactive decay is a perfectly random event.";
+            else if(msg.includes('mass') || msg.includes('factor')) reply = "The Mass Absorption coefficient explicitly removes density dependence from material attenuation. $\\mu_m = \\frac{\\mu}{\\rho}$. The AI engine computes this automatically during analysis.";
+            else if(msg.includes('dead') || msg.includes('tau') || msg.includes('resolving')) reply = "Dead time ($\\tau$) physically prevents the tube from recording simultaneous events. The system mathematically corrects expected true counts $N$ to observed counts $m$ using the non-paralyzable model: $m = \\frac{N}{1 + N\\tau}$. Our hardware operates at a dead time of 200µs.";
+            else if(msg.includes('plateau') || msg.includes('voltage')) reply = "The Geiger-Muller plateau is the safe operating voltage range. Operating below it misses counts. Operating above it triggers Townsend Avalanches (continuous electrical discharge), permanently ruining the tube.";
+            else if(msg.includes('inverse') || msg.includes('square') || msg.includes('isl')) reply = "The Inverse Square Law states radiation intensity drops proportionally to the square of the distance: $I \\propto 1/d^2$. This is a pure geometric consequence of isotropic sphere emission in 3D space.";
+            else if(msg.includes('absorption') || msg.includes('beta') || msg.includes('attenuation')) reply = "Beta particles are absorbed exponentially by dense matter like Aluminum. Equation: $I = I_0 e^{-\\mu t}$. By dynamically measuring the Half-Value Thickness (HVT), we determine the maximum end-point energy of the beta emission spectrum.";
+            else if(msg.includes('half life') || msg.includes('decay') || msg.includes('lambda')) reply = "Radioactive decay obeys the fundamental exponential law $N(t) = N_0 e^{-\\lambda t}$. The half-life is mathematically given by $T_{1/2} = \\frac{\\ln(2)}{\\lambda}$.";
+            else if(msg.includes('quiet') || msg.includes('noise')) reply = "Strict lab protocols state silence is mandatory. Artificial error margins will be algorithmically appended to your results if ambient decibels exceed 40dB.";
+            else if(msg.includes('hello') || msg.includes('hi')) reply = "Greetings. Terminal linked successfully. Nuclear Physics simulation parameters are currently stable.";
 
-            // Simulated Delay for realism
             setTimeout(() => { 
-                if(typing) {
-                    typing.classList.add('hidden'); typing.classList.remove('flex');
-                }
+                if(typing) { typing.classList.add('hidden'); typing.classList.remove('flex'); }
                 if(history) {
-                    history.innerHTML += `<div class="text-blue-200 bg-blue-900/40 p-3.5 rounded-xl border border-blue-500/30 shadow-inner mb-3 rounded-tl-sm"><strong>System:</strong> ${reply}</div>`; 
+                    history.innerHTML += `<div class="text-blue-200 bg-blue-900/40 p-4 rounded-xl border border-blue-500/30 shadow-inner mb-4 rounded-tl-sm leading-relaxed"><strong>System:</strong> ${reply}</div>`; 
                     history.scrollTop = history.scrollHeight; 
                 }
                 renderMath(); speakText(reply); playUIBeep(600, 0.1);
-            }, 1500 + Math.random() * 1000); 
+            }, 1200 + Math.random() * 800); 
         }
+
+        /* -------------------------------------------------------------------------
+           10.13 INITIALIZATION & STARTUP BINDINGS
+           ------------------------------------------------------------------------- */
+        
+        // Settings bindings
+        document.getElementById('btn-close-settings')?.addEventListener('click', closeSettingsModal);
+        document.getElementById('btn-close-update')?.addEventListener('click', closeUpdateModal);
+        
+        // Header Controls
+        document.getElementById('btn-reset')?.addEventListener('click', universalReset);
+        document.getElementById('btn-audio')?.addEventListener('click', toggleAudio);
+        document.getElementById('btn-voice')?.addEventListener('click', toggleVoice);
+        document.getElementById('btn-toggle-calc')?.addEventListener('click', () => toggleWidget('widget-calc'));
+        document.getElementById('btn-toggle-chat')?.addEventListener('click', () => toggleWidget('widget-chat'));
+        document.getElementById('btn-toggle-settings')?.addEventListener('click', toggleSettingsModal);
+
+        // Apparatus Controls
+        document.getElementById('btn-burst')?.addEventListener('click', injectCosmicBurst);
+        document.getElementById('btn-start')?.addEventListener('click', startCounting);
+        document.getElementById('btn-stop')?.addEventListener('click', stopCounting);
+        document.getElementById('btn-clear-scaler')?.addEventListener('click', resetApparatus);
+
+        // Data & Graph Analytics Controls
+        document.getElementById('btn-clear-data')?.addEventListener('click', clearData);
+        document.getElementById('btn-export-csv')?.addEventListener('click', exportCSV);
+        document.getElementById('btn-export-png')?.addEventListener('click', exportPNG);
+        document.getElementById('btn-run-ai')?.addEventListener('click', runAISolver);
+        document.getElementById('btn-gen-report')?.addEventListener('click', generateHTMLReport);
+        document.getElementById('btn-read-manual')?.addEventListener('click', () => {
+            const manual = document.getElementById('manual-content');
+            if(manual) speakText(manual.innerText);
+        });
+
+        // Chat Widget Controls
+        document.getElementById('btn-close-chat')?.addEventListener('click', () => toggleWidget('widget-chat'));
+        document.getElementById('btn-send-chat')?.addEventListener('click', sendChat);
+        
+        // Calculator Widget Controls
+        document.getElementById('btn-close-calc')?.addEventListener('click', () => toggleWidget('widget-calc'));
+        
+        // Init Systems
+        initCalculator();
+        makeDraggable('widget-calc', 'widget-calc-header');
+        makeDraggable('widget-chat', 'widget-chat-header');
+        initBackground();
+        
     </script>
 </body>
 </html>
